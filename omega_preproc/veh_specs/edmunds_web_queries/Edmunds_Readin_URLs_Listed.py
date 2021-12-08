@@ -27,7 +27,7 @@ working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_sp
 run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019_test.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 50 # print final_table csv file at the final_table_to_csv_inc increments
-cols_airbags = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
                 "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
                 "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
                 "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
@@ -135,14 +135,14 @@ for run_count in range (0,len(run_controller)):
     final_table = final_table.reset_index(drop=True)
 
     cols_final_table = list(final_table)
-    cols_safety = []
-    for i in range (len(cols_airbags)):
-        icol_airbag = cols_airbags[i]
-        if icol_airbag in cols_final_table:
-            cols_safety += [icol_airbag]
+    _icols_safety = []
+    for i in range (len(cols_safety)):
+        icol_safety = cols_safety[i]
+        if icol_safety in cols_final_table:
+            _icols_safety += [icol_safety]
 
     final_table = movecol(final_table,
-                 cols_to_move=cols_safety,
+                 cols_to_move= _icols_safety,
                  ref_col='CYLINDER DEACTIVATION',
                  place='After')
 
