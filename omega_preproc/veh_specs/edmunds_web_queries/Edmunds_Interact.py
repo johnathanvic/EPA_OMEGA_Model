@@ -473,7 +473,7 @@ def Edmunds_Interact(url):
     sleep_sec = 0.5
     wait_sec = 30
     _max_trim_groups_count = 20 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
-    _max_trim_buttons =  60     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
+    _max_trim_buttons =  50     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
     _num_menu_columns = 1 # 3 trims were displayed in 2020, and changed the trim column to 1 in 2021
     trim_options = []
     num_column_shift = 2 #

@@ -8,11 +8,32 @@ from datetime import datetime
 from pathlib import *
 
 # pip install pandas numpy selenium beautifulsoup4 html5lib lxml
+def movecol(df, cols_to_move=[], ref_col='', place='After'):
+    cols = df.columns.tolist()
+    if place == 'After':
+        seg1 = cols[:list(cols).index(ref_col) + 1]
+        seg2 = cols_to_move
+    if place == 'Before':
+        seg1 = cols[:list(cols).index(ref_col)]
+        seg2 = cols_to_move + [ref_col]
+
+    seg1 = [i for i in seg1 if i not in seg2]
+    seg3 = [i for i in cols if i not in seg1 + seg2]
+
+    return (df[seg1 + seg2 + seg3])
+
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2012.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019_test.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 50 # print final_table csv file at the final_table_to_csv_inc increments
+cols_airbags = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+                "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
+                "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+                "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
+                "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
+                "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
+
 for run_count in range (0,len(run_controller)):
     if run_count > 0: del final_table, reformatted_table
     continued_readin = str(run_controller['Continue Readin'][run_count])
@@ -103,11 +124,28 @@ for run_count in range (0,len(run_controller)):
             #         working_directory + output_name.split('.')[0] + '_Category_Specifications_' + timestr + '.csv',
             #         index=False)
 
+    # https: // towardsdatascience.com / reordering - pandas - dataframe - columns - thumbs - down - on - standard - solutions - 1ff0bc2941d5
+    # my_list = df.columns.values.tolist() or my_list = list(df)
+    # print (type(my_list))
+
     final_table['URL'] = final_table['URL'].str.upper()
     final_table = final_table.sort_values('URL')
     final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
     final_table = final_table.fillna('')
     final_table = final_table.reset_index(drop=True)
+
+    cols_final_table = list(final_table)
+    cols_safety = []
+    for i in range (len(cols_airbags)):
+        icol_airbag = cols_airbags[i]
+        if icol_airbag in cols_final_table:
+            cols_safety += [icol_airbag]
+
+    final_table = movecol(final_table,
+                 cols_to_move=cols_safety,
+                 ref_col='CYLINDER DEACTIVATION',
+                 place='After')
+
     timestr = time.strftime("%Y%m%d-%H%M%S")
     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + timestr + '.csv', index=False)
 
