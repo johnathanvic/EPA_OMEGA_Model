@@ -146,8 +146,7 @@ for run_count in range (0,len(run_controller)):
         if icol_safety in cols_final_table:
             _icols_safety += [icol_safety]
 
-    final_table = movecol(final_table,
-                 cols_to_move= _icols_safety, ref_cols = ['CYLINDER DEACTIVATION', 'CAM TYPE'], place='After')
+    final_table = movecol(final_table, cols_to_move= _icols_safety, ref_cols = ['CYLINDER DEACTIVATION', 'CAM TYPE'], place='After')
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + timestr + '.csv', index=False)
