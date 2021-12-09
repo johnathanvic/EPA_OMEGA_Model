@@ -12,7 +12,7 @@ def movecol(df, cols_to_move=[], ref_cols='', place='After'):
     cols = df.columns.tolist()
     if ref_cols[0] in cols:
         ref_col = ref_cols[0]
-    elseif len(ref_cols) > 0:
+    elif len(ref_cols) > 0:
         ref_col = ref_cols[1]
 
     if place == 'After':
@@ -146,7 +146,7 @@ for run_count in range (0,len(run_controller)):
         if icol_safety in cols_final_table:
             _icols_safety += [icol_safety]
 
-    final_table = movecol(final_table, cols_to_move= _icols_safety, ref_cols = ['CYLINDER DEACTIVATION', 'CAM TYPE'], place='After')
+    final_table = movecol(final_table, cols_to_move= _icols_safety, ref_cols = ['CAM TYPE', 'CYLINDER DEACTIVATION'], place='After')
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + timestr + '.csv', index=False)
