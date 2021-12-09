@@ -8,8 +8,13 @@ from datetime import datetime
 from pathlib import *
 
 # pip install pandas numpy selenium beautifulsoup4 html5lib lxml
-def movecol(df, cols_to_move=[], ref_col='', place='After'):
+def movecol(df, cols_to_move=[], ref_cols='', place='After'):
     cols = df.columns.tolist()
+    if ref_cols[0] in cols:
+        ref_col = ref_cols[0]
+    else:
+        ref_col = ref_cols[1]
+
     if place == 'After':
         seg1 = cols[:list(cols).index(ref_col) + 1]
         seg2 = cols_to_move
@@ -142,9 +147,7 @@ for run_count in range (0,len(run_controller)):
             _icols_safety += [icol_safety]
 
     final_table = movecol(final_table,
-                 cols_to_move= _icols_safety,
-                 ref_col='CYLINDER DEACTIVATION',
-                 place='After')
+                 cols_to_move= _icols_safety, ref_col = ['CYLINDER DEACTIVATION', 'CAM TYPE'], place='After')
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + timestr + '.csv', index=False)
