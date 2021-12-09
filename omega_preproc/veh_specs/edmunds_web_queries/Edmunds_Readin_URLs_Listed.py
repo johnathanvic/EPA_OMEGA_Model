@@ -12,7 +12,7 @@ def movecol(df, cols_to_move=[], ref_cols='', place='After'):
     cols = df.columns.tolist()
     if ref_cols[0] in cols:
         ref_col = ref_cols[0]
-    else:
+    elseif len(ref_cols) > 0:
         ref_col = ref_cols[1]
 
     if place == 'After':
