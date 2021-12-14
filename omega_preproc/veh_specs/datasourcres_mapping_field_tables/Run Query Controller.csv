@@ -1,6 +1,6 @@
 Desired Field,QueryType,AvgWtField,BoundingField,USE_YN,,model_year,master_index_source,aggregating_fields_input,,descriptions,database_definition_files,,aggregating_fields_input_list,,SetBodyIDtoLineageID,,notes
-Carline Class,all,,,y,,2019,Master Index,Carline Manufacturer Code,,field_mapping filename,field_mapping_20210715.csv,,Calc ID,,1,,field_mapping_OEM.csv
-Carline Class Description,all,,,y,,,,Model Type Index,,data_sources filename,data_sources_20210802.csv,,Fuel Usage,,,,data_sources_OEM.csv
+Carline Class,all,,,y,,2019,Master Index,Carline Manufacturer Code,,field_mapping filename,field_mapping_20211210.csv,,Calc ID,,1,,field_mapping_OEM.csv
+Carline Class Description,all,,,y,,,,Model Type Index,,data_sources filename,data_sources_20211210.csv,,Fuel Usage,,,,data_sources_OEM.csv
 Carline Code,all,,,n,,,,Electrification Category,,Main mapping category key filename,main_mapping_category_key_20210715.csv,,Fuel Usage Descriptio,,,,main_mapping_category_key_OEM.csv
 Carline Manufacturer Code,all,,,y,,,,Boost Type Category,,,,,Powertrain Category,,,,
 Carline Manufacturer Name,all,,,y,,,,,,,,,,,,,
@@ -9,11 +9,11 @@ Carline Name,all,,,y,,,,,,,,,,,,,
 50 State Production Volume (TLAAS),sum,,,n,,,,,,,,,,,,,
 50 State Production Volume (Total),sum,,,n,,,,,,,,,,,,,
 Air Aspiration,all,,,n,,,,,,,,,,,,,
-Air Aspiration Description,all,,,n,,,,,,,,,BodyID,,,,
-Air Injection,all,,,n,,,,,,,,,LineageID,,,,field_mapping_c047b62a_20210314.csv
-Air Injection Description,all,,,n,,,,,,,,,Carline Class Description,,,,data_sources_20210322.csv
-Approach Angle,max,,,n,,,,,,,,,Compliance Category Code,,,,main_mapping_category_key_20210322.csv
-Approach Angle,min,,,n,,,,,,,,,Electrification Category,,,,
+Air Aspiration Description,all,,,n,,,,,,,,,,,,,
+Air Injection,all,,,n,,,,,,,,,,,,,
+Air Injection Description,all,,,n,,,,,,,,,,,,,
+Approach Angle,max,,,n,,,,,,,,,,,,,
+Approach Angle,min,,,n,,,,,,,,,,,,,
 Approach Angle,avg,FOOTPRINT_SUBCONFIG_VOLUMES,,n,,,,,,,,,,,,,
 A Coefficient,avg,FOOTPRINT_SUBCONFIG_VOLUMES,,y,,,,,,,,,,,,,
 A Coefficient,min,,,y,,,,,,,,,,,,,
@@ -239,7 +239,7 @@ Final City Fuel Economy,max,,,y,,,,,,,,,,,,,
 Final City Fuel Economy,all,,,y,,,,,,,,,,,,,
 Final City GHG,avg,FOOTPRINT_SUBCONFIG_VOLUMES,,y,,,,,,,,,,,,,
 Final City GHG,min,,,y,,,,,,,,,,,,,
-Final City GHG,avg,FOOTPRINT_SUBCONFIG_VOLUMES,,y,,,,,,,,,,,,,
+Final City GHG,max,,,y,,,,,,,,,,,,,
 Final City GHG,all,,,y,,,,,,,,,,,,,
 Final Combined Fuel Economy,avg,FOOTPRINT_SUBCONFIG_VOLUMES,,y,,,,,,,,,,,,,
 Final Combined Fuel Economy,min,,,y,,,,,,,,,,,,,
@@ -433,3 +433,14 @@ Width,max,,,y,,,,,,,,,,,,,
 Wheels,avg,FOOTPRINT_SUBCONFIG_VOLUMES,,n,,,,,,,,,,,,,
 Wheels,min,,,n,,,,,,,,,,,,,
 Wheels,max,,,n,,,,,,,,,,,,,
+DUAL FRONT SIDE-MOUNTED AIRBAGS,all,,,y,,,,,,,,,,,,,
+DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS,all,,,y,,,,,,,,,,,,,
+DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS,all,,,y,,,,,,,,,,,,,
+DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS,all,,,y,,,,,,,,,,,,,
+DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS,all,,,y,,,,,,,,,,,,,
+"FRONT, REAR AND THIRD ROW HEAD AIRBAGS",all,,,y,,,,,,,,,,,,,
+FRONT AND REAR HEAD AIRBAGS,all,,,y,,,,,,,,,,,,,
+FRONT HEAD AIRBAGS,all,,,y,,,,,,,,,,,,,
+STABILITY CONTROL,all,,,y,,,,,,,,,,,,,
+TRACTION CONTROL,all,,,y,,,,,,,,,,,,,
+TIRE PRESSURE MONITORING,all,,,y,,,,,,,,,,,,,

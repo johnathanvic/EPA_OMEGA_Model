@@ -841,6 +841,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
 
             import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
+            # vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['CARLINE_NAME'] == 'Rio', :]
             output_array = Calculate_Powertrain_Efficiency.Calculate_Powertrain_Efficiency( \
                 vehghg_file_nonflexfuel['TEMP_ID'], vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'], \
                 vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'], vehghg_file_nonflexfuel['TARGET_COEF_B_BEST'], vehghg_file_nonflexfuel['TARGET_COEF_C_BEST'], vehghg_file_nonflexfuel['VEH_ETW'], \
@@ -915,7 +916,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'FOOTPRINT_SUBCONFIG_VOLUMES'] = 0
 
             vehghg_file_output['RLHP_FROM_RLCOEFFS'] = ((vehghg_file_output['TARGET_COEF_A_BEST'] + (50 * vehghg_file_output['TARGET_COEF_B_BEST']) \
-                         + ((50 * 50) * vehghg_file_output['TARGET_COEF_C_BEST'])) * 50 * lbfmph2hp).replace(0, np.nan)
+                         + ((50 * 50) * vehghg_file_output['TARGET_COEF_C_BEST'])) * 50 * lbfmph2hp).replace(0, np.nan) # dtmp = vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['PTEFF_FROM_RLCOEFFS'] == '', :]
             v_aero_mph = 45
             air_density = 1.17 * kgpm32slugpft3
             vehghg_file_output['CDA_FROM_RLCOEFFS'] = pd.Series(

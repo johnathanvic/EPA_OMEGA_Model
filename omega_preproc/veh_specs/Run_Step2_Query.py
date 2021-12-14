@@ -4,6 +4,12 @@ import datetime
 import os
 
 pd.options.mode.chained_assignment = None  # default='warn'
+cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+                "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
+                "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+                "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
+                "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
+                "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
 
 def weighted_average(grp):
     if grp[weighting_field]._get_numeric_data().sum() == 0: # if all the weighting factors are zero, take a simple average. Otherwise, it will calculate as 0/0.
@@ -364,6 +370,8 @@ for model_year in model_years:
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
+            # if information_toget_source_column_name == 'STABILITY CONTROL':
+            #     print(information_toget_source_column_name)
             if (aggregating_fields==information_toget).sum() == 0 and len(master_index_file_with_desired_fields_all_merges[\
                     ~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name])]) > 0:
                 print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
@@ -439,6 +447,8 @@ for model_year in model_years:
                 elif query_type == 'all':
                     # if information_toget_source_column_name == 'FINAL_CALC_CITY_FE_4':
                     #     print(information_toget_source_column_name)
+                    if "AIRBAGS" in information_toget_source_column_name:
+                        print(information_toget_source_column_name, master_index_file_with_desired_field_all_merges[information_toget_source_column_name].unique())
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]].groupby(\
                         list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: '|'.join(map(str, x))).reset_index()
@@ -572,6 +582,7 @@ for model_year in model_years:
     query_output.loc[(query_output['TARGET_COEF_BEST_MTH_min'] == 0) & (query_output['TARGET_COEF_BEST_MTH_max'] == 1), 'TARGET_COEF_BEST_MTH'] = 0 #.replace('', 0, inplace=True, regex=True)
     if '_plus_MTH_34' in master_index_filename: Query_filename = 'Query_plus_MTH_34'
     else: Query_filename = 'Query_MTH_012'
+
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)

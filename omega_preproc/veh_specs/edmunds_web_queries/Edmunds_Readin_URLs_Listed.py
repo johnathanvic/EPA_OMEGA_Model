@@ -145,6 +145,8 @@ for run_count in range (0,len(run_controller)):
         icol_safety = cols_safety[i]
         if icol_safety in cols_final_table:
             _icols_safety += [icol_safety]
+            if len(final_table.loc[final_table[icol_safety] == '']) > 0:
+                final_table[icol_safety] = final_table[icol_safety].replace('', 'null ')
 
     final_table = movecol(final_table, cols_to_move= _icols_safety, ref_cols = ['CAM TYPE', 'CYLINDER DEACTIVATION'], place='After')
 
@@ -153,3 +155,4 @@ for run_count in range (0,len(run_controller)):
 
     time_elapsed = datetime.now() - start_time
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
+
