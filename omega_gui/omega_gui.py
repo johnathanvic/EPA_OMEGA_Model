@@ -244,7 +244,7 @@ class Form(QObject):
 
         from PySide2.QtWidgets import QVBoxLayout
 
-        # create a generic QWidget to hold plots
+        # create a generic QWidget to hold plots (does **NOT** work if you create plot_widget in Qt Creator!!)
         self.window.plot_widget = QWidget(self.window.plot_scroll)
 
         # create a vertical layout and apply it to the plot_widget (set as parent in constructor below)
