@@ -80,6 +80,18 @@ log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
 
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+
+
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        from matplotlib.figure import Figure
+
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
+
 
 class Form(QObject):
 
@@ -155,8 +167,8 @@ class Form(QObject):
         # self.enable_run_button(False)
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
-        self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
-        self.window.results_comment.setStyleSheet(development_stylesheet(""))
+        # self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
+        # self.window.results_comment.setStyleSheet(development_stylesheet(""))
 
         # Load stylesheet for tab control
         stylesheet = ""
@@ -226,6 +238,36 @@ class Form(QObject):
         timer.start()
         # Setup the gui
         self.initialize_gui()
+
+        ################################################################
+        import matplotlib
+
+        from PySide2.QtWidgets import QVBoxLayout
+
+        # create a generic QWidget to hold plots
+        self.window.plot_widget = QWidget(self.window.plot_scroll)
+
+        # create a vertical layout and apply it to the plot_widget (set as parent in constructor below)
+        self.window.plot_layout = QVBoxLayout(self.window.plot_widget)
+        # self.window.plot_layout.setSizeConstraint(PySide2.QtWidgets.QLayout.SetMinAndMaxSize)
+
+        # set the scroll area widget contents to the plot_widget (so it knows what size widget it contains)
+        self.window.plot_scroll.setWidget(self.window.plot_widget)
+        # tell the scroll area NOT to auto-resize the plot widget to fit (or you won't get scroll bars!!)
+        self.window.plot_scroll.setWidgetResizable(False)
+
+        # Create the maptlotlib FigureCanvas object,
+        # which defines a single set of axes as self.axes.
+        sc = MplCanvas(self, width=2.75, height=2.5, dpi=100)
+        sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
+        self.window.plot_layout.addWidget(sc)
+
+        sc2 = MplCanvas(self, width=2.75, height=2.5, dpi=100)
+        sc2.axes.plot([0, 1, 2, 3, 4], [5, 6, 7, 8, 10])
+        self.window.plot_layout.addWidget(sc2)
+
+        # adjust the size of the plot widget or you will only get a gray rectangle and no plots!
+        self.window.plot_widget.adjustSize()
 
     def new_file(self):
         """
@@ -718,6 +760,8 @@ class Form(QObject):
 
         self.window.model_status_label.setText("Model Idle")
         self.window.select_plot_3.setEnabled(0)
+
+
 
     def clear_entries(self):
         """

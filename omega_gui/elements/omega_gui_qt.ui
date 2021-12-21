@@ -31,8 +31,8 @@
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>1101</width>
-      <height>401</height>
+      <width>1091</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="font">
@@ -56,7 +56,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <property name="iconSize">
      <size>
@@ -535,33 +535,49 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QTextEdit" name="results_comment">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
+     <widget class="QScrollArea" name="plot_scroll">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>15</y>
-        <width>1061</width>
-        <height>336</height>
+        <x>760</x>
+        <y>50</y>
+        <width>321</width>
+        <height>311</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>30</pointsize>
-        <weight>75</weight>
-        <italic>true</italic>
-        <bold>true</bold>
-       </font>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="toolTip">
-       <string>Feature Under Development</string>
+      <property name="baseSize">
+       <size>
+        <width>300</width>
+        <height>300</height>
+       </size>
       </property>
-      <property name="autoFillBackground">
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="widgetResizable">
        <bool>false</bool>
       </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>319</width>
+         <height>309</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
      <zorder>list_graphs_1</zorder>
      <zorder>available_plots_1_label_2</zorder>
@@ -570,7 +586,7 @@
      <zorder>available_plots_1_label_3</zorder>
      <zorder>select_plot_3</zorder>
      <zorder>select_plot_2</zorder>
-     <zorder>results_comment</zorder>
+     <zorder>plot_scroll</zorder>
     </widget>
     <widget class="QWidget" name="options_tab">
      <attribute name="title">
@@ -742,7 +758,7 @@
      <x>0</x>
      <y>0</y>
      <width>1121</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu1">
