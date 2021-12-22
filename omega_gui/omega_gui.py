@@ -88,9 +88,9 @@ class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         from matplotlib.figure import Figure
 
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        super(MplCanvas, self).__init__(fig)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        super(MplCanvas, self).__init__(self.fig)
 
 
 class Form(QObject):
@@ -138,9 +138,13 @@ class Form(QObject):
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
-        self.window.open_plot_2.clicked.connect(self.open_plot_2)
         self.window.select_plot_2.clicked.connect(self.select_plot_2)
         self.window.select_plot_3.clicked.connect(self.select_plot_3)
+
+        self.window.comboBox_x.currentTextChanged.connect(self.open_plot_2)
+        self.window.comboBox_y.currentTextChanged.connect(self.open_plot_2)
+        self.window.list_graphs_2.itemSelectionChanged.connect(self.open_plot_2)
+
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -190,9 +194,6 @@ class Form(QObject):
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
         self.window.run_model_button.setStyleSheet(stylesheet)
-        self.window.open_plot_2.setStyleSheet(stylesheet)
-        self.window.select_plot_2.setStyleSheet(stylesheet)
-        self.window.select_plot_3.setStyleSheet(stylesheet)
         self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for text boxes
@@ -207,8 +208,9 @@ class Form(QObject):
         # Load stylesheet for list boxes
         stylesheet = ""
         stylesheet = listbox_stylesheet(stylesheet)
-        self.window.list_graphs_1.setStyleSheet(stylesheet)
         self.window.list_graphs_2.setStyleSheet(stylesheet)
+        self.window.select_plot_2.setStyleSheet(stylesheet)
+        self.window.select_plot_3.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -225,7 +227,6 @@ class Form(QObject):
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
-        self.window.available_plots_1_label_2.setStyleSheet(stylesheet)
         self.window.available_plots_1_label_3.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
 
@@ -258,16 +259,22 @@ class Form(QObject):
 
         # Create the maptlotlib FigureCanvas object,
         # which defines a single set of axes as self.axes.
-        sc = MplCanvas(self, width=2.75, height=2.5, dpi=100)
-        sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
+        sc = MplCanvas(self, width=self.window.plot_scroll.width()/100 - 0.4,
+                       height=self.window.plot_scroll.height()/110, dpi=100)
+        # sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
         self.window.plot_layout.addWidget(sc)
 
-        sc2 = MplCanvas(self, width=2.75, height=2.5, dpi=100)
-        sc2.axes.plot([0, 1, 2, 3, 4], [5, 6, 7, 8, 10])
+        sc2 = MplCanvas(self, width=self.window.plot_scroll.width()/100 - 0.4,
+                       height=self.window.plot_scroll.height()/110, dpi=100)
+        # sc2.axes.plot([0, 1, 2, 3, 4], [5, 6, 7, 8, 10])
         self.window.plot_layout.addWidget(sc2)
 
         # adjust the size of the plot widget or you will only get a gray rectangle and no plots!
         self.window.plot_widget.adjustSize()
+
+        self.result_plots = [sc, sc2]
+
+        pass
 
     def new_file(self):
         """
@@ -761,8 +768,6 @@ class Form(QObject):
         self.window.model_status_label.setText("Model Idle")
         self.window.select_plot_3.setEnabled(0)
 
-
-
     def clear_entries(self):
         """
         Clears all fields in the gui.
@@ -1080,7 +1085,6 @@ class Form(QObject):
         file_dialog_title = 'Select Run Directory'
         file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
         if file_name == "":
-            self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
             return()
 
@@ -1088,18 +1092,10 @@ class Form(QObject):
         plot_select_directory_name = os.path.basename(os.path.normpath(file_name))
         # print(plot_select_directory_name)
 
-        self.window.list_graphs_1.clear()
-        input_file = path + 'omega_gui/elements/plot_definition.csv'
-        plot_data_df = pandas.read_csv(input_file)
-        for index, row in plot_data_df.iterrows():
-            # print(row['plot_name'])
-            self.window.list_graphs_1.addItem(row['plot_name'])
-
         self.window.list_graphs_2.clear()
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         plot_select_directory = input_file
         if not os.path.exists(input_file):
-            self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
             return()
         plot_data_df1 = pandas.read_csv(input_file)
@@ -1117,11 +1113,6 @@ class Form(QObject):
 
         global plot_select_directory_name
         global plot_select_directory
-        self.window.list_graphs_1.clear()
-        input_file = path + 'omega_gui/elements/plot_definition.csv'
-        plot_data_df = pandas.read_csv(input_file)
-        for index, row in plot_data_df.iterrows():
-            self.window.list_graphs_1.addItem(row['plot_name'])
 
         self.window.list_graphs_2.clear()
         plot_select_directory_path = output_batch_subdirectory
@@ -1129,13 +1120,18 @@ class Form(QObject):
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         plot_select_directory = input_file
         if not os.path.exists(input_file):
-            self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
             return()
         plot_data_df1 = pandas.read_csv(input_file)
+        self.summary_results_df = plot_data_df1.copy()
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
         for index, row in plot_data_df1.iterrows():
             self.window.list_graphs_2.addItem(row['session_name'])
+
+        self.window.list_graphs_2.setCurrentRow(0)
+
+        self.update_result_plot_comboboxes(plot_data_df1.columns)
+        pass
 
     def open_plot_2(self):
         """
@@ -1146,16 +1142,40 @@ class Form(QObject):
 
         global plot_select_directory_name
         global plot_select_directory
-        # See if valid selections have been made
-        if self.window.list_graphs_1.currentItem() is not None and self.window.list_graphs_2.currentItem() is not None:
-            # Get plot selections
-            a = self.window.list_graphs_1.selectedIndexes()[0]
-            b = self.window.list_graphs_2.selectedIndexes()[0]
-            # Send plot selections to plot function
-            c = "Plotting Data: [" + b.data() + "] [" + a.data() + "] From: " + plot_select_directory_name
-            self.event_monitor(c, "black", 'dt')
-            test_plot_2(a.data(), b.data(), plot_select_directory_name, plot_select_directory)
 
+        selected_sessions = [i.text() for i in self.window.list_graphs_2.selectedItems()]
+        selected_rows = [i.row() for i in self.window.list_graphs_2.selectedIndexes()]
+
+        self.result_plots[0].axes.cla()
+        if self.window.comboBox_x.currentText() != '' and self.window.comboBox_y.currentText() != '':
+            for selected_row, session_name in zip(selected_rows, selected_sessions):
+                session_rows = self.summary_results_df['session_name'] == session_name
+
+                x_name = self.window.comboBox_x.currentText()
+                y_name = self.window.comboBox_y.currentText()
+
+                x_data = self.summary_results_df.loc[session_rows, x_name]
+                y_data = self.summary_results_df.loc[session_rows, y_name]
+
+                self.result_plots[0].axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
+
+            self.result_plots[0].axes.set_xlabel(x_name)
+            self.result_plots[0].axes.set_ylabel(y_name)
+            self.result_plots[0].axes.legend()
+            self.result_plots[0].axes.grid()
+
+        self.result_plots[0].fig.tight_layout()
+        self.result_plots[0].draw()  # redraw plot
+        pass
+
+    def update_result_plot_comboboxes(self, var_names):
+        self.window.comboBox_x.addItems(var_names)
+        self.window.comboBox_y.addItems(var_names)
+        pass
+
+    def update_result_plot(self):
+
+        pass
 
 def status_bar():
     """

@@ -31,8 +31,8 @@
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>1091</width>
-      <height>421</height>
+      <width>1101</width>
+      <height>651</height>
      </rect>
     </property>
     <property name="font">
@@ -56,7 +56,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -378,6 +378,51 @@
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
      </widget>
+     <widget class="QLabel" name="event_monitor_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>350</y>
+        <width>201</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Event Monitor records ongoing program events</string>
+      </property>
+      <property name="text">
+       <string>Event Monitor</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="event_monitor_result">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>1081</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Event Monitor records ongoing program events</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="results_tab">
      <property name="enabled">
@@ -386,162 +431,13 @@
      <attribute name="title">
       <string>Results</string>
      </attribute>
-     <widget class="QListWidget" name="list_graphs_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>220</y>
-        <width>501</width>
-        <height>141</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="available_plots_1_label_2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>190</y>
-        <width>481</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Available Plots</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="open_plot_2">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>220</y>
-        <width>71</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Plots the selected parameters</string>
-      </property>
-      <property name="text">
-       <string>Plot</string>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="list_graphs_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>501</width>
-        <height>141</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="available_plots_1_label_3">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>10</y>
-        <width>471</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Available Scenarios</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_plot_2">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>80</y>
-        <width>211</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Selects previous model run for plotting</string>
-      </property>
-      <property name="text">
-       <string>Select Previous Run</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_plot_3">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>40</y>
-        <width>211</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Selects current model run for plotting</string>
-      </property>
-      <property name="text">
-       <string>Select Current Run</string>
-      </property>
-      <property name="autoDefault">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
      <widget class="QScrollArea" name="plot_scroll">
       <property name="geometry">
        <rect>
-        <x>760</x>
-        <y>50</y>
-        <width>321</width>
-        <height>311</height>
+        <x>320</x>
+        <y>10</y>
+        <width>760</width>
+        <height>601</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -552,8 +448,8 @@
       </property>
       <property name="baseSize">
        <size>
-        <width>300</width>
-        <height>300</height>
+        <width>760</width>
+        <height>360</height>
        </size>
       </property>
       <property name="mouseTracking">
@@ -561,6 +457,9 @@
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -579,14 +478,132 @@
        </property>
       </widget>
      </widget>
-     <zorder>list_graphs_1</zorder>
-     <zorder>available_plots_1_label_2</zorder>
-     <zorder>open_plot_2</zorder>
-     <zorder>list_graphs_2</zorder>
-     <zorder>available_plots_1_label_3</zorder>
-     <zorder>select_plot_3</zorder>
-     <zorder>select_plot_2</zorder>
-     <zorder>plot_scroll</zorder>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>301</width>
+        <height>601</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>X</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="comboBox_y">
+           <property name="placeholderText">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Y</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="comboBox_x">
+           <property name="placeholderText">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="select_plot_2">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>12</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Selects previous model run for plotting</string>
+           </property>
+           <property name="text">
+            <string>Select Previous Run</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="select_plot_3">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>12</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Selects current model run for plotting</string>
+           </property>
+           <property name="text">
+            <string>Select Current Run</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="available_plots_1_label_3">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>12</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string> Available Sessions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="list_graphs_2">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="options_tab">
      <attribute name="title">
@@ -667,47 +684,6 @@
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QTextEdit" name="event_monitor_result">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>510</y>
-      <width>1101</width>
-      <height>211</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Consolas</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Event Monitor records ongoing program events</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="event_monitor_label">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>480</y>
-      <width>191</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Event Monitor records ongoing program events</string>
-    </property>
-    <property name="text">
-     <string>Event Monitor</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="background_widget" native="true">
     <property name="geometry">
      <rect>
@@ -748,8 +724,6 @@
    </widget>
    <zorder>background_widget</zorder>
    <zorder>main_title_1_label</zorder>
-   <zorder>event_monitor_result</zorder>
-   <zorder>event_monitor_label</zorder>
    <zorder>tab_select</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
