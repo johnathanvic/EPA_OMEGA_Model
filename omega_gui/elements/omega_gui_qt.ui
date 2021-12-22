@@ -453,7 +453,7 @@
        </size>
       </property>
       <property name="mouseTracking">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
