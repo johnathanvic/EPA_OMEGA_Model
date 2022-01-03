@@ -138,12 +138,12 @@ class Form(QObject):
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
-        self.window.select_plot_2.clicked.connect(self.select_plot_2)
-        self.window.select_plot_3.clicked.connect(self.select_plot_3)
+        self.window.select_previous_run.clicked.connect(self.select_previous_run)
+        self.window.select_current_run.clicked.connect(self.select_current_run)
 
         self.window.comboBox_x.currentTextChanged.connect(self.open_plot_2)
         self.window.comboBox_y.currentTextChanged.connect(self.open_plot_2)
-        self.window.list_graphs_2.itemSelectionChanged.connect(self.open_plot_2)
+        self.window.sessions_list.itemSelectionChanged.connect(self.open_plot_2)
 
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
@@ -208,9 +208,9 @@ class Form(QObject):
         # Load stylesheet for list boxes
         stylesheet = ""
         stylesheet = listbox_stylesheet(stylesheet)
-        self.window.list_graphs_2.setStyleSheet(stylesheet)
-        self.window.select_plot_2.setStyleSheet(stylesheet)
-        self.window.select_plot_3.setStyleSheet(stylesheet)
+        self.window.sessions_list.setStyleSheet(stylesheet)
+        self.window.select_previous_run.setStyleSheet(stylesheet)
+        self.window.select_current_run.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -223,11 +223,11 @@ class Form(QObject):
         # self.window.configuration_file_1_label.setStyleSheet(stylesheet)
         self.window.input_batch_file_1_label.setStyleSheet(stylesheet)
         self.window.output_batch_directory_1_label.setStyleSheet(stylesheet)
-        self.window.project_description_1_label.setStyleSheet(stylesheet)
+        self.window.project_description_label.setStyleSheet(stylesheet)
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
-        self.window.available_plots_1_label_3.setStyleSheet(stylesheet)
+        self.window.sessions_label.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
@@ -766,7 +766,7 @@ class Form(QObject):
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
         self.window.model_status_label.setText("Model Idle")
-        self.window.select_plot_3.setEnabled(0)
+        self.window.select_current_run.setEnabled(0)
 
     def clear_entries(self):
         """
@@ -1060,7 +1060,7 @@ class Form(QObject):
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
         self.window.multiprocessor_checkbox.setEnabled(enable)
-        self.window.select_plot_3.setEnabled(enable)
+        self.window.select_current_run.setEnabled(enable)
 
         if enable == 1:
             # Check if dispy is running.
@@ -1071,7 +1071,7 @@ class Form(QObject):
         else:
             self.window.multiprocessor_checkbox.setEnabled(0)
 
-    def select_plot_2(self):
+    def select_previous_run(self):
         """
         Opens a Windows dialog to select a previous model run for plotting.
 
@@ -1085,26 +1085,26 @@ class Form(QObject):
         file_dialog_title = 'Select Run Directory'
         file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
         if file_name == "":
-            self.window.list_graphs_2.clear()
+            self.window.sessions_list.clear()
             return()
 
         plot_select_directory_path = file_name
         plot_select_directory_name = os.path.basename(os.path.normpath(file_name))
         # print(plot_select_directory_name)
 
-        self.window.list_graphs_2.clear()
+        self.window.sessions_list.clear()
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         plot_select_directory = input_file
         if not os.path.exists(input_file):
-            self.window.list_graphs_2.clear()
+            self.window.sessions_list.clear()
             return()
         plot_data_df1 = pandas.read_csv(input_file)
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
         for index, row in plot_data_df1.iterrows():
             # print(row['plot_name'])
-            self.window.list_graphs_2.addItem(row['session_name'])
+            self.window.sessions_list.addItem(row['session_name'])
 
-    def select_plot_3(self):
+    def select_current_run(self):
         """
         Opens the current model run for plotting.
 
@@ -1114,21 +1114,21 @@ class Form(QObject):
         global plot_select_directory_name
         global plot_select_directory
 
-        self.window.list_graphs_2.clear()
+        self.window.sessions_list.clear()
         plot_select_directory_path = output_batch_subdirectory
         plot_select_directory_name = os.path.basename(os.path.normpath(output_batch_subdirectory))
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         plot_select_directory = input_file
         if not os.path.exists(input_file):
-            self.window.list_graphs_2.clear()
+            self.window.sessions_list.clear()
             return()
         plot_data_df1 = pandas.read_csv(input_file)
         self.summary_results_df = plot_data_df1.copy()
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
         for index, row in plot_data_df1.iterrows():
-            self.window.list_graphs_2.addItem(row['session_name'])
+            self.window.sessions_list.addItem(row['session_name'])
 
-        self.window.list_graphs_2.setCurrentRow(0)
+        self.window.sessions_list.setCurrentRow(0)
 
         self.update_result_plot_comboboxes(plot_data_df1.columns)
         pass
@@ -1143,8 +1143,8 @@ class Form(QObject):
         global plot_select_directory_name
         global plot_select_directory
 
-        selected_sessions = [i.text() for i in self.window.list_graphs_2.selectedItems()]
-        selected_rows = [i.row() for i in self.window.list_graphs_2.selectedIndexes()]
+        selected_sessions = [i.text() for i in self.window.sessions_list.selectedItems()]
+        selected_rows = [i.row() for i in self.window.sessions_list.selectedIndexes()]
 
         self.result_plots[0].axes.cla()
         if self.window.comboBox_x.currentText() != '' and self.window.comboBox_y.currentText() != '':
