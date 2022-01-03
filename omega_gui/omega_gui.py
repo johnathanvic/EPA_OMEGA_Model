@@ -1213,6 +1213,7 @@ def run_gui():
     global form
 
     app = QApplication(sys.argv)
+    # app.setStyle('Fusion')
     # Load the gui
     uifilename = path + 'omega_gui/elements/omega_gui_qt.ui'
     print('uifilename = %s' % uifilename)
@@ -1221,11 +1222,17 @@ def run_gui():
 
 
 if __name__ == '__main__':
+    from PySide2 import QtCore
+
     import platform
+
     if platform.system() == 'Darwin':
         # workaround for PySide2 on MacOS Big Sur
         import os
         os.environ['QT_MAC_WANTS_LAYER'] = '1'
+
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+
     # ***** Added for new plot
     # import sys
     # if sys.flags.interactive != 1 or not hasattr(pg.QtCore, 'PYQT_VERSION'):
@@ -1233,4 +1240,5 @@ if __name__ == '__main__':
     # if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
     #     QtGui.QApplication.instance().exec_()
     # *****
+
     run_gui()

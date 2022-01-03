@@ -614,6 +614,12 @@
              </item>
              <item row="3" column="1">
               <widget class="QComboBox" name="comboBox_y">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
                <property name="placeholderText">
                 <string/>
                </property>
@@ -634,8 +640,17 @@
              </item>
              <item row="2" column="1">
               <widget class="QComboBox" name="comboBox_x">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>22</height>
+                </size>
+               </property>
                <property name="placeholderText">
                 <string/>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -732,7 +747,14 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox"/>
+                 <widget class="QComboBox" name="comboBox">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>22</height>
+                   </size>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -795,9 +817,6 @@
              </property>
              <property name="mouseTracking">
               <bool>false</bool>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Plain</enum>
