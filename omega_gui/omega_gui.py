@@ -102,7 +102,7 @@ class Form(QObject):
         ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
         loader.registerCustomWidget(myWidget)
-        loader.registerCustomWidget(myWindow)
+        loader.registerCustomWidget(omegaQMainWindow)
         self.window = loader.load(ui_file)
         ui_file.close()
 

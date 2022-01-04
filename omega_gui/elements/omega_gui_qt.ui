@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>main_window</class>
- <widget class="myWindow" name="main_window">
+ <widget class="omegaQMainWindow" name="main_window">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -1005,7 +1005,7 @@
           <property name="widgetResizable">
            <bool>false</bool>
           </property>
-          <widget class="myWidget" name="scrollAreaWidgetContents">
+          <widget class="QWidget" name="scrollAreaWidgetContents">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -1249,15 +1249,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>myWidget</class>
+   <class>omegaQMainWindow</class>
    <extends>QWidget</extends>
-   <header>myWidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>myWindow</class>
-   <extends>QWidget</extends>
-   <header>mywindow.h</header>
+   <header>omegaQMainWindow.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
