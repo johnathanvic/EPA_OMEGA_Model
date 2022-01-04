@@ -82,16 +82,7 @@ log_file_session_suffix = "_ReferencePolicy.txt"
 
 # from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
-from mplcanvas import myWidget, MplCanvas
-
-# class MplCanvas(FigureCanvasQTAgg):
-#
-#     def __init__(self, parent=None, width=5, height=4, dpi=100):
-#         from matplotlib.figure import Figure
-#
-#         self.fig = Figure(figsize=(width, height), dpi=dpi)
-#         self.axes = self.fig.add_subplot(111)
-#         super(MplCanvas, self).__init__(self.fig)
+from mplcanvas import *
 
 
 class Form(QObject):
@@ -110,6 +101,8 @@ class Form(QObject):
         ui_file = QFile(ui_file)
         ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
+        loader.registerCustomWidget(myWidget)
+        loader.registerCustomWidget(myWindow)
         self.window = loader.load(ui_file)
         ui_file.close()
 
@@ -275,7 +268,7 @@ class Form(QObject):
         # adjust the size of the plot widget or you will only get a gray rectangle and no plots!
         self.window.plot_widget.adjustSize()
 
-        self.result_plots = [sc, sc2]
+        self.window.result_plots = [sc, sc2]
 
         pass
 
@@ -1149,7 +1142,7 @@ class Form(QObject):
         selected_sessions = [i.text() for i in self.window.sessions_list.selectedItems()]
         selected_rows = [i.row() for i in self.window.sessions_list.selectedIndexes()]
 
-        self.result_plots[0].axes.cla()
+        self.window.result_plots[0].axes.cla()
         if self.window.comboBox_x.currentText() != '' and self.window.comboBox_y.currentText() != '':
             for selected_row, session_name in zip(selected_rows, selected_sessions):
                 session_rows = self.summary_results_df['session_name'] == session_name
@@ -1160,15 +1153,15 @@ class Form(QObject):
                 x_data = self.summary_results_df.loc[session_rows, x_name]
                 y_data = self.summary_results_df.loc[session_rows, y_name]
 
-                self.result_plots[0].axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
+                self.window.result_plots[0].axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
 
-            self.result_plots[0].axes.set_xlabel(x_name)
-            self.result_plots[0].axes.set_ylabel(y_name)
-            self.result_plots[0].axes.legend()
-            self.result_plots[0].axes.grid()
+            self.window.result_plots[0].axes.set_xlabel(x_name)
+            self.window.result_plots[0].axes.set_ylabel(y_name)
+            self.window.result_plots[0].axes.legend()
+            self.window.result_plots[0].axes.grid()
 
-        self.result_plots[0].fig.tight_layout()
-        self.result_plots[0].draw()  # redraw plot
+        self.window.result_plots[0].fig.tight_layout()
+        self.window.result_plots[0].draw()  # redraw plot
         pass
 
     def update_result_plot_comboboxes(self, var_names):

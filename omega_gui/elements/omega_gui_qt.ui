@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>main_window</class>
- <widget class="QMainWindow" name="main_window">
+ <widget class="myWindow" name="main_window">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1037</width>
-    <height>754</height>
+    <width>719</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -123,6 +123,14 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>708</width>
+     <height>572</height>
+    </rect>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <property name="spacing">
      <number>0</number>
@@ -381,7 +389,7 @@
           <item>
            <widget class="QPushButton" name="select_input_batch_file_button">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -997,7 +1005,7 @@
           <property name="widgetResizable">
            <bool>false</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
+          <widget class="myWidget" name="scrollAreaWidgetContents">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -1139,6 +1147,14 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>3</width>
+     <height>22</height>
+    </rect>
+   </property>
   </widget>
   <action name="action_open_configuration_file">
    <property name="text">
@@ -1231,6 +1247,20 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>myWidget</class>
+   <extends>QWidget</extends>
+   <header>myWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>myWindow</class>
+   <extends>QWidget</extends>
+   <header>mywindow.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
