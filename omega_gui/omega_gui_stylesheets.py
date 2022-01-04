@@ -18,7 +18,7 @@ def tab_stylesheet(stylesheet):
             QTabBar::tab { 
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                             stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
-                min-width: 150px;       /* Sets the width of the tabs */
+                min-width: 100px;       /* Sets the width of the tabs */
                 height: 30px;           /* Sets the height of the tabs */
                 padding-top : 0px;      /* Sets extra space at the top of the tabs */
                 padding-bottom : 0px;   /* Sets extra space at the bottom of the tabs */
@@ -46,23 +46,6 @@ def tab_stylesheet(stylesheet):
                 background: rgb(32, 84, 147);  /* Sets the color of the unselected tabs */
                 }
             """
-    return stylesheet
-
-
-def background_stylesheet(stylesheet):
-    """
-    Loads the stylesheet for the main window of the gui.
-
-    :param stylesheet:
-    :return: String containing stylesheet.
-    """
-
-    stylesheet = """
-        QWidget {
-            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
-            }
-     """
     return stylesheet
 
 
