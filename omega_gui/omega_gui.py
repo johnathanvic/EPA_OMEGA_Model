@@ -80,17 +80,18 @@ log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
+from mplcanvas import myWidget, MplCanvas
 
-class MplCanvas(FigureCanvasQTAgg):
-
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        from matplotlib.figure import Figure
-
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.fig.add_subplot(111)
-        super(MplCanvas, self).__init__(self.fig)
+# class MplCanvas(FigureCanvasQTAgg):
+#
+#     def __init__(self, parent=None, width=5, height=4, dpi=100):
+#         from matplotlib.figure import Figure
+#
+#         self.fig = Figure(figsize=(width, height), dpi=dpi)
+#         self.axes = self.fig.add_subplot(111)
+#         super(MplCanvas, self).__init__(self.fig)
 
 
 class Form(QObject):
