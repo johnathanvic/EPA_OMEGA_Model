@@ -224,11 +224,18 @@ class Form(QObject):
         self.window.model_status_label.setStyleSheet(stylesheet)
         self.window.sessions_label.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
+        self.window.x_label.setStyleSheet(stylesheet)
+        self.window.y_label.setStyleSheet(stylesheet)
+        self.window.ref_session_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
         stylesheet = ""
         stylesheet = checkbox_stylesheet(stylesheet)
         self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
+
+        stylesheet = ""
+        stylesheet = groupbox_stylesheet(stylesheet)
+        self.window.session_groupbox.setStyleSheet(stylesheet)
 
         # Timer start
         timer.start()
