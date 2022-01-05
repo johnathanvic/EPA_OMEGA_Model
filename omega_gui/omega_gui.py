@@ -82,7 +82,7 @@ log_file_session_suffix = "_ReferencePolicy.txt"
 
 # from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
-from mplcanvas import *
+from omega_gui_widgets import *
 
 
 class Form(QObject):
