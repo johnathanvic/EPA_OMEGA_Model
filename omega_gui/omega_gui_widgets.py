@@ -50,7 +50,14 @@ class omegaQMainWindow(QMainWindow):
             # resizing the widget resizes the plots automatically:
             # self.plot_widget.resize(self.plot_scroll.width() - 20,
             #                         self.plot_scroll.height() * 0.96 * len(self.result_plots))
-            self.plot_widget.resize(self.plot_scroll.width() - 20,
-                                    self.plot_scroll.height() * len(self.result_plots) - 34)
+            w = self.plot_scroll.width() - 20
+            # h = min(1 * w, self.plot_scroll.height() * len(self.result_plots)) - 34
+            h = 1.75 * w - 34
+
+            self.plot_widget.resize(w,h)
+
+            for plot_canvas in self.result_plots:
+                plot_canvas.fig.tight_layout()
+
         except:
             pass
