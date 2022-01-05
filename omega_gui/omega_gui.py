@@ -1154,7 +1154,9 @@ class Form(QObject):
         selected_sessions = [i.text() for i in self.window.sessions_list.selectedItems()]
         selected_rows = [i.row() for i in self.window.sessions_list.selectedIndexes()]
 
-        self.window.result_plots[0].axes.cla()
+        plot_canvas = self.window.result_plots[0]
+
+        plot_canvas.axes.cla()
         if self.window.comboBox_x.currentText() != '' and self.window.comboBox_y.currentText() != '':
             for selected_row, session_name in zip(selected_rows, selected_sessions):
                 session_rows = self.summary_results_df['session_name'] == session_name
@@ -1165,15 +1167,49 @@ class Form(QObject):
                 x_data = self.summary_results_df.loc[session_rows, x_name]
                 y_data = self.summary_results_df.loc[session_rows, y_name]
 
-                self.window.result_plots[0].axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
+                plot_canvas.axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
 
-            self.window.result_plots[0].axes.set_xlabel(x_name)
-            self.window.result_plots[0].axes.set_ylabel(y_name)
-            self.window.result_plots[0].axes.legend()
-            self.window.result_plots[0].axes.grid()
+            plot_canvas.axes.set_xlabel(x_name)
+            plot_canvas.axes.set_ylabel(y_name)
+            plot_canvas.axes.legend()
+            plot_canvas.axes.grid()
 
-        self.window.result_plots[0].fig.tight_layout()
-        self.window.result_plots[0].draw()  # redraw plot
+        plot_canvas.fig.tight_layout()
+        plot_canvas.draw()  # redraw plot
+
+
+        # plot delta data
+        data_plotted = False
+        ref_session_name = self.window.ref_session_select.currentText()
+        plot_canvas = self.window.result_plots[1]
+        plot_canvas.axes.cla()
+        if self.window.comboBox_x.currentText() != '' and self.window.comboBox_y.currentText() != '':
+            for selected_row, session_name in zip(selected_rows, selected_sessions):
+                if session_name != ref_session_name:
+                    data_plotted = True
+                    session_rows = self.summary_results_df['session_name'] == session_name
+                    ref_session_rows = self.summary_results_df['session_name'] == ref_session_name
+
+                    x_name = self.window.comboBox_x.currentText()
+                    y_name = self.window.comboBox_y.currentText()
+
+                    x_data = self.summary_results_df.loc[session_rows, x_name]
+                    y_data = self.summary_results_df.loc[session_rows, y_name].values - \
+                                self.summary_results_df.loc[ref_session_rows, y_name].values
+
+                    plot_canvas.axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
+
+        if data_plotted:
+            plot_canvas.axes.set_xlabel(x_name)
+            plot_canvas.axes.set_ylabel('delta ' + y_name)
+            plot_canvas.axes.legend()
+            plot_canvas.axes.grid()
+
+        plot_canvas.fig.tight_layout()
+        plot_canvas.draw()  # redraw plot
+
+        self.window.plot_widget.resize(self.window.plot_scroll.width() - 20,
+                                self.window.plot_scroll.height() * len(self.window.result_plots) - 34)
         pass
 
     def update_result_plot_comboboxes(self, var_names):
@@ -1181,9 +1217,6 @@ class Form(QObject):
         self.window.comboBox_y.addItems(var_names)
         pass
 
-    def update_result_plot(self):
-
-        pass
 
 def status_bar():
     """
