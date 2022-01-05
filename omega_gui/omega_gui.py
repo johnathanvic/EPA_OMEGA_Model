@@ -174,6 +174,9 @@ class Form(QObject):
         # stylesheet = test1(stylesheet)
         self.window.tab_select.setStyleSheet(stylesheet)
 
+        stylesheet = vtab_stylesheet(stylesheet)
+        self.window.plotmode_select.setStyleSheet(stylesheet)
+
         # Load stylesheet for buttons
         stylesheet = ""
         stylesheet = button_stylesheet(stylesheet)
