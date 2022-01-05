@@ -135,9 +135,9 @@ class Form(QObject):
         self.window.select_previous_run.clicked.connect(self.select_previous_run)
         self.window.select_current_run.clicked.connect(self.select_current_run)
 
-        self.window.comboBox_x.currentTextChanged.connect(self.open_plot_2)
-        self.window.comboBox_y.currentTextChanged.connect(self.open_plot_2)
-        self.window.sessions_list.itemSelectionChanged.connect(self.open_plot_2)
+        self.window.comboBox_x.currentTextChanged.connect(self.plot_session_data)
+        self.window.comboBox_y.currentTextChanged.connect(self.plot_session_data)
+        self.window.sessions_list.itemSelectionChanged.connect(self.plot_session_data)
 
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
@@ -1141,7 +1141,7 @@ class Form(QObject):
         self.update_result_plot_comboboxes(plot_data_df1.columns)
         pass
 
-    def open_plot_2(self):
+    def plot_session_data(self):
         """
         Plots the selected data.
 
