@@ -689,7 +689,6 @@
        <zorder>project_description_label</zorder>
        <zorder>event_monitor_result</zorder>
        <zorder>event_monitor_label</zorder>
-       <zorder></zorder>
       </widget>
       <widget class="QWidget" name="results_tab">
        <property name="enabled">
