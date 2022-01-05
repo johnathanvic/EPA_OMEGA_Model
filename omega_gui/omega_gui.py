@@ -138,6 +138,7 @@ class Form(QObject):
         self.window.comboBox_x.currentTextChanged.connect(self.plot_session_data)
         self.window.comboBox_y.currentTextChanged.connect(self.plot_session_data)
         self.window.sessions_list.itemSelectionChanged.connect(self.plot_session_data)
+        self.window.ref_session_select.currentIndexChanged.connect(self.plot_session_data)
 
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
