@@ -139,6 +139,7 @@ class Form(QObject):
         self.window.comboBox_y.currentTextChanged.connect(self.plot_session_data)
         self.window.sessions_list.itemSelectionChanged.connect(self.plot_session_data)
         self.window.ref_session_select.currentIndexChanged.connect(self.plot_session_data)
+        self.window.plot_splitter.splitterMoved.connect(self.resize_plot_widget)
 
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
@@ -1211,6 +1212,16 @@ class Form(QObject):
 
         plot_canvas.fig.tight_layout()
         plot_canvas.draw()  # redraw plot
+
+    def resize_plot_widget(self):
+        w = self.window.plot_scroll.width() - 20
+        # h = min(1 * w, self.plot_scroll.height() * len(self.result_plots)) - 34
+        h = 1.75 * w - 34
+
+        self.window.plot_widget.resize(w, h)
+
+        for plot_canvas in self.window.result_plots:
+            plot_canvas.fig.tight_layout()
 
     def update_result_plot_comboboxes(self, var_names):
         self.window.comboBox_x.addItems(var_names)
