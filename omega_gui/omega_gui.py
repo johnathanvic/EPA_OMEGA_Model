@@ -255,22 +255,18 @@ class Form(QObject):
 
         # Create the maptlotlib FigureCanvas object,
         # which defines a single set of axes as self.axes.
-        sc = MplCanvas(self, width=self.window.plot_scroll.width()/100 - 0.4,
+        session_plot = MplCanvas(self, width=self.window.plot_scroll.width()/100 - 0.4,
                        height=self.window.plot_scroll.height()/110, dpi=100)
-        # sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
-        self.window.plot_layout.addWidget(sc)
+        self.window.plot_layout.addWidget(session_plot)
 
-        sc2 = MplCanvas(self, width=self.window.plot_scroll.width()/100 - 0.4,
+        session_delta_plot = MplCanvas(self, width=self.window.plot_scroll.width()/100 - 0.4,
                        height=self.window.plot_scroll.height()/110, dpi=100)
-        # sc2.axes.plot([0, 1, 2, 3, 4], [5, 6, 7, 8, 10])
-        self.window.plot_layout.addWidget(sc2)
+        self.window.plot_layout.addWidget(session_delta_plot)
 
         # adjust the size of the plot widget or you will only get a gray rectangle and no plots!
         self.window.plot_widget.adjustSize()
 
-        self.window.result_plots = [sc, sc2]
-
-        pass
+        self.window.result_plots = [session_plot, session_delta_plot]
 
     def new_file(self):
         """
@@ -1154,11 +1150,12 @@ class Form(QObject):
         selected_sessions = [i.text() for i in self.window.sessions_list.selectedItems()]
         selected_rows = [i.row() for i in self.window.sessions_list.selectedIndexes()]
 
+        data_plotted = False
         plot_canvas = self.window.result_plots[0]
-
         plot_canvas.axes.cla()
         if self.window.comboBox_x.currentText() != '' and self.window.comboBox_y.currentText() != '':
             for selected_row, session_name in zip(selected_rows, selected_sessions):
+                data_plotted = True
                 session_rows = self.summary_results_df['session_name'] == session_name
 
                 x_name = self.window.comboBox_x.currentText()
@@ -1169,6 +1166,7 @@ class Form(QObject):
 
                 plot_canvas.axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
 
+        if data_plotted:
             plot_canvas.axes.set_xlabel(x_name)
             plot_canvas.axes.set_ylabel(y_name)
             plot_canvas.axes.legend()
@@ -1208,14 +1206,9 @@ class Form(QObject):
         plot_canvas.fig.tight_layout()
         plot_canvas.draw()  # redraw plot
 
-        self.window.plot_widget.resize(self.window.plot_scroll.width() - 20,
-                                self.window.plot_scroll.height() * len(self.window.result_plots) - 34)
-        pass
-
     def update_result_plot_comboboxes(self, var_names):
         self.window.comboBox_x.addItems(var_names)
         self.window.comboBox_y.addItems(var_names)
-        pass
 
 
 def status_bar():

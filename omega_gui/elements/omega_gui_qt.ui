@@ -258,7 +258,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="iconSize">
        <size>
@@ -977,8 +977,8 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>360</width>
-            <height>360</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="baseSize">
@@ -1009,7 +1009,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-5</y>
              <width>400</width>
              <height>463</height>
             </rect>
