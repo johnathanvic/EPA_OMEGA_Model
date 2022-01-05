@@ -85,19 +85,20 @@ log_file_session_suffix = "_ReferencePolicy.txt"
 from omega_gui_widgets import *
 
 
-class Form(QObject):
+class omegaGUI():
+    """
+    Class to load the GUI from a .ui file and implement the gui logic.
+    """
 
-    def __init__(self, ui_file, parent=None):
+    def __init__(self, ui_file):
         """
         This function runs once during program start.
         Loads the gui along with defining all connections and element defaults.
 
         :param ui_file:
-        :param parent:
         """
 
         # Load the gui.
-        super(Form, self).__init__(parent)
         ui_file = QFile(ui_file)
         ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
@@ -1268,7 +1269,7 @@ def run_gui():
     # Load the gui
     uifilename = path + 'omega_gui/elements/omega_gui_qt.ui'
     print('uifilename = %s' % uifilename)
-    form = Form(uifilename)
+    form = omegaGUI(uifilename)
     sys.exit(app.exec_())
 
 
