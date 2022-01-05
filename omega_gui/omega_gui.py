@@ -1171,6 +1171,7 @@ class Form(QObject):
                 plot_canvas.axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
 
         if data_plotted:
+            plot_canvas.axes.set_title('Session Data')
             plot_canvas.axes.set_xlabel(x_name)
             plot_canvas.axes.set_ylabel(y_name)
             plot_canvas.axes.legend()
@@ -1202,6 +1203,7 @@ class Form(QObject):
                     plot_canvas.axes.plot(x_data, y_data, label=session_name, c='C%d' % selected_row)  # load new data
 
         if data_plotted:
+            plot_canvas.axes.set_title('Session Delta')
             plot_canvas.axes.set_xlabel(x_name)
             plot_canvas.axes.set_ylabel('delta ' + y_name)
             plot_canvas.axes.legend()
