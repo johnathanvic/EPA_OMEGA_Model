@@ -1082,23 +1082,31 @@ class Form(QObject):
         file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
         if file_name == "":
             self.window.sessions_list.clear()
-            return()
+            self.window.ref_session_select.clear()
+            return
 
         plot_select_directory_path = file_name
         plot_select_directory_name = os.path.basename(os.path.normpath(file_name))
         # print(plot_select_directory_name)
 
         self.window.sessions_list.clear()
+        self.window.ref_session_select.clear()
+
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         plot_select_directory = input_file
+
         if not os.path.exists(input_file):
-            self.window.sessions_list.clear()
-            return()
+            return
+
         plot_data_df1 = pandas.read_csv(input_file)
+        self.summary_results_df = plot_data_df1.copy()
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
-        for index, row in plot_data_df1.iterrows():
-            # print(row['plot_name'])
-            self.window.sessions_list.addItem(row['session_name'])
+
+        self.window.sessions_list.addItems(plot_data_df1['session_name'])
+        self.window.sessions_list.setCurrentRow(0)
+
+        self.window.ref_session_select.addItems(plot_data_df1['session_name'])
+        self.update_result_plot_comboboxes(plot_data_df1.columns)
 
     def select_current_run(self):
         """
@@ -1111,20 +1119,24 @@ class Form(QObject):
         global plot_select_directory
 
         self.window.sessions_list.clear()
+        self.window.ref_session_select.clear()
+
         plot_select_directory_path = output_batch_subdirectory
         plot_select_directory_name = os.path.basename(os.path.normpath(output_batch_subdirectory))
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         plot_select_directory = input_file
+
         if not os.path.exists(input_file):
-            self.window.sessions_list.clear()
-            return()
+            return
+
         plot_data_df1 = pandas.read_csv(input_file)
         self.summary_results_df = plot_data_df1.copy()
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
-        for index, row in plot_data_df1.iterrows():
-            self.window.sessions_list.addItem(row['session_name'])
 
+        self.window.sessions_list.addItems(plot_data_df1['session_name'])
         self.window.sessions_list.setCurrentRow(0)
+
+        self.window.ref_session_select.addItems(plot_data_df1['session_name'])
 
         self.update_result_plot_comboboxes(plot_data_df1.columns)
         pass
