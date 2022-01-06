@@ -20,7 +20,7 @@ import psutil
 
 import multitimer
 
-from PySide2.QtGui import QIcon, QColor, QTextOption
+from PySide2.QtGui import QIcon, QColor, QTextOption, QFont
 from PySide2.QtWidgets import QWidget, QMessageBox
 # from playsound import playsound
 
@@ -1251,7 +1251,7 @@ def status_bar():
     mem = "{" + "|" * mem + "                      "
     mem = "Memory Load=" + mem[0:21] + "}"
     try:
-        form.window.statusBar().showMessage(date_time + "  " + status_bar_message + "     " + cpu + "   " + mem)
+        gui.window.statusBar().showMessage(date_time + "  " + status_bar_message + "     " + cpu + "   " + mem)
     except NameError:
         return
 
@@ -1262,14 +1262,15 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 def run_gui():
     global app
-    global form
+    global gui
 
     app = QApplication(sys.argv)
     # app.setStyle('Fusion')
+    # app.setFont(QFont('Arial', 5)) # only resizes labels, and only labels without manually set font sizes
     # Load the gui
     uifilename = path + 'omega_gui/elements/omega_gui_qt.ui'
     print('uifilename = %s' % uifilename)
-    form = omegaGUI(uifilename)
+    gui = omegaGUI(uifilename)
     sys.exit(app.exec_())
 
 

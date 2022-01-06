@@ -1035,6 +1035,14 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="font">
+                   <font>
+                    <family>Arial</family>
+                    <pointsize>12</pointsize>
+                    <weight>50</weight>
+                    <bold>false</bold>
+                   </font>
+                  </property>
                   <property name="editTriggers">
                    <set>QAbstractItemView::NoEditTriggers</set>
                   </property>
