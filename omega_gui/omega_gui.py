@@ -20,27 +20,28 @@ import psutil
 
 import multitimer
 
+from PySide2.QtCore import QFile, QObject
+
+from PySide2.QtUiTools import QUiLoader
+
 from PySide2.QtGui import QIcon, QColor, QTextOption, QFont
-from PySide2.QtWidgets import QWidget, QMessageBox, QListWidget, QComboBox, QLabel, \
+
+from PySide2.QtWidgets import QApplication, QWidget, QMessageBox, QListWidget, QComboBox, QLabel, \
     QTextEdit, QPushButton, QTabWidget, QCheckBox, QGroupBox
+
 # from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
-import PySide2.QtXml
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import QFile, QObject
+# import PySide2.QtXml
 
 from datetime import datetime
 
 # Import functions from other files
 from omega_gui_functions import *
 from omega_gui_stylesheets import *
+from omega_gui_widgets import *
 
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
-
-# print('omega_gui.py path = %s' % path)
-# print('SYS Path = %s' % sys.path)
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
@@ -76,14 +77,9 @@ event_separator = "----------"
 # OMEGA 2 version
 omega2_version = ""
 # Log file for communication from other processes
-# log_file = "comm_file.txt"
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
-
-# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-
-from omega_gui_widgets import *
 
 
 class omegaGUI():
@@ -111,8 +107,6 @@ class omegaGUI():
         # Set the window title
         self.window.setWindowTitle("EPA OMEGA 2 Model")
         # Set the status bar
-        # self.window.statusBar().showMessage("Ready")
-        # Set the window icon
         self.window.setWindowIcon(QIcon(path + "omega_gui/elements/icon_white.ico"))
 
         # Define gui connections to functions
@@ -122,11 +116,12 @@ class omegaGUI():
         self.window.action_select_output_batch_directory.triggered.connect(self.open_output_batch_directory)
         self.window.action_save_configuration_file.triggered.connect(self.save_file)
         self.window.action_exit.triggered.connect(self.exit_gui)
+
         self.window.select_input_batch_file_button.clicked.connect(self.open_input_batch_file)
         self.window.select_output_batch_directory_button.clicked.connect(self.open_output_batch_directory)
-        # self.window.open_configuration_file_button.clicked.connect(self.open_file)
-        # self.window.save_configuration_file_button.clicked.connect(self.save_file)
-        # self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
+        self.window.select_previous_run.clicked.connect(self.select_previous_run)
+        self.window.select_current_run.clicked.connect(self.select_current_run)
+
         self.window.run_model_button.clicked.connect(self.run_model)
         self.window.action_run_model.triggered.connect(self.run_model)
         self.window.action_documentation.triggered.connect(self.launch_documentation)
@@ -134,8 +129,6 @@ class omegaGUI():
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
-        self.window.select_previous_run.clicked.connect(self.select_previous_run)
-        self.window.select_current_run.clicked.connect(self.select_current_run)
 
         self.window.comboBox_x.currentTextChanged.connect(self.plot_session_data)
         self.window.comboBox_y.currentTextChanged.connect(self.plot_session_data)
@@ -158,66 +151,57 @@ class omegaGUI():
         # Set input file directory window options
         self.window.input_batch_file_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.input_batch_file_1_result.setReadOnly(1)
-        # Set configuration file window options
-        # self.window.configuration_file_1_result.setWordWrapMode(QTextOption.NoWrap)
-        # self.window.configuration_file_1_result.setReadOnly(1)
         # Set project directory window options
         self.window.output_batch_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.output_batch_directory_1_result.setReadOnly(1)
         # Set wizard window options
-        # self.window.wizard_result.setReadOnly(1)
-        # Disable run model button graphic
-        # self.enable_run_button(False)
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
-        # self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
-        # self.window.results_comment.setStyleSheet(development_stylesheet(""))
 
         # Load stylesheets for QTabWidgets
-        stylesheet = ""
-        stylesheet = tab_stylesheet(stylesheet)
+        stylesheet = tab_stylesheet()
         self.window.tab_select.setStyleSheet(stylesheet)
 
-        stylesheet = vtab_stylesheet(stylesheet)
+        stylesheet = vtab_stylesheet()
         self.window.plotmode_select.setStyleSheet(stylesheet)
 
         # Load stylesheet for buttons
         stylesheet = ""
-        stylesheet = button_stylesheet(stylesheet)
+        stylesheet = button_stylesheet()
         objs = self.window.findChildren(QPushButton)
         for o in objs:
             o.setStyleSheet(stylesheet)
 
         # Load stylesheet for QTextEdit
-        stylesheet = textbox_stylesheet(stylesheet)
+        stylesheet = textbox_stylesheet()
         objs = self.window.findChildren(QTextEdit)
         for o in objs:
             o.setStyleSheet(stylesheet)
 
         # Load stylesheet for QListWidget
-        stylesheet = listbox_stylesheet(stylesheet)
+        stylesheet = listbox_stylesheet()
         objs = self.window.findChildren(QListWidget)
         for o in objs:
             o.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
-        stylesheet = logo_button_stylesheet(stylesheet)
+        stylesheet = logo_button_stylesheet()
         self.window.epa_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for labels
-        stylesheet = label_stylesheet(stylesheet)
+        stylesheet = label_stylesheet()
         objs = self.window.findChildren(QLabel)
         for o in objs:
             o.setStyleSheet(stylesheet)
 
         # Load stylesheet for QCheckBox
-        stylesheet = checkbox_stylesheet(stylesheet)
+        stylesheet = checkbox_stylesheet()
         objs = self.window.findChildren(QCheckBox)
         for o in objs:
             o.setStyleSheet(stylesheet)
 
         # Load stylesheet for QGroupBox
-        stylesheet = groupbox_stylesheet(stylesheet)
+        stylesheet = groupbox_stylesheet()
         objs = self.window.findChildren(QGroupBox)
         for o in objs:
             o.setStyleSheet(stylesheet)
@@ -521,7 +505,7 @@ class omegaGUI():
         # self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
-        # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+
         file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Select Output Batch Directory"
@@ -536,7 +520,7 @@ class omegaGUI():
         # Get path of selected directory
         temp2 = os.path.dirname(file_name)
         temp2 = os.path.normpath(temp2) + os.sep
-        # working_directory = temp2
+
         output_batch_directory = temp2 + temp1
         # Update dictionary entry
         scenario['output_batch_directory']['output_batch_directory'] = output_batch_directory
@@ -565,14 +549,13 @@ class omegaGUI():
         :param text: Text to append to event monitor window
         :param color: Color to display text
         :param timecode: 'dt' will display current date and time before text
-        :return:
-        """
 
+        """
         if timecode == 'dt':
             now = datetime.now()
             date_time = now.strftime("%m/%d/%Y %H:%M:%S")
             text = date_time + "  " + text
-        # if color != 'black':
+
         self.window.event_monitor_result.setTextColor(QColor(color))
         self.window.event_monitor_result.append(text)
 
@@ -580,17 +563,8 @@ class omegaGUI():
         """
         Clears the event monitor textbox.
 
-        :return:
         """
-
         self.window.event_monitor_result.setPlainText("")
-
-    # def wizard(self, text, color):
-    # self.window.wizard_result.setTextColor(QColor(color))
-    # self.window.wizard_result.append(text)
-
-    # def clear_wizard(self):
-    # self.window.wizard_result.setPlainText("")
 
     def launch_documentation(self):
         """
@@ -683,6 +657,7 @@ class omegaGUI():
             if not output_batch_directory_valid:
                 temp2 = "Output Batch Directory Invalid:\n    [" + output_batch_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
+
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             self.enable_run_button(True)
         else:
@@ -741,11 +716,8 @@ class omegaGUI():
         output_batch_directory_valid = False
         status_bar_message = "Status = Ready"
         self.enable_run_button(False)
-        # self.window.save_configuration_file_button.setEnabled(0)
+
         self.window.epa_button.setIcon(QIcon(epa_button_image))
-        # self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
-        # self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
-        # self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
         self.window.model_status_label.setText("Model Idle")
@@ -784,13 +756,10 @@ class omegaGUI():
         global status_bar_message
         global multiprocessor_mode_selected
         global output_batch_subdirectory
-        # status_bar()
         self.window.repaint()
 
         model_error_count = 0
 
-        # This call works but gui freezes until new process ends
-        # os.system("python omega_model/__main__.py")
         # Open batch definition
         if '.xls' in input_batch_file:
             batch_definition_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
@@ -811,6 +780,7 @@ class omegaGUI():
         command_line_dict['bundle_path'] = output_batch_directory
         command_line_dict['timestamp'] = batch_time_stamp
         command_line_dict['calc_effects'] = 'Physical and Costs'
+
         if multiprocessor_mode_selected:
             command_line_dict['dispy'] = True
             command_line_dict['local'] = True
@@ -835,12 +805,10 @@ class omegaGUI():
         import omega_model.omega_batch as omega_batch
         import threading, time
         import multiprocessing
-        # t = threading.Thread(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
         t = multiprocessing.Process(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
         t.name = input_batch_file
         t.start()
 
-        # self.load_plots_2()
         # Keep looking for communication from other processes through the log files
         # while omega_batch.poll() is None:
         while t.is_alive():
@@ -905,13 +873,6 @@ class omegaGUI():
                             break
                         lines = f.readlines()
                         f.close()
-
-                        # j = lines[0]  # Get first line
-                        # h = j.find('session')
-                        # l = h + 8
-                        # i = j.find(' ', 21)
-                        # k = j[l:i]
-                        # print('&&&', j, h, i, k)
 
                         g = lines[log_counter_array[log_loop]]
                         g = g.rstrip("\n")
@@ -1292,13 +1253,5 @@ if __name__ == '__main__':
         os.environ['QT_MAC_WANTS_LAYER'] = '1'
 
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-
-    # ***** Added for new plot
-    # import sys
-    # if sys.flags.interactive != 1 or not hasattr(pg.QtCore, 'PYQT_VERSION'):
-    #     pg.QtGui.QApplication.exec_()
-    # if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-    #     QtGui.QApplication.instance().exec_()
-    # *****
 
     run_gui()

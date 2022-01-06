@@ -6,15 +6,14 @@ The color scheme is set to the standard EPA publication Pantone palette.
 """
 
 
-def tab_stylesheet(stylesheet):
+def tab_stylesheet():
     """
     Loads the stylesheet for the tab area of the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
             QTabBar::tab { 
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                             stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
@@ -46,18 +45,16 @@ def tab_stylesheet(stylesheet):
                 background: rgb(32, 84, 147);  /* Sets the color of the unselected tabs */
                 }
             """
-    return stylesheet
 
 
-def vtab_stylesheet(stylesheet):
+def vtab_stylesheet():
     """
     Loads the stylesheet for the tab area of the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
             QTabBar::tab { 
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                             stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
@@ -92,18 +89,16 @@ def vtab_stylesheet(stylesheet):
                 background: rgb(32, 84, 147);  /* Sets the color of the unselected tabs */
                 }
             """
-    return stylesheet
 
 
-def button_stylesheet(stylesheet):
+def button_stylesheet():
     """
     Loads the stylesheet for buttons contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QPushButton {
             border: 1px solid darkGray;
             border-radius: 6px;
@@ -122,35 +117,16 @@ def button_stylesheet(stylesheet):
             border-radius: 6px;
         }
      """
-    return stylesheet
 
 
-def development_stylesheet(stylesheet):
-    """
-    Loads the stylesheet for buttons contained in the gui.
-
-    :param stylesheet:
-    :return: String containing stylesheet.
-    """
-
-    stylesheet = """
-        QTextEdit {
-            background-color: rgba(0, 113, 188, 200);
-            border: 2px solid lightGray;
-        }
-     """
-    return stylesheet
-
-
-def logo_button_stylesheet(stylesheet):
+def logo_button_stylesheet():
     """
     Loads the stylesheet for logo buttons contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QPushButton {
             background-color: rgb(00, 113, 188);
             border: 0px solid white;
@@ -174,115 +150,67 @@ def logo_button_stylesheet(stylesheet):
             color: white;
         }
      """
-    return stylesheet
 
 
-def label_stylesheet(stylesheet):
+def label_stylesheet():
     """
     Loads the stylesheet for labels contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QLabel { color : white; }
      """
-    return stylesheet
 
 
-def checkbox_stylesheet(stylesheet):
+def checkbox_stylesheet():
     """
     Loads the stylesheet for checkboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QCheckBox { color : white; }
      """
-    return stylesheet
 
 
-def groupbox_stylesheet(stylesheet):
+def groupbox_stylesheet():
     """
     Loads the stylesheet for checkboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QGroupBox { color : white; }
      """
-    return stylesheet
 
 
-def textbox_stylesheet(stylesheet):
+def textbox_stylesheet():
     """
     Loads the stylesheet for textboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QTextEdit { border: 1px solid; 
                     border-radius:6px; 
                     background-color: palette(base);  }
      """
-    return stylesheet
 
 
-def listbox_stylesheet(stylesheet):
+def listbox_stylesheet():
     """
     Loads the stylesheet for listboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
-    """
 
-    stylesheet = """
+    """
+    return """
         QListWidget { border: 1px solid; 
                       border-radius:6px; 
                       background-color: palette(base);  }
      """
-    return stylesheet
-
-
-def test1(stylesheet):
-    stylesheet = """
-        QTabBar::tab { 
-            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 rgb(181, 232, 181), stop: 1.0 rgb(147, 188, 147));
-            min-width: 150px;       /* Sets the width of the tabs */
-            height: 30px;           /* Sets the height of the tabs */
-            padding-top : 0px;      /* Sets extra space at the top of the tabs */
-            padding-bottom : 0px;   /* Sets extra space at the bottom of the tabs */
-            color: rgb(0,0,0);            /* Sets the text color and frame color of the tabs */
-            font: 12pt "Arial";     /* Sets the font for the tabs */
-            }
-        QTabBar::tab:hover { 
-            font: bold;
-            }    
-        QTabWidget::tab-bar { 
-            left: 15px;             /* Moves the tabs to the right */
-            }    
-        QTabWidget::pane {
-            border-top: 4px solid gray;     /* Sets the border color and thickness of the tab area */
-            border-left: 4px solid gray;
-            border-right: 4px solid gray;
-            border-bottom: 4px solid gray;
-            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 rgb(181, 232, 181), stop: 1.0 rgb(147, 188, 147));
-            }  
-        QTabBar::tab:!selected {
-            margin-top: 2px; /* Shrinks non-selected tabs */
-            }
-        QTabWidget {
-            background: rgb(170,170,170);  /* Sets the color of the unselected tabs */
-            }
-        """
-    return stylesheet
-
