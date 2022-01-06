@@ -1270,8 +1270,10 @@ def run_gui():
     global gui
 
     app = QApplication(sys.argv)
-    # app.setStyle('Fusion')
-    # app.setFont(QFont('Arial', 5)) # only resizes labels, and only labels without manually set font sizes
+
+    if platform.system() != 'Darwin':
+        app.setStyle('Fusion')
+
     # Load the gui
     uifilename = path + 'omega_gui/elements/omega_gui_qt.ui'
     print('uifilename = %s' % uifilename)
