@@ -1187,6 +1187,14 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="fontsize_label">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
           <property name="text">
            <string>Change Font Size</string>
           </property>
