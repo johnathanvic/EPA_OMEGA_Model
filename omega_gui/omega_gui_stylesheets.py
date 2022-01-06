@@ -160,7 +160,8 @@ def label_stylesheet():
 
     """
     return """
-        QLabel { color : white; }
+        QLabel { color : white; 
+                }
      """
 
 
@@ -212,5 +213,6 @@ def listbox_stylesheet():
     return """
         QListWidget { border: 1px solid; 
                       border-radius:6px; 
-                      background-color: palette(base);  }
+                      background-color: palette(base);
+                      }
      """
