@@ -1195,7 +1195,7 @@
         <item row="1" column="2">
          <widget class="QComboBox" name="sample_comboBox">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1260,7 +1260,7 @@
         <item row="2" column="2">
          <widget class="QListWidget" name="sample_listWidget">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
