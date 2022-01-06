@@ -21,7 +21,8 @@ import psutil
 import multitimer
 
 from PySide2.QtGui import QIcon, QColor, QTextOption, QFont
-from PySide2.QtWidgets import QWidget, QMessageBox
+from PySide2.QtWidgets import QWidget, QMessageBox, QListWidget, QComboBox, QLabel, \
+    QTextEdit, QPushButton, QTabWidget, QCheckBox, QGroupBox
 # from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
@@ -141,6 +142,7 @@ class omegaGUI():
         self.window.sessions_list.itemSelectionChanged.connect(self.plot_session_data)
         self.window.ref_session_select.currentIndexChanged.connect(self.plot_session_data)
         self.window.plot_splitter.splitterMoved.connect(self.resize_plot_widget)
+        self.window.font_spinner.valueChanged.connect(self.mod_font_sizes)
 
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
@@ -171,10 +173,9 @@ class omegaGUI():
         # self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
         # self.window.results_comment.setStyleSheet(development_stylesheet(""))
 
-        # Load stylesheet for tab control
+        # Load stylesheets for QTabWidgets
         stylesheet = ""
         stylesheet = tab_stylesheet(stylesheet)
-        # stylesheet = test1(stylesheet)
         self.window.tab_select.setStyleSheet(stylesheet)
 
         stylesheet = vtab_stylesheet(stylesheet)
@@ -183,59 +184,43 @@ class omegaGUI():
         # Load stylesheet for buttons
         stylesheet = ""
         stylesheet = button_stylesheet(stylesheet)
-        # self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
-        # self.window.open_configuration_file_button.setStyleSheet(stylesheet)
-        # self.window.save_configuration_file_button.setStyleSheet(stylesheet)
-        self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
-        self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
-        self.window.run_model_button.setStyleSheet(stylesheet)
-        self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
+        objs = self.window.findChildren(QPushButton)
+        for o in objs:
+            o.setStyleSheet(stylesheet)
 
-        # Load stylesheet for text boxes
-        stylesheet = ""
+        # Load stylesheet for QTextEdit
         stylesheet = textbox_stylesheet(stylesheet)
-        # stylesheet = "border: 1px solid; border-radius:10px; background-color: palette(base); "
-        self.window.event_monitor_result.setStyleSheet(stylesheet)
-        self.window.input_batch_file_1_result.setStyleSheet(stylesheet)
-        self.window.output_batch_directory_1_result.setStyleSheet(stylesheet)
-        self.window.project_description.setStyleSheet(stylesheet)
+        objs = self.window.findChildren(QTextEdit)
+        for o in objs:
+            o.setStyleSheet(stylesheet)
 
-        # Load stylesheet for list boxes
-        stylesheet = ""
+        # Load stylesheet for QListWidget
         stylesheet = listbox_stylesheet(stylesheet)
-        self.window.sessions_list.setStyleSheet(stylesheet)
-        self.window.select_previous_run.setStyleSheet(stylesheet)
-        self.window.select_current_run.setStyleSheet(stylesheet)
+        objs = self.window.findChildren(QListWidget)
+        for o in objs:
+            o.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
-        stylesheet = ""
         stylesheet = logo_button_stylesheet(stylesheet)
         self.window.epa_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for labels
-        stylesheet = ""
         stylesheet = label_stylesheet(stylesheet)
-        # self.window.configuration_file_1_label.setStyleSheet(stylesheet)
-        self.window.input_batch_file_1_label.setStyleSheet(stylesheet)
-        self.window.output_batch_directory_1_label.setStyleSheet(stylesheet)
-        self.window.project_description_label.setStyleSheet(stylesheet)
-        self.window.main_title_1_label.setStyleSheet(stylesheet)
-        self.window.event_monitor_label.setStyleSheet(stylesheet)
-        self.window.model_status_label.setStyleSheet(stylesheet)
-        self.window.sessions_label.setStyleSheet(stylesheet)
-        self.window.intro_label.setStyleSheet(stylesheet)
-        self.window.x_label.setStyleSheet(stylesheet)
-        self.window.y_label.setStyleSheet(stylesheet)
-        self.window.ref_session_label.setStyleSheet(stylesheet)
+        objs = self.window.findChildren(QLabel)
+        for o in objs:
+            o.setStyleSheet(stylesheet)
 
-        # Load stylesheet for checkboxes
-        stylesheet = ""
+        # Load stylesheet for QCheckBox
         stylesheet = checkbox_stylesheet(stylesheet)
-        self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
+        objs = self.window.findChildren(QCheckBox)
+        for o in objs:
+            o.setStyleSheet(stylesheet)
 
-        stylesheet = ""
+        # Load stylesheet for QGroupBox
         stylesheet = groupbox_stylesheet(stylesheet)
-        self.window.session_groupbox.setStyleSheet(stylesheet)
+        objs = self.window.findChildren(QGroupBox)
+        for o in objs:
+            o.setStyleSheet(stylesheet)
 
         # Timer start
         timer.start()
@@ -1223,6 +1208,26 @@ class omegaGUI():
 
         for plot_canvas in self.window.result_plots:
             plot_canvas.fig.tight_layout()
+
+    def mod_font_sizes(self):
+        modifier = self.window.font_spinner.value()
+
+        objs = self.window.findChildren(QListWidget)
+        for o in objs:
+            if hasattr(o,'font'):
+                f = o.font()
+                f.setPointSize(f.pointSize() + modifier)
+                o.setFont(f)
+
+        objs = self.window.findChildren(QComboBox)
+        for o in objs:
+            if hasattr(o,'font'):
+                f = o.font()
+                f.setPointSize(f.pointSize() + modifier)
+                o.setFont(f)
+
+        self.window.font_spinner.setValue(0)
+
 
     def update_result_plot_comboboxes(self, var_names):
         self.window.comboBox_x.addItems(var_names)
