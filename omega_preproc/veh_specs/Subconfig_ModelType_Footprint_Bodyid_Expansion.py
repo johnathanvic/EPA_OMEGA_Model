@@ -473,6 +473,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
 
             set_roadload_coefficient_table = set_roadload_coefficient_table[set_roadload_coefficient_table_indexing_categories]
             set_roadload_coefficient_table = set_roadload_coefficient_table.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
+            set_roadload_coefficient_table = set_roadload_coefficient_table.rename({'FE Bag 1': 'FTP_FE Bag 1', 'FE Bag 2': 'FTP_FE Bag 2', 'FE Bag 3': 'FTP_FE Bag 3', 'FE Bag 4': 'FTP_FE Bag 4'}, axis=1)
 
             vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'] = vehghg_file_nonflexfuel['TARGET_COEF_A'].copy()
             vehghg_file_nonflexfuel['TARGET_COEF_B_BEST'] = vehghg_file_nonflexfuel['TARGET_COEF_B'].copy()
