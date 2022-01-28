@@ -439,7 +439,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             set_roadload_coefficient_table = pd.read_csv(root_drive_letter + test_car_filename_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])
 
             _test_category = ['FTP', 'HWY', 'US06'];
-            _test_procedure_description = ["Federal fuel 2-day exhaust (w/can load)", "Federal fuel 3-day exhaust", "HWFE", "US06"];
+            # _test_procedure_description = ["Federal fuel 2-day exhaust (w/can load)", "Federal fuel 3-day exhaust", "HWFE", "US06"];
             _test_fuel_type_description = ['Tier 2 Cert Gasoline', 'Federal Cert Diesel 7-15 PPM Sulfur']; #'Test Fuel Type Description'
             set_roadload_coefficient_table = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Test Category'].str.contains('|'.join(_test_category), case=False, na=False), :]
             # set_roadload_coefficient_table1 = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Test Procedure Description'].str.contains('|'.join(_test_procedure_description), case=False, na=False), :]
