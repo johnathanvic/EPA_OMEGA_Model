@@ -637,7 +637,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             print('# of TARGET_COEF_A', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A'])).sum())
             print('# of TARGET_COEF_A_SURRO', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])).sum())
             print('')
-
             df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A']))].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX']).mean()
             for i in range(len(df_Cafe_MFR_CD_Mode_Type_Index)):
                 _cafe_mfr_cd = df_Cafe_MFR_CD_Mode_Type_Index.index[i][0]
