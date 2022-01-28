@@ -433,10 +433,38 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_nonflexfuel', vehghg_file_nonflexfuel, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
             set_roadload_coefficient_table_indexing_categories = ['Model Year', 'Veh Mfr Code', 'Represented Test Veh Make', 'Represented Test Veh Model', 'Test Vehicle ID', 'Test Veh Configuration #', 'Test Number', \
                                                                   'Test Category', 'Rated Horsepower', 'Equivalent Test Weight (lbs.)', 'Test Veh Displacement (L)', 'Actual Tested Testgroup', '# of Gears', 'Drive System Code', 'N/V Ratio', \
-                                                                  'CO2 (g/mi)', 'RND_ADJ_FE', 'FE Bag 1', 'FE Bag 2', 'FE Bag 3', \
+                                                                  'CO2 (g/mi)', 'RND_ADJ_FE', 'FE Bag 1', 'FE Bag 2', 'FE Bag 3', 'FE Bag 4', 'US06_FE', 'US06_FE_Bag 1', 'US06_FE_Bag 2', \
                                                                   'Target Coef A (lbf)', 'Target Coef B (lbf/mph)', 'Target Coef C (lbf/mph**2)', \
                                                                   'Set Coef A (lbf)', 'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']
             set_roadload_coefficient_table = pd.read_csv(root_drive_letter + test_car_filename_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])
+
+            _test_category = ['FTP', 'HWY', 'US06'];
+            _test_procedure_description = ["Federal fuel 2-day exhaust (w/can load)", "Federal fuel 3-day exhaust", "HWFE", "US06"];
+            _test_fuel_type_description = ['Tier 2 Cert Gasoline', 'Federal Cert Diesel 7-15 PPM Sulfur']; #'Test Fuel Type Description'
+            set_roadload_coefficient_table = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Test Category'].str.contains('|'.join(_test_category), case=False, na=False), :]
+            # set_roadload_coefficient_table1 = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Test Procedure Description'].str.contains('|'.join(_test_procedure_description), case=False, na=False), :]
+            set_roadload_coefficient_table = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Procedure Description'] != 'Fed. fuel 50 F exh.') & \
+                                                                                (set_roadload_coefficient_table['Test Procedure Description'] != 'Cold CO') & \
+                                                                                (set_roadload_coefficient_table['Test Procedure Description'] != "CVS 75 and later (w/o can. load)") & \
+                                                                                (set_roadload_coefficient_table['Test Procedure Description'] != "California fuel 2-day exhaust (w/can load)") & \
+                                                                                (set_roadload_coefficient_table['Test Procedure Description'] != 'California fuel 3-day exhaust'), :]
+            set_roadload_coefficient_table = set_roadload_coefficient_table.dropna(axis=1, how='all').reset_index(drop=True)
+            set_roadload_coefficient_table.insert(51, 'US06_FE', float('nan')); set_roadload_coefficient_table.insert(52, 'US06_FE_Bag 1', float('nan')); set_roadload_coefficient_table.insert(53, 'US06_FE_Bag 2', float('nan'));
+            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'RND_ADJ_FE']
+            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 1'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 1']
+            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 2'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 2']
+
+            _test_vehicle_IDs = set_roadload_coefficient_table['Test Vehicle ID'].unique();
+            for i in range(len(_test_vehicle_IDs)):
+                _test_veh_ID = _test_vehicle_IDs[i]
+                if len(set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 1'])  > 0:
+                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE'] = \
+                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE'].values[0];
+                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE_Bag 1'] = \
+                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 1'].values[0];
+                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE_Bag 2'] = \
+                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 2'].values[0];
+
             if len(tstcar_MY_exceptions_table) > 0:
                 set_roadload_coefficient_table = file_errta_update(set_roadload_coefficient_table, tstcar_MY_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'Model Year', \
                                                                'Represented Test Veh Make', 'Veh Mfr Code', 'Represented Test Veh Model', np.nan, np.nan)
