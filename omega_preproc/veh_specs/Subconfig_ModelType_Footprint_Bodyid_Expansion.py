@@ -304,10 +304,42 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                     print(grp_volumes_footprint_file.index[i], grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i], grp_volumes_full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i], \
                           (grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i] - grp_volumes_full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i]))
 
-            subconfig_file = pd.read_csv(input_path + '\\' + subconfig_filename, encoding="ISO-8859-1", na_values=['-'])  # subconfig_sales # EVCIS Qlik Sense query results contain hyphens for nan
-            subconfig_file = subconfig_file[subconfig_file['MODEL_YEAR'] == year].reset_index(drop=True)
+            # DRV_SYS 4/P, A, F, R
             model_type_file = pd.read_csv(input_path + '\\' + model_type_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan)
             model_type_file = model_type_file[model_type_file['CAFE_MODEL_YEAR'] == year].reset_index(drop=True)
+
+            # No drive system in the CAFE_Subconfig_Sales, but can be extracted from the CARLINE_NAME
+            subconfig_file = pd.read_csv(input_path + '\\' + subconfig_filename, encoding="ISO-8859-1", na_values=['-'])  # subconfig_sales # EVCIS Qlik Sense query results contain hyphens for nan
+            subconfig_file = subconfig_file[subconfig_file['MODEL_YEAR'] == year].reset_index(drop=True)
+            # _test_fuel_type_description = ['Tier 2 Cert Gasoline', 'Federal Cert Diesel 7-15 PPM Sulfur'];
+            subconfig_file.insert(20, 'DRV_SYS', np.nan);
+
+            _carline_names = subconfig_file['CARLINE_NAME'].unique()
+            for i in range(len(_carline_names)-1):
+                _carline_name= _carline_names[i]
+                _drive_system = model_type_file.loc[model_type_file['CARLINE_NAME'] == _carline_name, 'DRV_SYS'].dropna().unique()
+                if (len(_drive_system) == 1):
+                    subconfig_file.loc[subconfig_file['CARLINE_NAME'] == _carline_name, 'DRV_SYS'] = _drive_system[0]
+                elif (len(_drive_system) > 1):
+                    print(i, _carline_name, _drive_system)
+                    for j in range(len(_drive_system)):
+                        _drive_system_j = _drive_system[j]
+                        _model_type_index = model_type_file.loc[model_type_file['CARLINE_NAME'] == _carline_name, 'MODEL_TYPE_INDEX'].dropna().unique()[j]
+                        subconfig_file.loc[(subconfig_file['CARLINE_NAME'] == _carline_name) & (subconfig_file['MODEL_TYPE_INDEX'] == _model_type_index), 'DRV_SYS'] = _drive_system_j
+
+            # subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('NV200'), case=False, na=False) & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'F'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('4WD'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = '4'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('2WD'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'R'
+            # subconfig_file.loc[subconfig_file['MFR_DIVISION_SHORT_NM'].str.contains(('MAZDA'), case=False, na=False), 'DRV_SYS'] = 'F'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('AWD'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'A'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('FWD'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'F'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('RWD'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'R'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('xDrive'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'A'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('4MATIC'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'A'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('4x4'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = '4'
+            subconfig_file.loc[subconfig_file['CARLINE_NAME'].str.contains(('4x2'), case=False, na=False)  & (pd.isnull(subconfig_file['DRV_SYS'])), 'DRV_SYS'] = 'R'
+            subconfig_file = subconfig_file.dropna(axis=1, how='all').reset_index(drop=True)
+            # subconfig_file_tmp = subconfig_file.loc[subconfig_file['CARLINE_NAME'] == 'REGAL TOUR X AWD', 'DRV_SYS']
 
             if len(modeltype_exceptions_table) > 0:
                 if DEBUGGING_CAFE_MFR_CD_MODE: model_type_file = model_type_file.loc[model_type_file['CAFE_MFR_CODE'] == DEBUGGING_CAFE_MFR_CD, :]
@@ -413,7 +445,10 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                                                                  'PROD_VOL_GHG_STD_50_STATE'], axis=1).columns)
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
 
+            # DRIVE_SYSTEM 4/P, A, F, R, - in the CAFE_Subconfig_MY file
             roadload_coefficient_table = pd.read_csv(input_path + '\\' + roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
+            roadload_coefficient_table = roadload_coefficient_table[roadload_coefficient_table['MODEL_YEAR'] == year].reset_index(drop=True)
+            # roadload_coefficient_table_tmp = roadload_coefficient_table.loc[pd.isnull(roadload_coefficient_table['DRIVE_SYSTEM']), :]
             if len(subconfig_MY_exceptions_table) > 0:
                 if DEBUGGING_CAFE_MFR_CD_MODE: roadload_coefficient_table = roadload_coefficient_table.loc[roadload_coefficient_table['CAFE_MFR_CD'] == DEBUGGING_CAFE_MFR_CD, :]
                 roadload_coefficient_table = file_errta_update(roadload_coefficient_table, subconfig_MY_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR',  \
@@ -433,9 +468,10 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_nonflexfuel', vehghg_file_nonflexfuel, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
             set_roadload_coefficient_table_indexing_categories = ['Model Year', 'Veh Mfr Code', 'Represented Test Veh Make', 'Represented Test Veh Model', 'Test Vehicle ID', 'Test Veh Configuration #', 'Test Number', \
                                                                   'Test Category', 'Rated Horsepower', 'Equivalent Test Weight (lbs.)', 'Test Veh Displacement (L)', 'Actual Tested Testgroup', '# of Gears', 'Drive System Code', 'N/V Ratio', \
-                                                                  'CO2 (g/mi)', 'RND_ADJ_FE', 'FE Bag 1', 'FE Bag 2', 'FE Bag 3', 'FE Bag 4', 'US06_FE', 'US06_FE_Bag 1', 'US06_FE_Bag 2', \
+                                                                  'CO2 (g/mi)', 'RND_ADJ_FE', 'FE Bag 1', 'FE Bag 2', 'FE Bag 3', 'FE Bag 4', 'US06_FE', 'US06_FE Bag 1', 'US06_FE Bag 2', \
                                                                   'Target Coef A (lbf)', 'Target Coef B (lbf/mph)', 'Target Coef C (lbf/mph**2)', \
                                                                   'Set Coef A (lbf)', 'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']
+            # tstcar data file, Drive System Code, 4/P, A, F, R, CAFE_SubConfig_MY file
             set_roadload_coefficient_table = pd.read_csv(root_drive_letter + test_car_filename_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])
 
             _test_category = ['FTP', 'HWY', 'US06']; # Test Category
@@ -451,19 +487,19 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             set_roadload_coefficient_table = set_roadload_coefficient_table.dropna(axis=1, how='all').reset_index(drop=True)
             set_roadload_coefficient_table.insert(51, 'US06_FE', float('nan')); set_roadload_coefficient_table.insert(52, 'US06_FE_Bag 1', float('nan')); set_roadload_coefficient_table.insert(53, 'US06_FE_Bag 2', float('nan'));
             set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'RND_ADJ_FE']
-            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 1'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 1']
-            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 2'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 2']
+            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 1'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 1']
+            set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 2'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 2']
 
             _test_vehicle_IDs = set_roadload_coefficient_table['Test Vehicle ID'].unique();
             for i in range(len(_test_vehicle_IDs)):
                 _test_veh_ID = _test_vehicle_IDs[i]
-                if len(set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 1'])  > 0:
+                if len(set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 1'])  > 0:
                     set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE'] = \
                         set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE'].values[0];
-                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE_Bag 1'] = \
-                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 1'].values[0];
-                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE_Bag 2'] = \
-                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE_Bag 2'].values[0];
+                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE Bag 1'] = \
+                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 1'].values[0];
+                    set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'FTP'), 'US06_FE Bag 2'] = \
+                        set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 2'].values[0];
 
             if len(tstcar_MY_exceptions_table) > 0:
                 set_roadload_coefficient_table = file_errta_update(set_roadload_coefficient_table, tstcar_MY_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'Model Year', \
@@ -637,6 +673,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             print('# of TARGET_COEF_A', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A'])).sum())
             print('# of TARGET_COEF_A_SURRO', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])).sum())
             print('')
+
             df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A']))].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX']).mean()
             for i in range(len(df_Cafe_MFR_CD_Mode_Type_Index)):
                 _cafe_mfr_cd = df_Cafe_MFR_CD_Mode_Type_Index.index[i][0]
