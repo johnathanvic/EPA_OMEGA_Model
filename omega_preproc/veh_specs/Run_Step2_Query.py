@@ -583,6 +583,11 @@ for model_year in model_years:
     if '_plus_MTH_34' in master_index_filename: Query_filename = 'Query_plus_MTH_34'
     else: Query_filename = 'Query_MTH_012'
 
+    query_output.loc[query_output['Drive System Code_all'] == 'F|A', 'Drive System Code_all'] = 'A|F'
+    query_output.loc[query_output['Drive System Code_all'] == 'R|A', 'Drive System Code_all'] = 'A|R'
+    query_output=query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all', 'DRIVE TYPE_all': 'Drive Sys Edmunds_all'}, axis=1)
+    # query_output=query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all'}, axis=1)
+
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
