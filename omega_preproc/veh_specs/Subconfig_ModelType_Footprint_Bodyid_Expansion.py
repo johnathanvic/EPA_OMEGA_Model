@@ -236,10 +236,10 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
     footprint_indexing_categories = ['FOOTPRINT_DIVISION_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_INDEX']
     subconfig_indexing_categories = ['MFR_DIVISION_NM', 'MODEL_TYPE_INDEX', 'SS_ENGINE_FAMILY', 'CARLINE_CODE',
                                      'LDFE_CAFE_ID', 'BASE_LEVEL_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX']
-    modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CAFE_MFR_CODE', 'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME']
+    modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CAFE_MFR_CODE', 'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME', 'DRV_SYS']
     roadload_coefficient_table_indexing_categories = ['LDFE_CAFE_SUBCONFIG_INFO_ID', 'LDFE_CAFE_ID', 'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'CAFE_MFR_CD', \
                                                       'LABEL_MFR_CD', 'MODEL_TYPE_INDEX', 'MFR_DIVISION_SHORT_NM', 'CARLINE_NAME', \
-                                                      'INERTIA_WT_CLASS', 'CONFIG_INDEX', 'SUBCONFIG_INDEX', 'TRANS_TYPE', 'HYBRID_YN']
+                                                      'INERTIA_WT_CLASS', 'CONFIG_INDEX', 'SUBCONFIG_INDEX', 'TRANS_TYPE', 'HYBRID_YN', 'DRV_SYS']
     CAFE_ID_not_matched = []
     for i in range(len(footprint_file['FOOTPRINT_DIVISION_NM'])):
         for j in range(len(lineage_file['FOOTPRINT_DIVISION_NM'])):
@@ -359,7 +359,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                                                         right_on=['MODEL_YEAR', 'FOOTPRINT_CARLINE_CD', 'CAFE_MFR_CD', 'FOOTPRINT_DIVISION_NM'])
 
             vehghg_file_full_merged_data = vehghg_file_data_pt1.merge(model_type_file, how='left', left_on=['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'MODEL_YEAR', 'CAFE_MFR_CD', 'MFR_DIVISION_NM', \
-                                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'LDFE_CAFE_ID', 'CARLINE_NAME'], right_on=modeltype_indexing_categories)
+                                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'LDFE_CAFE_ID', 'CARLINE_NAME', 'DRV_SYS'], right_on=modeltype_indexing_categories)
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_full_merged_data', vehghg_file_full_merged_data, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
 
             vehghg_file_data = vehghg_file_full_merged_data[vehghg_file_full_merged_data['SS_LD_CARLINE_HEADER_ID'] == vehghg_file_full_merged_data['LD_CARLINE_HEADER_ID']].reset_index(drop=True)
@@ -459,6 +459,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             roadload_coefficient_table = roadload_coefficient_table[roadload_coefficient_table['MODEL_YEAR'] == year].groupby(['LDFE_CAFE_SUBCONFIG_INFO_ID', 'TARGET_COEF_A', 'TARGET_COEF_B', 'TARGET_COEF_C', \
                           'FUEL_NET_HEATING_VALUE', 'FUEL_GRAVITY']).first().reset_index().drop('MODEL_YEAR', axis=1).reset_index(drop=True)
             # roadload_coefficient_table_flexfuel = roadload_coefficient_table[roadload_coefficient_table['SUBCFG_FUEL_USAGE'] == 'E'].reset_index(drop=True)
+            roadload_coefficient_table = roadload_coefficient_table.rename({'DRIVE_SYSTEM': 'DRV_SYS'}, axis=1)
+
             roadload_coefficient_table_nonflexfuel = roadload_coefficient_table[roadload_coefficient_table['SUBCFG_FUEL_USAGE'] != 'E'].reset_index(drop=True)
             vehghg_file_flexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] == 'E'].reset_index(drop=True)
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] != 'E'].reset_index(drop=True)
@@ -510,6 +512,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             set_roadload_coefficient_table = set_roadload_coefficient_table[set_roadload_coefficient_table_indexing_categories]
             set_roadload_coefficient_table = set_roadload_coefficient_table.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
             set_roadload_coefficient_table = set_roadload_coefficient_table.rename({'FE Bag 1': 'FTP_FE Bag 1', 'FE Bag 2': 'FTP_FE Bag 2', 'FE Bag 3': 'FTP_FE Bag 3', 'FE Bag 4': 'FTP_FE Bag 4'}, axis=1)
+            # set_roadload_coefficient_table = set_roadload_coefficient_table.rename({'FE Bag 1': 'FTP_FE Bag 1', 'FE Bag 2': 'FTP_FE Bag 2', 'FE Bag 3': 'FTP_FE Bag 3', 'FE Bag 4': 'FTP_FE Bag 4', 'Drive System Code': 'DRV_SYStst'}, axis=1)
 
             vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'] = vehghg_file_nonflexfuel['TARGET_COEF_A'].copy()
             vehghg_file_nonflexfuel['TARGET_COEF_B_BEST'] = vehghg_file_nonflexfuel['TARGET_COEF_B'].copy()
@@ -1033,6 +1036,14 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                 vehghg_filename = vehghg_filename + '_MTH_012'
 
             if DEBUGGING_CAFE_MFR_CD_MODE: vehghg_filename = vehghg_filename + '_' + DEBUGGING_CAFE_MFR_CD
+            vehghg_file_output.insert(22, 'DRIVE TYPE', np.nan);
+            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == '4', 'DRIVE TYPE'] = 'Four wheel drive'
+            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'P', 'DRIVE TYPE'] = 'Four wheel drive'
+            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'A', 'DRIVE TYPE'] = 'All wheel drive'
+            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'F', 'DRIVE TYPE'] = 'Front wheel drive'
+            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'R', 'DRIVE TYPE'] = 'Rear wheel drive'
+            # vehghg_file_output.loc[vehghg_file_output['Drive System Code'] == '4'  & (~pd.isnull(vehghg_file_output['Drive System Code'])), 'DRIVE TYPE'] = 'Four wheel drive'
+
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename + '_' + date_and_time + '.csv', index=False)
         else:
             # New BodyID table sought, previous data included
