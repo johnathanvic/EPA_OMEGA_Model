@@ -75,6 +75,9 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
 
     Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['GROSS WEIGHT'] = Edmunds_data_cleaned['GROSS WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].str.replace('no', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['GROSS WEIGHT'] = Edmunds_data_cleaned['GROSS WEIGHT'].str.replace('no', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['MAXIMUM PAYLOAD'] = Edmunds_data_cleaned['MAXIMUM PAYLOAD'].str.replace('no', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Most Popular)')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Discontinued)')

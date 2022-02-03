@@ -387,8 +387,8 @@ for model_year in model_years:
                         #     master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                         master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                             pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
-                        if (unique_sourcename == 'Edmunds') and ('CURB WEIGHT' in master_index_file_with_desired_field_all_merges.columns):
-                            print(master_index_file_with_desired_field_all_merges['CURB WEIGHT'])  # = pd.Series(source_file['CURB WEIGHT']).str.extract("(\d*\.?\d+)", expand=True).astype(float)
+                        # if (unique_sourcename == 'Edmunds') and ('CURB WEIGHT' in master_index_file_with_desired_field_all_merges.columns):
+                        #     print(master_index_file_with_desired_field_all_merges['CURB WEIGHT'])  # = pd.Series(source_file['CURB WEIGHT']).str.extract("(\d*\.?\d+)", expand=True).astype(float)
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
                             information_toget_source_column_name].str.extract("(\d*\.?\d+)", expand=True).astype(float)
