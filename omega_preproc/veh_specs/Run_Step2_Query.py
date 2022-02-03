@@ -230,8 +230,8 @@ for model_year in model_years:
             vehghg_matching_categories = matching_categories
         if unique_sourcename != master_index_source: #If the current source is not the master index, readin the source file
             try:
-                source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename,\
-                    converters={'LineageID': int, 'BodyID': int}).astype(str)
+                source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
+
             except ValueError:
                 try:
                     source_file = pd.read_csv(unique_filepath + '\\' + unique_filename).astype(str)
@@ -387,16 +387,17 @@ for model_year in model_years:
                         #     master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                         master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                             pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
+                        if (unique_sourcename == 'Edmunds') and ('CURB WEIGHT' in master_index_file_with_desired_field_all_merges.columns):
+                            print(master_index_file_with_desired_field_all_merges['CURB WEIGHT'])  # = pd.Series(source_file['CURB WEIGHT']).str.extract("(\d*\.?\d+)", expand=True).astype(float)
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
-                            information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
+                            information_toget_source_column_name].str.extract("(\d*\.?\d+)", expand=True).astype(float)
+                        # information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
                         if pd.isnull(testing_column).sum() >= 0:
                             master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                                master_index_file_with_desired_field_all_merges[
-                                    information_toget_source_column_name].str.extract('(\d+)').astype(float)
+                                master_index_file_with_desired_field_all_merges[information_toget_source_column_name].str.extract('(\d+)').astype(float)
                         else:
-                            master_index_file_with_desired_field_all_merges[
-                                information_toget_source_column_name] = testing_column
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = testing_column
                 if query_type == 'max':
                     if bounding_field == str(np.nan) or pd.isnull(bounding_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
@@ -447,8 +448,6 @@ for model_year in model_years:
                 elif query_type == 'all':
                     # if information_toget_source_column_name == 'FINAL_CALC_CITY_FE_4':
                     #     print(information_toget_source_column_name)
-                    if "AIRBAGS" in information_toget_source_column_name:
-                        print(information_toget_source_column_name, master_index_file_with_desired_field_all_merges[information_toget_source_column_name].unique())
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]].groupby(\
                         list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: '|'.join(map(str, x))).reset_index()
