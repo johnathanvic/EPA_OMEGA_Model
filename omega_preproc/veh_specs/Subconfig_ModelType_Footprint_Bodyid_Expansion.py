@@ -321,7 +321,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                 if (len(_drive_system) == 1):
                     subconfig_file.loc[subconfig_file['CARLINE_NAME'] == _carline_name, 'DRV_SYS'] = _drive_system[0]
                 elif (len(_drive_system) > 1):
-                    print(i, _carline_name, _drive_system)
+                    # print(i, _carline_name, _drive_system)
                     for j in range(len(_drive_system)):
                         _drive_system_j = _drive_system[j]
                         _model_type_index = model_type_file.loc[model_type_file['CARLINE_NAME'] == _carline_name, 'MODEL_TYPE_INDEX'].dropna().unique()[j]
@@ -1036,12 +1036,12 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                 vehghg_filename = vehghg_filename + '_MTH_012'
 
             if DEBUGGING_CAFE_MFR_CD_MODE: vehghg_filename = vehghg_filename + '_' + DEBUGGING_CAFE_MFR_CD
-            vehghg_file_output.insert(22, 'DRIVE TYPE', np.nan);
-            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == '4', 'DRIVE TYPE'] = 'Four wheel drive'
-            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'P', 'DRIVE TYPE'] = 'Four wheel drive'
-            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'A', 'DRIVE TYPE'] = 'All wheel drive'
-            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'F', 'DRIVE TYPE'] = 'Front wheel drive'
-            vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'R', 'DRIVE TYPE'] = 'Rear wheel drive'
+            # vehghg_file_output.insert(22, 'DRIVE TYPE', np.nan);
+            # vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == '4', 'DRIVE TYPE'] = '4'
+            # vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'P', 'DRIVE TYPE'] = '4'
+            # vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'A', 'DRIVE TYPE'] = 'A'
+            # vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'F', 'DRIVE TYPE'] = 'F'
+            # vehghg_file_output.loc[vehghg_file_output['DRV_SYS'] == 'R', 'DRIVE TYPE'] = 'R'
             # vehghg_file_output.loc[vehghg_file_output['Drive System Code'] == '4'  & (~pd.isnull(vehghg_file_output['Drive System Code'])), 'DRIVE TYPE'] = 'Four wheel drive'
 
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename + '_' + date_and_time + '.csv', index=False)

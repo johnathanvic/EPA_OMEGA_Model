@@ -241,6 +241,7 @@ for model_year in model_years:
                 source_file = pd.read_csv(unique_filepath + '\\' + unique_filename, encoding = "ISO-8859-1", \
                     converters={'LineageID': int, 'BodyID': int}).astype(str)
             except FileNotFoundError:
+                print(unique_filename, 'not found!!!')
                 continue
 
             if SetBodyIDtoLineageID == 1:
@@ -585,7 +586,13 @@ for model_year in model_years:
     query_output.loc[query_output['Drive System Code_all'] == 'F|A', 'Drive System Code_all'] = 'A|F'
     query_output.loc[query_output['Drive System Code_all'] == 'R|A', 'Drive System Code_all'] = 'A|R'
     query_output=query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all', 'DRIVE TYPE_all': 'Drive Sys Edmunds_all'}, axis=1)
-    # query_output=query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all'}, axis=1)
+
+    _airbags = query_output.columns[query_output.columns.str.contains('AIRBAG')].tolist() + ['STABILITY CONTROL_all', 'TRACTION CONTROL_all', 'TIRE PRESSURE MONITORING_all']
+    for i in range(len(_airbags)):
+        _airbag = _airbags[i]
+        query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
+        query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
+        query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
 
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
