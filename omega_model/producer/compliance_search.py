@@ -222,13 +222,13 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
             min_constraints = dict()
             max_constraints = dict()
-            for c in share_column_names:
-                production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
-                production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
-                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+            for cn in share_column_names:
+                production_min = ProductionConstraints.get_minimum_share(calendar_year, cn.replace(producer_prefix, ''))
+                production_max = ProductionConstraints.get_maximum_share(calendar_year, cn.replace(producer_prefix, ''))
+                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, cn.replace(producer_prefix, ''))
 
-                max_constraints[c] = production_max
-                min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+                max_constraints[cn] = production_max
+                min_constraints[cn] = min(production_max, max(required_zev_share, production_min))
 
             if share_range == 1.0:
                 # span the whole space of shares
@@ -245,23 +245,73 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                        max_constraints=max_constraints)
         else:
             sales_share_dict = pd.DataFrame()
-            for c, cn in zip(children, share_column_names):
-                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
+            for ch, cn in zip(children, share_column_names):
+                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[ch] /
                                         context_new_vehicle_sales(calendar_year)['total']]
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
-    else:
-        # inherit absolute market shares from consumer response
+    else:  # with consumer response...
+        # use absolute market shares from consumer response as caps for responsive children?
+        producer_prefix = 'producer_share_frac_'
         if node_name:
-            abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c for c in children]
+            share_column_names = [producer_prefix + node_name + '.' + c for c in children]
         else:
-            abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
+            share_column_names = [producer_prefix + c for c in children]
 
-        sales_share_dict = dict()
-        for cn in abs_share_column_names:
-            if cn.replace('producer', 'consumer') in consumer_response:
-                sales_share_dict[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
+        if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
 
-        sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
+            min_constraints = dict()
+            max_constraints = dict()
+            for cn in share_column_names:
+                production_min = ProductionConstraints.get_minimum_share(calendar_year, cn.replace(producer_prefix, ''))
+                production_max = ProductionConstraints.get_maximum_share(calendar_year, cn.replace(producer_prefix, ''))
+                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, cn.replace(producer_prefix, ''))
+
+                consumer_share = consumer_response[cn.replace('producer', 'consumer')]
+                producer_share = consumer_response[cn]
+
+                tolerance = 0.03
+
+                if consumer_share < producer_share:
+                    max_constraints[cn] = min(np.mean(consumer_share), production_max)
+                    min_constraints[cn] = min(production_max, max(required_zev_share, production_min))
+                else:
+                    max_constraints[cn] = production_max
+                    min_constraints[cn] = min(production_max, max(np.mean(consumer_share),
+                                                                  required_zev_share, production_min))
+
+            if share_range == 1.0:
+                # span the whole space of shares
+                sales_share_df = partition(share_column_names,
+                                           num_levels=omega_globals.options.producer_num_market_share_options,
+                                           min_constraints=min_constraints, max_constraints=max_constraints)
+            else:
+                # narrow search span to a range of shares around the winners
+                sales_share_df = \
+                    generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                                                       share_range,
+                                                       omega_globals.options.producer_num_market_share_options,
+                                                       min_constraints=min_constraints,
+                                                       max_constraints=max_constraints)
+
+        else:
+            sales_share_dict = pd.DataFrame()
+            for ch, cn in zip(children, share_column_names):
+                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[ch] /
+                                        context_new_vehicle_sales(calendar_year)['total']]
+            sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
+
+            # # inherit absolute market shares from consumer response for non-responsive children
+            # if node_name:
+            #     abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c for c in children]
+            # else:
+            #     abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
+            #
+            # sales_share_dict = dict()
+            # for cn in abs_share_column_names:
+            #     if cn.replace('producer', 'consumer') in consumer_response:
+            #         sales_share_dict[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
+            #
+            # sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
 
     # print('generate market share options time = %f' % (time.time() - start_time))
 

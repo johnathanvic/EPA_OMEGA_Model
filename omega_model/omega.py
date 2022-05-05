@@ -169,7 +169,7 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
     omega_log.logwrite('')
 
     omega_log.logwrite(
-        '%d_%d_%d  SCORE:%f, CE:%f, CSPE:%f\n' % (calendar_year, producer_consumer_iteration_num,
+        '%d_%d_%d  SCORE:%f, SCE:%f, CSPE:%f\n' % (calendar_year, producer_consumer_iteration_num,
                                                   cross_subsidy_iteration_num,
                                                   producer_decision_and_response['pricing_score'],
                                                   share_convergence_error, cross_subsidy_pricing_error))
@@ -258,9 +258,9 @@ def run_producer_consumer():
             iterate_producer_consumer = True
 
             while iterate_producer_consumer:
-                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
+                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s  Offset=%d" %
                                    (omega_globals.options.session_unique_name, calendar_year,
-                                    producer_consumer_iteration_num),
+                                    producer_consumer_iteration_num, strategic_target_offset_Mg),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
@@ -306,6 +306,8 @@ def run_producer_consumer():
 
             credit_banks[compliance_id].handle_credit(calendar_year,
                                                      producer_decision_and_response['total_credits_co2e_megagrams'])
+
+            print('** total_credits_co2e_megagrams = %s' % producer_decision_and_response['total_credits_co2e_megagrams'])
 
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
@@ -466,6 +468,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, producer_consumer_iteration_num,
                                    producer_decision_and_response, share_convergence_error)
 
+    print('(Target - Cert Mg) = %f, compliant = %s' % (producer_decision_and_response['total_target_co2e_megagrams']
+                             - producer_decision_and_response['total_cert_co2e_megagrams'], compliant))
+
     update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, mcat_converged,
                                   producer_consumer_iteration_num, compliant, share_convergence_error)
 
@@ -607,10 +612,10 @@ def update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_
 
     if 'cross_subsidy_convergence' in omega_globals.options.verbose_console_modules:
         if mcat_converged:
-            omega_log.logwrite('   PRODUCER-CONSUMER CONVERGED %s CE:%f, CSPE:%f' %
+            omega_log.logwrite('   PRODUCER-CONSUMER CONVERGED %s SCE:%f, CSPE:%f' %
                                (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error))
         else:
-            omega_log.logwrite('** PRODUCER-CONSUMER CONVERGENCE FAIL %s CE:%f, CSPE:%f **' %
+            omega_log.logwrite('** PRODUCER-CONSUMER CONVERGENCE FAIL %s SCE:%f, CSPE:%f **' %
                                (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error))
 
 
