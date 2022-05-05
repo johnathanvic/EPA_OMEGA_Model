@@ -272,12 +272,14 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                 tolerance = 0.03
 
                 if consumer_share < producer_share:
-                    max_constraints[cn] = min(np.mean(consumer_share), production_max)
+                    max_constraints[cn] = min(np.mean([consumer_share, producer_share]), production_max)
                     min_constraints[cn] = min(production_max, max(required_zev_share, production_min))
+                    pass
                 else:
                     max_constraints[cn] = production_max
-                    min_constraints[cn] = min(production_max, max(np.mean(consumer_share),
+                    min_constraints[cn] = min(production_max, max(np.mean([consumer_share, producer_share]),
                                                                   required_zev_share, production_min))
+                    pass
 
             if share_range == 1.0:
                 # span the whole space of shares
