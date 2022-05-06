@@ -211,6 +211,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
     # Generate market share options
     if consumer_response is None:
+        # omega_log.logwrite('WITHOUT')
         # generate producer desired market shares for responsive market sectors
         producer_prefix = 'producer_share_frac_'
         if node_name:
@@ -251,6 +252,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
     else:  # with consumer response...
         # use absolute market shares from consumer response as caps for responsive children?
+        # omega_log.logwrite('WITH')
         producer_prefix = 'producer_share_frac_'
         if node_name:
             share_column_names = [producer_prefix + node_name + '.' + c for c in children]
@@ -268,18 +270,19 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                 consumer_share = consumer_response[cn.replace('producer', 'consumer')]
                 producer_share = consumer_response[cn]
+                mean_share = np.mean([consumer_share, producer_share])
 
-                tolerance = 0.03
+                # omega_log.logwrite('%40s: %.10f P:%.6f C:%.6f A:%.6f' %
+                #                    (cn, share_range, producer_share, consumer_share,
+                #                     np.mean([consumer_share, producer_share])))
 
                 if consumer_share < producer_share:
-                    max_constraints[cn] = min(np.mean([consumer_share, producer_share]), production_max)
-                    min_constraints[cn] = min(production_max, max(required_zev_share, production_min))
-                    pass
+                    max_constraints[cn] = min(mean_share, production_max)
+                    min_constraints[cn] = min(max_constraints[cn], max(consumer_share - (mean_share - consumer_share),
+                                                                       required_zev_share, production_min))
                 else:
-                    max_constraints[cn] = production_max
-                    min_constraints[cn] = min(production_max, max(np.mean([consumer_share, producer_share]),
-                                                                  required_zev_share, production_min))
-                    pass
+                    max_constraints[cn] = min(production_max, consumer_share + (consumer_share - mean_share))
+                    min_constraints[cn] = min(max_constraints[cn], max(mean_share, required_zev_share, production_min))
 
             if share_range == 1.0:
                 # span the whole space of shares
