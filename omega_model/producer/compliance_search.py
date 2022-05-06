@@ -300,23 +300,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
         else:
             sales_share_dict = pd.DataFrame()
-            for ch, cn in zip(children, share_column_names):
-                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[ch] /
-                                        context_new_vehicle_sales(calendar_year)['total']]
+            for cn in share_column_names:
+                sales_share_dict[cn] = [consumer_response[cn]]
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
-
-            # # inherit absolute market shares from consumer response for non-responsive children
-            # if node_name:
-            #     abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c for c in children]
-            # else:
-            #     abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
-            #
-            # sales_share_dict = dict()
-            # for cn in abs_share_column_names:
-            #     if cn.replace('producer', 'consumer') in consumer_response:
-            #         sales_share_dict[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
-            #
-            # sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
 
     # print('generate market share options time = %f' % (time.time() - start_time))
 
