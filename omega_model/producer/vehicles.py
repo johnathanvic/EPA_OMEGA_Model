@@ -969,7 +969,7 @@ class Vehicle(OMEGABase):
             from common.omega_plot import figure, label_xyt
 
             fig, ax1 = figure()
-            label_xyt(ax1, 'CO2e [g/mi]', 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
+            label_xyt(ax1, '%s' % cost_curve_interp_key, 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
             # ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
             #          cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
@@ -981,12 +981,12 @@ class Vehicle(OMEGABase):
 
             ax1.plot(cost_cloud[cost_curve_interp_key],
                      cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], 'x',
-                     label='Credits g/mi')
+                     label='Generalized Cost')
 
             ax1.plot(cost_curve['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
                      cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 'x-',
                      color='black',
-                     label='Credit Cost Curve')
+                     label='Generalized Cost Curve')
 
             # ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
             #          cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
@@ -1001,7 +1001,7 @@ class Vehicle(OMEGABase):
             fig.savefig(figname.replace(' ', '_'), bbox_inches='tight')
 
             fig, ax1 = figure()
-            label_xyt(ax1, 'CO2e credits [Mg]', 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
+            label_xyt(ax1, '%s' % cost_curve_interp_key, 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
             ax1.plot(cost_cloud[cost_curve_interp_key],
                      cost_cloud['cert_co2e_grams_per_mile'], '.',
                      label='CO2e g/mi')
