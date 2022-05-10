@@ -959,11 +959,13 @@ class Vehicle(OMEGABase):
         if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
             (self.model_year in omega_globals.options.log_producer_compliance_search_years)):
 
-            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                       self.name.replace(':', '/'))
             cost_cloud['frontier'] = False
             cost_cloud.loc[cost_curve.index, 'frontier'] = True
             cost_cloud.to_csv(logfile_name)
-            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                       self.name.replace(':', '/'))
             cost_curve.to_csv(logfile_name)
 
             from common.omega_plot import figure, label_xyt
