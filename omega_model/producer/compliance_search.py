@@ -126,11 +126,15 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
             cv.get_from_cost_curve('new_vehicle_mfr_generalized_cost_dollars', cost_curve_options)
         # tech_kwh_options = \
         #     cv.get_from_cost_curve('cert_direct_kwh_per_mile', cost_curve_options)
+        tech_cert_co2e_gpmi = \
+            cv.get_from_cost_curve('cert_co2e_grams_per_mile', cost_curve_options)
 
         d = {'veh_%s_cost_curve_indices' % cv.vehicle_id: cost_curve_options,
              # 'veh_%s_kwh_pmi' % cv.vehicle_id: tech_kwh_options,
              'veh_%s_cost_dollars' % cv.vehicle_id: tech_cost_options,
-             'veh_%s_generalized_cost_dollars' % cv.vehicle_id: tech_generalized_cost_options}
+             'veh_%s_generalized_cost_dollars' % cv.vehicle_id: tech_generalized_cost_options,
+             'veh_%s_cert_co2e_gpmi' % cv.vehicle_id: tech_cert_co2e_gpmi,
+             }
         df = pd.DataFrame.from_dict(d)
 
         child_df_list.append(df)
@@ -409,6 +413,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         # start_time = time.time()
 
         tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
+        tech_sweeps['tech_index'] = tech_sweeps.index
+
         # print('tech_sweeps time %f' % (time.time() - start_time))
 
         # start_time = time.time()
@@ -423,6 +429,131 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)
+
+        # >>> calc non-subsidized consumer response here ---------------------------------------------------------- <<<
+
+        if calendar_year in [2020, 2035, 2045] and producer_consumer_iteration_num == 0 and search_iteration == 0:
+            start_time = time.time()
+
+            tech_index_cache = dict()
+
+            producer_decisions_and_responses = []
+
+            consumer_cache_columns = []
+            mc_columns = []
+            for mc in omega_globals.options.MarketClass.market_classes:
+                mc_columns.append('average_onroad_direct_co2e_gpmi_%s' % mc)
+                mc_columns.append('average_onroad_direct_kwh_pmi_%s' % mc)
+                mc_columns.append('average_new_vehicle_mfr_cost_%s' % mc)
+                mc_columns.append('sales_%s' % mc)
+                mc_columns.append('average_retail_fuel_price_dollars_per_unit_%s' % mc)
+
+            mc_columns += ['producer_abs_share_frac_hauling', 'producer_abs_share_frac_non_hauling']
+
+            cache_columns = mc_columns
+
+            for index, row in production_options.iterrows():
+                producer_decision = row
+
+                cache_key = producer_decision['tech_index']
+
+                if cache_key not in tech_index_cache:
+
+                    candidate_mfr_composite_vehicles = \
+                        apply_production_decision_to_composite_vehicles(composite_vehicles, producer_decision)
+
+                    market_class_vehicle_dict = omega_globals.options.MarketClass.get_market_class_dict()
+                    for new_veh in candidate_mfr_composite_vehicles:
+                        market_class_vehicle_dict[new_veh.market_class_id].append(new_veh)
+
+                    # for cv in candidate_mfr_composite_vehicles:
+                    #     cv.credits_co2e_Mg_per_vehicle = producer_decision[
+                    #         'veh_%s_cost_curve_indices' % cv.vehicle_id]
+                    #     cv.initial_registered_count = producer_decision['veh_%s_sales' % cv.vehicle_id]
+                    #     # VehicleAttributeCalculations.perform_attribute_calculations(cv)
+                    #     cv.decompose(['onroad_direct_co2e_grams_per_mile',
+                    #                   'onroad_direct_kwh_per_mile',
+                    #                   'new_vehicle_mfr_cost_dollars'])
+                    #     cv.new_vehicle_mfr_cost_dollars = \
+                    #         cv.get_weighted_attribute('new_vehicle_mfr_cost_dollars')
+                    #     cv.new_vehicle_mfr_generalized_cost_dollars = \
+                    #         cv.get_weighted_attribute('new_vehicle_mfr_generalized_cost_dollars')
+                    #     cv.target_co2e_Mg = \
+                    #         cv.get_weighted_attribute('target_co2e_Mg')
+                    #     cv.cert_co2e_Mg = \
+                    #         cv.get_weighted_attribute('cert_co2e_Mg')
+
+                    # calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
+
+                    # shortcut here:
+                    producer_decision['producer_abs_share_frac_hauling'] = \
+                        producer_decision['producer_share_frac_hauling']
+
+                    producer_decision['producer_abs_share_frac_non_hauling'] = \
+                        producer_decision['producer_share_frac_non_hauling']
+
+                    for mc in omega_globals.options.MarketClass.market_classes:
+                        market_class_vehicles = market_class_vehicle_dict[mc]
+                        if market_class_vehicles:
+                            producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = \
+                                weighted_value(market_class_vehicles, 'initial_registered_count',
+                                               'onroad_direct_co2e_grams_per_mile')
+
+                            producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = \
+                                weighted_value(market_class_vehicles, 'initial_registered_count',
+                                               'onroad_direct_kwh_per_mile')
+
+                            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = \
+                                weighted_value(market_class_vehicles, 'initial_registered_count',
+                                               'new_vehicle_mfr_cost_dollars')
+
+                            producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % mc] = \
+                                weighted_value(market_class_vehicles, 'initial_registered_count',
+                                               'retail_fuel_price_dollars_per_unit')
+
+                            producer_decision['sales_%s' % mc] = 0
+                            for v in market_class_vehicles:
+                                producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
+                        else:
+                            producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
+                            producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = 0
+                            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = 0
+                            producer_decision['sales_%s' % mc] = 0
+
+                    tech_index_cache[cache_key] = \
+                        calc_consumer_response(calendar_year, market_class_tree, compliance_id,
+                                               producer_decision, pd.DataFrame(producer_decision).transpose())
+
+                consumer_response = tech_index_cache[cache_key]
+
+                if not consumer_cache_columns:
+                    consumer_cache_columns = [c for c in consumer_response if 'consumer' in c]
+                    cache_columns += consumer_cache_columns
+
+                max_share_error = 0
+                for c in cache_columns:
+                    producer_decision[c] = consumer_response[c].item()
+                    if c.startswith('consumer_share'):
+                        error = producer_decision[c.replace('consumer', 'producer')] - consumer_response[c].item()
+                        max_share_error = max(abs(error), max_share_error)
+                        producer_decision[c + '_error'] = error
+
+                producer_decision['max_share_error'] = max_share_error
+
+                producer_decisions_and_responses.append(pd.DataFrame(producer_decision).transpose())
+
+            print('consumer cloud time %.2f' % (time.time() - start_time))
+
+            production_options_and_response = pd.concat(producer_decisions_and_responses)
+
+            # save and append at each iteration...?
+            production_options_and_response.to_csv(omega_globals.options.output_folder +
+                                                   'poar_%s_%d_%d_%d.csv' % (omega_globals.options.session_name,
+                                                                             calendar_year,
+                                                                             producer_consumer_iteration_num,
+                                                                             search_iteration))
+
+        # >>> calc non-subsidized consumer response here ---------------------------------------------------------- <<<
 
         # insert code to cull production options based on policy here #
 

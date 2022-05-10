@@ -220,10 +220,12 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
-            producer_decision (Series): selected producer compliance option
-            market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
-                'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
-                columns, where MC = market class ID
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
             mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
             mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
 

@@ -9,6 +9,7 @@ Runs a single session, writes info to log files and the console, executes sessio
 **CODE**
 
 """
+import pandas as pd
 
 print('importing %s' % __file__)
 
@@ -39,7 +40,7 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
             into market classes
         compliance_id (str): name of manufacturer, e.g. 'consolidated_OEM'
         producer_decision (Series): result of producer compliance search, *without* consumer response
-        cross_subsidy_options_and_response (DataFrame, Series): initiall empty dataframe or Series containing cross
+        cross_subsidy_options_and_response (DataFrame, Series): initially empty dataframe or Series containing cross
             subsidy options and response
         producer_consumer_iteration_num (int): producer-consumer iteration number
         iteration_log (DataFrame): DataFrame of producer-consumer iteration data
@@ -85,6 +86,70 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
                                                         verbose=verbose)
 
     return cross_subsidy_options_and_response, iteration_log
+
+
+def calc_consumer_response(calendar_year, market_class_tree, compliance_id, producer_decision,
+                           producer_decision_and_response, node_name='', verbose=False):
+    """
+    Traverse the market class tree and generate non-cross-subsidized consumer response for
+    responsive market categories/classes
+
+    Args:
+        calendar_year (int): the year in which the compliance calculations take place
+        market_class_tree (dict): a dict of CompositeVehicle object lists hiearchically grouped by market categories
+            into market classes
+        compliance_id (str): name of manufacturer, e.g. 'consolidated_OEM'
+        producer_decision (Series): result of producer compliance search, *without* consumer response
+        producer_decision_and_response (DataFrame, Series): initiall empty dataframe or Series containing cross
+            subsidy options and response
+        node_name (str):
+        verbose (bool): enable additional console output if True
+
+    Returns:
+        ``consumer_response``
+
+    """
+    children = list(market_class_tree)
+    if verbose:
+        print('children: %s' % children)
+
+    if node_name:
+        cross_subsidy_pair = [node_name + '.' + c for c in children]
+    else:
+        cross_subsidy_pair = [c for c in children]
+
+    if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
+        if verbose:
+            print('responsive: %s' % cross_subsidy_pair)
+
+        # if producer_decision_and_response.empty:
+        #     market_class_data = pd.DataFrame(producer_decision).transpose()
+        # else:
+        market_class_data = producer_decision_and_response
+
+        for mc in cross_subsidy_pair:
+            market_class_data['average_modified_cross_subsidized_price_%s' % mc] = \
+                producer_decision['average_new_vehicle_mfr_cost_%s' % mc]
+
+        producer_decision_and_response = \
+            omega_globals.options.SalesShare.calc_shares(calendar_year, producer_decision, market_class_data,
+                                                         node_name, cross_subsidy_pair)
+
+    else:
+        if verbose:
+            print('non-responsive: %s' % cross_subsidy_pair)
+        # do no search cross-subsidy options at this level of the tree
+
+    for child in market_class_tree:
+        if type(market_class_tree[child]) is dict:
+            if verbose:
+                print('processing child ' + child)
+            # process subtree
+            producer_decision_and_response = \
+                calc_consumer_response(calendar_year, market_class_tree[child], compliance_id, producer_decision,
+                                       producer_decision_and_response, node_name=child, verbose=verbose)
+
+    return producer_decision_and_response
 
 
 def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subsidy_pricing_error,
@@ -460,10 +525,10 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     mcat_converged, share_convergence_error, cross_subsidy_pricing_error = \
         detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
 
-    if (best_producer_decision_and_response is None) or \
-            (producer_decision_and_response['pricing_score']
-             < best_producer_decision_and_response['pricing_score']):
-        best_producer_decision_and_response = producer_decision_and_response.copy()
+    # if (best_producer_decision_and_response is None) or \
+    #         (producer_decision_and_response['pricing_score']
+    #          < best_producer_decision_and_response['pricing_score']):
+    best_producer_decision_and_response = producer_decision_and_response.copy()
 
     logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, producer_consumer_iteration_num,
                                    producer_decision_and_response, share_convergence_error)

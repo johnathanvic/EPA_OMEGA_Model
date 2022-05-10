@@ -175,8 +175,8 @@ try:
             self.end_time = 0
 
             # developer settings
-            self.producer_num_market_share_options = 3
-            self.producer_num_tech_options_per_ice_vehicle = 3
+            self.producer_num_market_share_options = 5 # 3
+            self.producer_num_tech_options_per_ice_vehicle = 5 # 3
             self.producer_num_tech_options_per_bev_vehicle = 1
             self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = True
