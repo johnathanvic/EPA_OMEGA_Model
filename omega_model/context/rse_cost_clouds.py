@@ -349,10 +349,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
             if vehicle.bev:
                 rated_hp = vehicle.motor_kw * 1.34102
-            elif vehicle.ice:
+            else:  # use continuous rated power (engine power)
                 rated_hp = vehicle.eng_rated_hp
-            else:  # TODO: HEVs / PHEVs... what to do about sizing...?
-                rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
 
             if vehicle.bev:
                 vehicle.powertrain_type = 'BEV'

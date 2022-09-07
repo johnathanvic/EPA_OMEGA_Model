@@ -50,14 +50,15 @@ def update_stock(calendar_year, compliance_id=None):
 
     if calendar_year < omega_globals.options.analysis_initial_year:
         vehicles_cache.clear()
+        prior_analysis_years_vehicle_annual_data = []
+    else:
+        prior_analysis_years_vehicle_annual_data = \
+            VehicleAnnualData.get_vehicle_annual_data(omega_globals.options.analyzed_years[compliance_id][-1], compliance_id)
 
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year, compliance_id)
 
-    last_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, compliance_id)
-
-    # omega_globals.session.add_all(this_years_vehicle_annual_data)
-    # UPDATE vehicle annual data for this year's stock
+    # UPDATE vehicle annual data for this analysis year's stock
     for vad in this_years_vehicle_annual_data:
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad['vehicle_id'])
         age = calendar_year - model_year
@@ -79,14 +80,14 @@ def update_stock(calendar_year, compliance_id=None):
             vad['odometer'] = odometer
             vad['vmt'] = annual_vmt * registered_count
 
-    if not last_years_vehicle_annual_data:
+    if not prior_analysis_years_vehicle_annual_data:
         prior_year_vehicle_data = []
     else:
-        prior_year_vehicle_data = [(v['vehicle_id'], v['odometer']) for v in last_years_vehicle_annual_data]
+        prior_year_vehicle_data = [(v['vehicle_id'], v['odometer']) for v in prior_analysis_years_vehicle_annual_data]
 
     vad_list = []
 
-    # CREATE vehicle annual data for last year's stock, now one year older:
+    # CREATE vehicle annual data for prior analysis year's stock (if any), now older:
     if prior_year_vehicle_data:
         for vehicle_id, prior_odometer in prior_year_vehicle_data:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)

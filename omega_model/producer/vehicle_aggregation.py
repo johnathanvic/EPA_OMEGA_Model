@@ -436,6 +436,7 @@ class VehicleAggregation(OMEGABase):
                 agg_df['model_year'] = omega_globals.options.vehicles_file_base_year
             else:
                 agg_df['model_year'] = df['model_year'].iloc[0]
+                omega_globals.options.vehicles_file_base_year = int(df['model_year'].iloc[0])
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 

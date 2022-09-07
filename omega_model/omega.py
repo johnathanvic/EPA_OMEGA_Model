@@ -241,13 +241,16 @@ def run_producer_consumer():
         omega_log.logwrite("\nRunning %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, compliance_id),
                            echo_console=True)
 
-        analysis_end_year = omega_globals.options.analysis_final_year + 1
+        omega_globals.options.analyzed_years[compliance_id] = [omega_globals.options.vehicles_file_base_year]
+
+        # update vehicle annual data for base year fleet
+        stock.update_stock(omega_globals.options.vehicles_file_base_year, compliance_id)
 
         credit_banks[compliance_id] = CreditBank(
             omega_globals.options.ghg_credit_params_file,
             omega_globals.options.ghg_credits_file, compliance_id)
 
-        for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
+        for calendar_year in omega_globals.options.analysis_years:
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
 
@@ -328,6 +331,8 @@ def run_producer_consumer():
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
             stock.update_stock(calendar_year, compliance_id)
+
+            omega_globals.options.analyzed_years[compliance_id].append(calendar_year)
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
@@ -1456,12 +1461,17 @@ def init_omega(session_runtime_options):
                                                       verbose=verbose_init)
 
         if not init_fail:
-            # initial year = initial fleet model year (latest year of data)
-            omega_globals.options.analysis_initial_year = \
-                int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+            omega_globals.options.analysis_initial_year = omega_globals.options.vehicles_file_base_year + 1
 
-            # update vehicle annual data for base year fleet
-            stock.update_stock(omega_globals.options.analysis_initial_year - 1)
+            analysis_start_year = omega_globals.options.analysis_initial_year
+            analysis_end_year = omega_globals.options.analysis_final_year + 1
+
+            omega_globals.options.analysis_years = range(analysis_start_year, analysis_end_year)
+
+            omega_globals.options.analysis_years = [2020, 2025]
+
+            # # update vehicle annual data for base year fleet
+            # stock.update_stock(omega_globals.options.vehicles_file_base_year)
 
     except:
         init_fail += ["\n#INIT FAIL\n%s\n" % traceback.format_exc()]
@@ -1507,7 +1517,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
-    session_runtime_options.multiprocessing = session_runtime_options.multiprocessing and not standalone_run
+    session_runtime_options.multiprocessing = session_runtime_options.multiprocessing # and not standalone_run
 
     init_fail = None
 

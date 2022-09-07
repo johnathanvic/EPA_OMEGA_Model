@@ -50,8 +50,10 @@ def run_postproc(iteration_log, credit_banks):
     if not omega_globals.options.standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)
 
-    vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
-                               omega_globals.options.analysis_final_year + 1))
+    # vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
+    #                            omega_globals.options.analysis_final_year + 1))
+
+    vehicle_years = [omega_globals.options.vehicles_file_base_year] + omega_globals.options.analysis_years
 
     # collect vehicle data in one database hit then filter it later
     vehicle_data = omega_globals.session.query(VehicleFinal.vehicle_id, VehicleFinal.model_year,
@@ -68,7 +70,7 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
     vehicle_annual_data = vehicle_annual_data_df.to_dict(orient='index')
 
-    analysis_years = vehicle_years[1:]
+    analysis_years = omega_globals.options.analysis_years
 
     dump_table_to_csv(omega_globals.options.output_folder, 'vehicles',
                       omega_globals.options.session_unique_name + '_vehicles',
@@ -954,7 +956,7 @@ def plot_market_shares(calendar_years, total_sales):
     # plot reg class results
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % rc], '.--')
+        ax1.plot(calendar_years[1:], market_share_results['abs_share_frac_%s' % rc][1:], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
               '%s\nReg Class Absolute Market Shares' % omega_globals.options.session_unique_name)
