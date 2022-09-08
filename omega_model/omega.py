@@ -241,7 +241,7 @@ def run_producer_consumer():
         omega_log.logwrite("\nRunning %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, compliance_id),
                            echo_console=True)
 
-        omega_globals.options.analyzed_years[compliance_id] = [omega_globals.options.vehicles_file_base_year]
+        omega_globals.prior_analysis_year = omega_globals.options.vehicles_file_base_year
 
         # update vehicle annual data for base year fleet
         stock.update_stock(omega_globals.options.vehicles_file_base_year, compliance_id)
@@ -332,7 +332,7 @@ def run_producer_consumer():
 
             stock.update_stock(calendar_year, compliance_id)
 
-            omega_globals.options.analyzed_years[compliance_id].append(calendar_year)
+            omega_globals.prior_analysis_year = calendar_year
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
@@ -1461,17 +1461,16 @@ def init_omega(session_runtime_options):
                                                       verbose=verbose_init)
 
         if not init_fail:
-            omega_globals.options.analysis_initial_year = omega_globals.options.vehicles_file_base_year + 1
+            if omega_globals.options.analysis_years:
+                omega_globals.options.analysis_initial_year = omega_globals.options.analysis_years[0]
+                omega_globals.options.analysis_final_year = omega_globals.options.analysis_years[-1]  # not necessary, but it makes me feel better
+            else:
+                omega_globals.options.analysis_initial_year = omega_globals.options.vehicles_file_base_year + 1
 
-            analysis_start_year = omega_globals.options.analysis_initial_year
-            analysis_end_year = omega_globals.options.analysis_final_year + 1
+                analysis_start_year = omega_globals.options.analysis_initial_year
+                analysis_end_year = omega_globals.options.analysis_final_year
 
-            omega_globals.options.analysis_years = range(analysis_start_year, analysis_end_year)
-
-            omega_globals.options.analysis_years = [2020, 2025]
-
-            # # update vehicle annual data for base year fleet
-            # stock.update_stock(omega_globals.options.vehicles_file_base_year)
+                omega_globals.options.analysis_years = list(range(analysis_start_year, analysis_end_year + 1))
 
     except:
         init_fail += ["\n#INIT FAIL\n%s\n" % traceback.format_exc()]

@@ -53,7 +53,7 @@ def update_stock(calendar_year, compliance_id=None):
         prior_analysis_years_vehicle_annual_data = []
     else:
         prior_analysis_years_vehicle_annual_data = \
-            VehicleAnnualData.get_vehicle_annual_data(omega_globals.options.analyzed_years[compliance_id][-1], compliance_id)
+            VehicleAnnualData.get_vehicle_annual_data(omega_globals.prior_analysis_year, compliance_id)
 
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year, compliance_id)

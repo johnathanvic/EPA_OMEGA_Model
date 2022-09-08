@@ -17,3 +17,5 @@ print('importing %s' % __file__)
 options = None  #: simulation options
 engine = None  #: connection to database engine
 session = None  #: database session
+
+prior_analysis_year = None  #: track prior analysis year

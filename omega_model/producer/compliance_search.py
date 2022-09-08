@@ -494,7 +494,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     if cache_key not in _cache:
         # pull in prior analysis year's vehicles:
         manufacturer_prior_vehicles = \
-            VehicleFinal.get_compliance_vehicles(omega_globals.options.analyzed_years[compliance_id][-1], compliance_id)
+            VehicleFinal.get_compliance_vehicles(omega_globals.prior_analysis_year, compliance_id)
 
         # Vehicle.reset_vehicle_ids()
 

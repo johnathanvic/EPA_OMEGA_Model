@@ -412,10 +412,11 @@ class CreditBank(OMEGABase):
         """
 
         # grab last years
-        last_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year - 1].copy()
+        last_years_credits = self.credit_bank[self.credit_bank['calendar_year'] ==
+                                              omega_globals.prior_analysis_year].copy()
 
         # last_years_credits = last_years_credits.loc[last_years_credits['credit_transfer_action'] != 'EXPIRATION']
-        last_years_credits['age'] = last_years_credits['age'] + 1
+        last_years_credits['age'] = last_years_credits['age'] + calendar_year - omega_globals.prior_analysis_year
         last_years_credits['calendar_year'] = calendar_year
         last_years_credits['beginning_balance_Mg'] = last_years_credits['ending_balance_Mg']
 
