@@ -121,7 +121,7 @@ try:
 
             self.analysis_initial_year = None
             self.analysis_final_year = 2021
-            self.analysis_years = [2020, 2025, 2030]
+            self.analysis_years = []
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
