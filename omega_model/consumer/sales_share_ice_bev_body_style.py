@@ -293,13 +293,13 @@ class SalesShare(OMEGABase, SalesShareBase):
         dfs_coeffs = pd.Series({'sedan_wagon': sedan_wagon_constants, 'cuv_suv_van': cuv_suv_van_constants,
                                 'pickup': pickup_constants}[body_style])
 
-        if 'y_hat_sedan_wagon_%s' % (calendar_year - 1) not in SalesShare._data:
+        if 'y_hat_sedan_wagon_%s' % omega_globals.prior_analysis_year not in SalesShare._data:
             # no prior year analysis, use base year, historic value
-            SalesShare._data['y_hat_sedan_wagon_%s' % (calendar_year - 1)] = sedan_wagon_constants['y_hat_historic']
-            SalesShare._data['y_hat_cuv_suv_van_%s' % (calendar_year - 1)] = cuv_suv_van_constants['y_hat_historic']
-            SalesShare._data['y_hat_pickup_%s' % (calendar_year - 1)] = pickup_constants['y_hat_historic']
+            SalesShare._data['y_hat_sedan_wagon_%s' % omega_globals.prior_analysis_year] = sedan_wagon_constants['y_hat_historic']
+            SalesShare._data['y_hat_cuv_suv_van_%s' % omega_globals.prior_analysis_year] = cuv_suv_van_constants['y_hat_historic']
+            SalesShare._data['y_hat_pickup_%s' % omega_globals.prior_analysis_year] = pickup_constants['y_hat_historic']
 
-        y_hat_prior = SalesShare._data['y_hat_%s_%s' % (body_style, calendar_year - 1)]
+        y_hat_prior = SalesShare._data['y_hat_%s_%s' % (body_style, omega_globals.prior_analysis_year)]
         price = producer_decision['average_new_vehicle_mfr_cost_%s' % body_style]
         footprint = producer_decision['average_footprint_ft2_%s' % body_style]
         gasoline_dollars_per_gallon = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
