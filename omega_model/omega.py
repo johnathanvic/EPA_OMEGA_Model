@@ -1469,7 +1469,7 @@ def init_omega(session_runtime_options):
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                                         verbose=verbose_init)
 
-        init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file, verbose=verbose_init)
+        # init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file, verbose=verbose_init)
 
         # must be after Manufacturer init for input validation
         init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
