@@ -1,0 +1,38 @@
+# This requirements file indicates packages necessary to run the OMEGA model and the GUI
+#
+# quick uninstall all: pip freeze | xargs pip uninstall -y
+# or
+# pip freeze > freeze.txt
+# pip uninstall -r freeze.txt -y
+#
+# Install using pip:
+# pip install -r requirements.txt --compile
+
+# for omega_model:
+numpy
+matplotlib
+pandas==1.2.5
+scipy
+SQLAlchemy<1.4.0
+treelib
+
+# for readthedocs:
+sphinx-rtd-theme>=1.0.0<=2.0.0
+
+# for dispy parallel processing:
+dispy==4.12.4
+pycos==4.11.0
+psutil
+netifaces
+
+# for omega batch process:
+pyDOE2
+
+# for reading excel files (omega_preproc):
+openpyxl
+
+# for omega_gui:
+PySide2
+multitimer
+playsound
+PyYAML
