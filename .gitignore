@@ -5,6 +5,7 @@ build
 dist
 /omega_model/output/*
 /omega_preproc/output_context_aeo
+/omega_effects_module/outputs
 outputs
 .pytest_cache
 .coverage

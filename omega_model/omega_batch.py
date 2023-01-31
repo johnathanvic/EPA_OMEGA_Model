@@ -816,10 +816,10 @@ class OMEGABatchObject(OMEGABase):
         if self.settings.analysis_final_year is not None:
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
         self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
-        self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
-        self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
-                                                      {'end-of-year', 'beginning-of-year'})
-        self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
+        # self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
+        # self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
+        #                                               {'end-of-year', 'beginning-of-year'})
+        # self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
         self.settings.analysis_dollar_basis = self.read_parameter('Analysis Dollar Basis')
 
         # read context scalar settings
@@ -827,8 +827,8 @@ class OMEGABatchObject(OMEGABase):
         self.settings.context_case_id = self.read_parameter('Context Case')
         self.settings.new_vehicle_price_elasticity_of_demand = \
             self.read_parameter('New Vehicle Price Elasticity of Demand')
-        self.settings.vmt_rebound_rate_ice = self.read_parameter('VMT Rebound Rate ICE')
-        self.settings.vmt_rebound_rate_bev = self.read_parameter('VMT Rebound Rate BEV')
+        # self.settings.vmt_rebound_rate_ice = self.read_parameter('VMT Rebound Rate ICE')
+        # self.settings.vmt_rebound_rate_bev = self.read_parameter('VMT Rebound Rate BEV')
         self.settings.consumer_pricing_multiplier_max = \
             self.read_parameter('Producer Cross Subsidy Multiplier Max')
         self.settings.consumer_pricing_multiplier_min = \
@@ -839,10 +839,10 @@ class OMEGABatchObject(OMEGABase):
         # read context file settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
-        self.settings.context_stock_vmt_file = self.read_parameter('Context Stock and VMT File')
-        self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
-        self.settings.repair_cost_inputs_file = self.read_parameter('Repair Costs File')
-        self.settings.refueling_cost_inputs_file = self.read_parameter('Refueling Costs File')
+        # self.settings.context_stock_vmt_file = self.read_parameter('Context Stock and VMT File')
+        # self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
+        # self.settings.repair_cost_inputs_file = self.read_parameter('Repair Costs File')
+        # self.settings.refueling_cost_inputs_file = self.read_parameter('Refueling Costs File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
@@ -864,22 +864,22 @@ class OMEGABatchObject(OMEGABase):
         self.settings.workfactor_definition_file = self.read_parameter('Workfactor Definition File')
 
         # read postproc settings
-        self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
-        self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
-        self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
-        self.settings.energysecurity_cost_factors_file = \
-            self.read_parameter('Context Energy Security Cost Factors File')
-        self.settings.congestion_noise_cost_factors_file = \
-            self.read_parameter('Context Congestion-Noise Cost Factors File')
-        self.settings.emission_factors_powersector_file = \
-            self.read_parameter('Context Powersector Emission Factors File')
-        self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
-        self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
+        # self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
+        # self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
+        # self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
+        # self.settings.energysecurity_cost_factors_file = \
+        #     self.read_parameter('Context Energy Security Cost Factors File')
+        # self.settings.congestion_noise_cost_factors_file = \
+        #     self.read_parameter('Context Congestion-Noise Cost Factors File')
+        # self.settings.emission_factors_powersector_file = \
+        #     self.read_parameter('Context Powersector Emission Factors File')
+        # self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
+        # self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
-        self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
-        self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
-        self.settings.legacy_fleet_file = self.read_parameter('Context Legacy Fleet File')
+        # self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
+        # self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
+        # self.settings.legacy_fleet_file = self.read_parameter('Context Legacy Fleet File')
 
     def num_sessions(self):
         """
@@ -1001,10 +1001,10 @@ class OMEGASessionObject(OMEGABase):
         # read context settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
-        self.settings.context_stock_vmt_file = self.read_parameter('Context Stock and VMT File')
-        self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
-        self.settings.repair_cost_inputs_file = self.read_parameter('Repair Costs File')
-        self.settings.refueling_cost_inputs_file = self.read_parameter('Refueling Costs File')
+        # self.settings.context_stock_vmt_file = self.read_parameter('Context Stock and VMT File')
+        # self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
+        # self.settings.repair_cost_inputs_file = self.read_parameter('Repair Costs File')
+        # self.settings.refueling_cost_inputs_file = self.read_parameter('Refueling Costs File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
@@ -1026,22 +1026,22 @@ class OMEGASessionObject(OMEGABase):
         self.settings.workfactor_definition_file = self.read_parameter('Workfactor Definition File')
 
         # read postproc settings
-        self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
-        self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
-        self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
-        self.settings.energysecurity_cost_factors_file = \
-            self.read_parameter('Context Energy Security Cost Factors File')
-        self.settings.congestion_noise_cost_factors_file = \
-            self.read_parameter('Context Congestion-Noise Cost Factors File')
-        self.settings.emission_factors_powersector_file = \
-            self.read_parameter('Context Powersector Emission Factors File')
-        self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
-        self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
+        # self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
+        # self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
+        # self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
+        # self.settings.energysecurity_cost_factors_file = \
+        #     self.read_parameter('Context Energy Security Cost Factors File')
+        # self.settings.congestion_noise_cost_factors_file = \
+        #     self.read_parameter('Context Congestion-Noise Cost Factors File')
+        # self.settings.emission_factors_powersector_file = \
+        #     self.read_parameter('Context Powersector Emission Factors File')
+        # self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
+        # self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
-        self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
-        self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
-        self.settings.legacy_fleet_file = self.read_parameter('Context Legacy Fleet File')
+        # self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
+        # self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
+        # self.settings.legacy_fleet_file = self.read_parameter('Context Legacy Fleet File')
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
@@ -1724,33 +1724,33 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                        + '_summary_results.csv'
                             session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
-                            if 'Physical' in batch.sessions[s_index].settings.calc_effects:
-                                annual_physical_effects_filename = options.batch_path + '_' \
-                                                                   + batch.sessions[s_index].settings.output_folder_base \
-                                                                   + batch.sessions[s_index].settings.session_unique_name \
-                                                                   + '_physical_effects_annual.csv'
-                                annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
-
-                            if 'Costs' in batch.sessions[s_index].settings.calc_effects:
-                                apa_cost_effects_filename = options.batch_path + '_' \
-                                                            + batch.sessions[s_index].settings.output_folder_base \
-                                                            + batch.sessions[s_index].settings.session_unique_name \
-                                                            + '_cost_effects_annual_present_and_annualized.csv'
-                                apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
+                            # if 'Physical' in batch.sessions[s_index].settings.calc_effects:
+                            #     annual_physical_effects_filename = options.batch_path + '_' \
+                            #                                        + batch.sessions[s_index].settings.output_folder_base \
+                            #                                        + batch.sessions[s_index].settings.session_unique_name \
+                            #                                        + '_physical_effects_annual.csv'
+                            #     annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
+                            #
+                            # if 'Costs' in batch.sessions[s_index].settings.calc_effects:
+                            #     apa_cost_effects_filename = options.batch_path + '_' \
+                            #                                 + batch.sessions[s_index].settings.output_folder_base \
+                            #                                 + batch.sessions[s_index].settings.session_unique_name \
+                            #                                 + '_cost_effects_annual_present_and_annualized.csv'
+                            #     apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
 
                 batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
                 batch_summary_filename = batch.name + '_summary_results.csv'
                 batch_summary_df.to_csv(batch_summary_filename, index=False)
 
-                if 'Physical' in batch.sessions[s_index].settings.calc_effects:
-                    batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
-                    batch_annual_physical_effects_filename = batch.name + '_physical_effects_annual.csv'
-                    batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
-
-                if 'Costs' in batch.sessions[s_index].settings.calc_effects:
-                    batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
-                    batch_apa_cost_effects_filename = batch.name + '_cost_effects_annual_present_and_annualized.csv'
-                    batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
+                # if 'Physical' in batch.sessions[s_index].settings.calc_effects:
+                #     batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
+                #     batch_annual_physical_effects_filename = batch.name + '_physical_effects_annual.csv'
+                #     batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
+                #
+                # if 'Costs' in batch.sessions[s_index].settings.calc_effects:
+                #     batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
+                #     batch_apa_cost_effects_filename = batch.name + '_cost_effects_annual_present_and_annualized.csv'
+                #     batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
 
 
 if __name__ == '__main__':
