@@ -103,10 +103,12 @@ def main():
 
         session_safety_effects_dict = {**analysis_fleet_safety_effects_dict, **legacy_fleet_safety_effects_dict}
 
-        effects_log.logwrite(f'Saving safety effects file for {session_name}')
-        session_safety_effects_df = \
-            save_file(session_settings, session_safety_effects_dict, path_of_run_folder, 'safety_effects', effects_log,
-                      extension=runtime_options.file_format)
+        if runtime_options.save_vehicle_detail_files:
+            effects_log.logwrite(f'Saving safety effects file for {session_name}')
+            session_safety_effects_df = \
+                pd.DataFrame.from_dict(session_safety_effects_dict, orient='index').reset_index(drop=True)
+            save_file(session_settings, session_safety_effects_df, path_of_run_folder, 'safety_effects',
+                      effects_log, extension=runtime_options.file_format)
 
         # physical effects ---------------------------------------------------------------------------------------------
         effects_log.logwrite(f'\nCalculating analysis fleet physical effects for {session_name}')
@@ -119,14 +121,16 @@ def main():
 
         session_physical_effects_dict = {**analysis_fleet_physical_effects_dict, **legacy_fleet_physical_effects_dict}
 
-        effects_log.logwrite(f'Saving physical effects file for {session_name}')
         session_physical_effects_df = \
-            save_file(session_settings, session_physical_effects_dict, path_of_run_folder, 'physical_effects', effects_log,
+            pd.DataFrame.from_dict(session_physical_effects_dict, orient='index').reset_index(drop=True)
+
+        if runtime_options.save_vehicle_detail_files:
+            effects_log.logwrite(f'Saving physical effects file for {session_name}')
+            save_file(session_settings, session_physical_effects_df, path_of_run_folder, 'physical_effects', effects_log,
                       extension=runtime_options.file_format)
 
         effects_log.logwrite(f'\nCalculating annual physical effects for {session_name}')
-        session_annual_physical_effects_df \
-            = calc_annual_physical_effects(batch_settings, session_physical_effects_df)
+        session_annual_physical_effects_df = calc_annual_physical_effects(batch_settings, session_physical_effects_df)
 
         # for use in benefits calcs, create an annual_physical_effects_df
         annual_physical_effects_df \
@@ -139,9 +143,11 @@ def main():
         session_cost_effects_dict.update(
             calc_cost_effects(batch_settings, session_settings, session_physical_effects_dict, context_fuel_cpm_dict))
 
-        effects_log.logwrite(f'Saving cost effects file for {session_name}')
-        session_cost_effects_df = \
-            save_file(session_settings, session_cost_effects_dict, path_of_run_folder, 'cost_effects', effects_log,
+        session_cost_effects_df = pd.DataFrame.from_dict(session_cost_effects_dict, orient='index').reset_index(drop=True)
+
+        if runtime_options.save_vehicle_detail_files:
+            effects_log.logwrite(f'Saving cost effects file for {session_name}')
+            save_file(session_settings, session_cost_effects_df, path_of_run_folder, 'cost_effects', effects_log,
                       extension=runtime_options.file_format)
 
         effects_log.logwrite(f'\nCalculating annual costs effects for {session_name}')

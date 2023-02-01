@@ -55,6 +55,23 @@ class RuntimeOptions:
         self.batch_settings_file_name = None
         self.file_format = None
         self.path_outputs = None
+        self.save_vehicle_detail_files = None
+
+        self.true_false_dict = dict({
+            True: True,
+            False: False,
+            'True': True,
+            'False': False,
+            'TRUE': True,
+            'FALSE': False,
+            'None': None,
+            'Yes': True,
+            'yes': True,
+            'YES': True,
+            'No': False,
+            'no': False,
+            'NO': False,
+        })
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -88,6 +105,10 @@ class RuntimeOptions:
 
         self.path_outputs = Path(save_path_string)
 
+        self.save_vehicle_detail_files = self._dict['Save Vehicle-Level Output Files']['Entry']
+        if self.save_vehicle_detail_files in self.true_false_dict:
+            self.save_vehicle_detail_files = self.true_false_dict[self.save_vehicle_detail_files]
+
         try:
             self.batch_settings_file_name = self.batch_settings_file.name
         except Exception as e:
@@ -97,13 +118,13 @@ class RuntimeOptions:
 
         try:
             # protect against NaN or empty string
-            self.file_format = self._dict['Large Effects File Save Format']['Entry'].lower()
+            self.file_format = self._dict['Format for Vehicle-Level Output Files']['Entry'].lower()
         except Exception as e:
-            effects_log.logwrite('\nLarge Effects File Save Format in runtime_settings.csv must be "csv" or "parquet"')
+            effects_log.logwrite('\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
             effects_log.logwrite(e)
             sys.exit()
 
         if self.file_format not in ['csv', 'parquet']:
             # protect against improper save format
-            effects_log.logwrite('\nLarge Effects File Save Format in runtime_settings.csv must be "csv" or "parquet"')
+            effects_log.logwrite('\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
             sys.exit()

@@ -21,6 +21,7 @@ def validate_template_version_info(df, input_template_name, input_template_versi
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
+    effects_log.logwrite('Template version info is valid.')
 
 
 def validate_template_column_names(filepath, df, column_names, effects_log):

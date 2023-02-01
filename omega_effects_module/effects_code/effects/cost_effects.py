@@ -87,17 +87,20 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
             drive_value_cost_dollars = 0
 
             base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
-            market_class_id, fueling_class, base_year_powertrain_type \
-                = physical['base_year_vehicle_id'],\
-                  physical['model_year'], \
-                  physical['manufacturer_id'], \
-                  physical['name'], \
-                  physical['base_year_reg_class_id'], \
-                  physical['reg_class_id'], \
-                  physical['in_use_fuel_id'], \
-                  physical['market_class_id'], \
-                  physical['fueling_class'], \
-                  physical['base_year_powertrain_type']
+                market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor \
+                = physical['base_year_vehicle_id'], \
+                physical['model_year'], \
+                physical['manufacturer_id'], \
+                physical['name'], \
+                physical['base_year_reg_class_id'], \
+                physical['reg_class_id'], \
+                physical['in_use_fuel_id'], \
+                physical['market_class_id'], \
+                physical['fueling_class'], \
+                physical['base_year_powertrain_type'], \
+                physical['body_style'], \
+                physical['footprint_ft2'], \
+                physical['workfactor']
 
             vehicle_count, annual_vmt, odometer, vmt, vmt_rebound, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
@@ -213,6 +216,9 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 'in_use_fuel_id': in_use_fuel_id,
                 'fueling_class': fueling_class,
                 'base_year_powertrain_type': base_year_powertrain_type,
+                'body_style': body_style,
+                'footprint_ft2': footprint,
+                'workfactor': workfactor,
                 'registered_count': vehicle_count,
                 'annual_vmt': annual_vmt,
                 'odometer': odometer,

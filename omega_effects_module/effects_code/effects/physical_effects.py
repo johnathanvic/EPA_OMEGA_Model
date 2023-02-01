@@ -243,6 +243,8 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
         'market_class_id',
         'fueling_class',
         'base_year_powertrain_type',
+        'footprint_ft2',
+        'workfactor',
         'target_co2e_grams_per_mile',
         'onroad_direct_co2e_grams_per_mile',
         'onroad_direct_kwh_per_mile',
@@ -281,7 +283,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
                 base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
-                fueling_class, base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
+                fueling_class, base_year_powertrain_type, footprint, workfactor, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
                 onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
                     = vehicle_info_dict[vehicle_id]
 
@@ -310,7 +312,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                 age = int(vad['age'])
 
                 base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
-                fueling_class, base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
+                fueling_class, base_year_powertrain_type, footprint, workfactor, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
                 onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
                     = vehicle_info_dict[vehicle_id]
 
@@ -596,6 +598,8 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                             'fueling_class': fueling_class,
                             'base_year_powertrain_type': base_year_powertrain_type,
                             'body_style': body_style,
+                            'footprint_ft2': footprint,
+                            'workfactor': workfactor,
                             'registered_count': vad['registered_count'],
                             'context_vmt_adjustment': calendar_year_vmt_adj,
                             'annual_vmt': annual_vmt,
@@ -1054,6 +1058,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'fueling_class': legacy_fleet_safety_effects_dict[safety_dict_key]['fueling_class'],
             'base_year_powertrain_type': legacy_fleet_safety_effects_dict[safety_dict_key]['base_year_powertrain_type'],
             'body_style': legacy_fleet_safety_effects_dict[safety_dict_key]['body_style'],
+            'footprint_ft2': 0,
+            'workfactor': 0,
             'registered_count': legacy_fleet_safety_effects_dict[safety_dict_key]['registered_count'],
             'context_vmt_adjustment': calendar_year_vmt_adj,
             'annual_vmt': annual_vmt,

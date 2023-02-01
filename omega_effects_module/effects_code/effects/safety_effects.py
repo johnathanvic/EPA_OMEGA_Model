@@ -142,6 +142,8 @@ def calc_safety_effects(batch_settings, session_settings, vmt_adjustments_sessio
         'market_class_id',
         'fueling_class',
         'base_year_powertrain_type',
+        'footprint_ft2',
+        'workfactor',
         'body_style',
         'base_year_curbweight_lbs',
         'curbweight_lbs',
@@ -176,7 +178,7 @@ def calc_safety_effects(batch_settings, session_settings, vmt_adjustments_sessio
                         = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
                 base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, \
-                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, body_style, \
+                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint, workfactor, body_style, \
                 base_year_curbweight_lbs, curbweight_lbs, \
                 onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                     = vehicle_info_dict[vehicle_id]
@@ -284,6 +286,8 @@ def calc_safety_effects(batch_settings, session_settings, vmt_adjustments_sessio
                         'annual_vmt_rebound': annual_vmt_rebound,
                         'vmt_rebound': vmt_rebound,
                         'body_style': body_style,
+                        'footprint_ft2': footprint,
+                        'workfactor': workfactor,
                         'change_per_100lbs_below': change_per_100lbs_below,
                         'change_per_100lbs_above': change_per_100lbs_above,
                         'threshold_lbs': threshold_lbs,
@@ -398,6 +402,8 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings, vmt_adjus
             'annual_vmt_rebound': 0,
             'vmt_rebound': 0,
             'body_style': body_style,
+            'footprint_ft2': 0,
+            'workfactor': 0,
             'change_per_100lbs_below': 0,
             'change_per_100lbs_above': 0,
             'threshold_lbs': threshold_lbs,

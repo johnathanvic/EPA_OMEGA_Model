@@ -2,12 +2,12 @@ import pandas as pd
 from csv import reader, writer
 
 
-def save_file(session_settings, dict_to_save, save_folder, file_id, effects_log, extension='parquet'):
+def save_file(session_settings, df, save_folder, file_id, effects_log, extension='parquet'):
     """
 
     Args:
         session_settings: an instance of the SessionSettings class.
-        dict_to_save (dict): the dictionary to be saved.
+        df: the DataFrame to be saved.
         save_folder: a Path instance for the save folder.
         file_id (str): file identifier to be included in the saved filename.
         effects_log: an instance of the EffectsLog class.
@@ -18,8 +18,6 @@ def save_file(session_settings, dict_to_save, save_folder, file_id, effects_log,
 
     """
     filepath = save_folder / f'{session_settings.session_name}_{file_id}.{extension}'
-    df = pd.DataFrame.from_dict(dict_to_save, orient='index')
-    df.reset_index(inplace=True, drop=True)
 
     if extension not in ['csv', 'parquet']:
         effects_log.logwrite(f'Improper extension provided when attempting to save {file_id} file.')
@@ -27,8 +25,6 @@ def save_file(session_settings, dict_to_save, save_folder, file_id, effects_log,
         df.to_parquet(filepath, engine='fastparquet', compression='snappy', index=False)
     else:
         df.to_csv(filepath, index=False)
-
-    return df
 
 
 def add_id_to_csv(filepath, output_file_id_info):

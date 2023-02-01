@@ -7,7 +7,8 @@ def calc_social_effects(costs_df, benefits_df, calc_health_effects=False):
     Args:
         costs_df (DataFrame): the annual, present and equivalent annualized values.
         benefits_df (DataFrame): the annual, present and equivalent annualized values.
-        calc_health_effects (bool): pass True to use $/ton values to calculate health effects.
+        calc_health_effects (bool): pass True to use $/ton values to calculate health effects. If cost_factors_criteria.csv
+        contains benefit per ton values, calc_health_effects will be True; blank values will result in the default False.
 
     Returns:
         A summary effects DataFrame with additional columns summing costs and benefits.
@@ -52,6 +53,7 @@ def calc_social_effects(costs_df, benefits_df, calc_health_effects=False):
         'energy_security_benefit_dollars',
         'drive_value_benefit_dollars',
     ]
+    # the if-else below is focused on benefits; costs are subtracted from benefits near the end to get net benefits
     if calc_health_effects:
         sum_dict = {
             1: {'name': 'net_benefit_dollars_ghg5_criteria3_low',
@@ -121,6 +123,7 @@ def calc_social_effects(costs_df, benefits_df, calc_health_effects=False):
     dfb.reset_index(drop=True, inplace=True)
     summary_effects_df = pd.concat([dfb, delta_costs_df], axis=1)
 
+    # sum benefits per the if-else dictionaries above and then subtract costs to get net benefits
     for sum_num in sum_dict:
         new_col = sum_dict[sum_num]['name']
         summary_effects_df.insert(
