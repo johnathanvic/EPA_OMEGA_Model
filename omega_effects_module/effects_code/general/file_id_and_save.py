@@ -16,8 +16,22 @@ def save_file(session_settings, df, save_folder, file_id, effects_log, extension
     Returns:
         The passed dict_to_save as a DataFrame while also saving that DataFrame to the save_folder.
 
+    Note:
+        If saving files as parquet files, they are readable only by Pandas and cannot be read directly by Excel. To
+        read the parquet file into Pandas, do the following in the Python Console on your IDE:
+        Type 'import pandas as pd' without the quotes.
+        Type 'from pathlib import Path' without the quotes.
+        Type 'path = Path("path to file")' without the single quotes but with the double quotes around the path; include
+        double backslash \\ rather than single backslash.
+        Type 'file = "filename.parquet"' without the single quotes but with the double quotes.
+        Type 'df = pd.read_parquet(path / file)' without the quotes.
+        The DataFrame (df) should contain the contents of the parquet file.
+
     """
-    filepath = save_folder / f'{session_settings.session_name}_{file_id}.{extension}'
+    if 'context' in file_id:
+        filepath = save_folder / f'{file_id}.{extension}'
+    else:
+        filepath = save_folder / f'{session_settings.session_name}_{file_id}.{extension}'
 
     if extension not in ['csv', 'parquet']:
         effects_log.logwrite(f'Improper extension provided when attempting to save {file_id} file.')

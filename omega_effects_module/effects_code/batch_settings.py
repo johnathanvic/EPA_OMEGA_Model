@@ -59,7 +59,6 @@ class BatchSettings:
         self.congestion_noise_cost_factors_file = None
         self.legacy_fleet_file = None
 
-        self.context_fuel_cost_per_mile_file = None
         self.context_fuel_prices_file = None
         self.context_stock_and_vmt_file = None
         self.onroad_fuels_file = None
@@ -157,7 +156,6 @@ class BatchSettings:
         self.batch_folder = self.get_attribute_value(('batch_folder', 'all'), 'full_path')
         self.batch_name = Path(self.batch_folder).name
 
-        self.batch_program = self.get_attribute_value(('batch_program', 'all'), 'value')
         self.analysis_initial_year \
             = pd.to_numeric(self.get_attribute_value(('Analysis Initial Year', 'all'), 'value'))
         self.analysis_final_year \
@@ -190,22 +188,16 @@ class BatchSettings:
         self.congestion_noise_cost_factors_file \
             = self.get_attribute_value(('Context Congestion-Noise Cost Factors File', 'all'), 'full_path')
         self.legacy_fleet_file = self.get_attribute_value(('Context Legacy Fleet File', 'all'), 'full_path')
+        self.ip_deflators_file = self.get_attribute_value(('Context Implicit Price Deflators File', 'all'), 'full_path')
+        self.cpi_deflators_file = self.get_attribute_value(('Context Consumer Price Index File', 'all'), 'full_path')
 
-        self.context_fuel_cost_per_mile_file \
-            = self.get_attribute_value(('Context Fuel Cost per Mile File', 'context'), 'full_path')
-
-        # get context_session_name only if context_fuel_cost_per_mile_file is not available
-        if not self.context_fuel_cost_per_mile_file:
-            self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
-
+        self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
         self.context_fuel_prices_file = self.get_attribute_value(('Context Fuel Prices File', 'context'), 'full_path')
         self.context_stock_and_vmt_file = self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
         self.onroad_fuels_file = self.get_attribute_value(('Onroad Fuels File', 'context'), 'full_path')
         self.onroad_vehicle_calculations_file = self.get_attribute_value(('Onroad Vehicle Calculations File', 'context'), 'full_path')
         self.onroad_vmt_file = self.get_attribute_value(('Onroad VMT File', 'context'), 'full_path')
         self.vehicle_reregistration_file = self.get_attribute_value(('Vehicle Reregistration File', 'context'), 'full_path')
-        self.ip_deflators_file = self.get_attribute_value(('Context Implicit Price Deflators File', 'context'), 'full_path')
-        self.cpi_deflators_file = self.get_attribute_value(('Context Consumer Price Index File', 'context'), 'full_path')
 
         self.session_dict[0] = {'session_policy': 'no_action',
                                 'session_name': self.get_attribute_value(('Session Name', 'no_action'), 'value'),
@@ -288,15 +280,6 @@ class BatchSettings:
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
-
-        if self.context_fuel_cost_per_mile_file:
-
-            effects_log.logwrite('\nGetting "Context Fuel Cost per Mile File" as set in batch_settings.csv')
-            try:
-                self.context_fuel_cost_per_mile = read_input_file(self.context_fuel_cost_per_mile_file, effects_log)
-            except Exception as e:
-                effects_log.logwrite(e)
-                sys.exit()
 
     def return_session_policy(self, session_name):
         """

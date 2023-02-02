@@ -49,7 +49,7 @@ def main():
     path_of_run_folder, path_of_code_folder = \
         set_paths.create_output_paths(runtime_options, batch_settings, start_time_readable, run_id)
 
-    # build legacy fleet which is used for the entire batch
+    # build legacy fleet which is used for the entire batch ____________________________________________________________
     effects_log.logwrite('\nBuilding legacy fleet for the batch')
     try:
         batch_settings.legacy_fleet.build_legacy_fleet_for_analysis(batch_settings)
@@ -57,27 +57,21 @@ def main():
         effects_log.logwrite(e)
         sys.exit()
 
-    if batch_settings.context_session_name:
-        session_settings = SessionSettings()
-        session_settings.get_context_session_settings(batch_settings, effects_log)
+    # context fuel cost per mile and vmt adjustments ___________________________________________________________________
+    session_settings = SessionSettings()
+    session_settings.get_context_session_settings(batch_settings, effects_log)
 
-        effects_log.logwrite('\nCalculating context vmt adjustments and context fuel cost per mile')
-        vmt_adjustments_context = AdjustmentsVMT()
-        vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
-        context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
-        context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index')
-    else:
-        context_fuel_cpm_df = batch_settings.context_fuel_cost_per_mile
-        key = pd.Series(zip(
-            context_fuel_cpm_df['base_year_vehicle_id'],
-            context_fuel_cpm_df['base_year_powertrain_type'],
-            context_fuel_cpm_df['model_year'],
-            context_fuel_cpm_df['age'],
-        ))
-        context_fuel_cpm_df.set_index(key, inplace=True)
-        context_fuel_cpm_dict = context_fuel_cpm_df.to_dict('index')
+    effects_log.logwrite('\nCalculating context vmt adjustments and context fuel cost per mile')
+    vmt_adjustments_context = AdjustmentsVMT()
+    vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
+    context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
+    if runtime_options.save_vehicle_detail_files:
+        effects_log.logwrite(f'Saving context fuel cost per mile file')
+        context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
+        save_file(session_settings, context_fuel_cpm_df, path_of_run_folder, 'context_fuel_cost_per_mile',
+                  effects_log, extension=runtime_options.file_format)
 
-    # loop thru sessions to calc safety effects, physical effects, cost effects for each
+    # loop thru sessions to calc safety effects, physical effects, cost effects for each _______________________________
     annual_physical_effects_df = pd.DataFrame()
     annual_cost_effects_df = pd.DataFrame()
 
@@ -175,6 +169,7 @@ def main():
     pv_and_eav_benefits_dict = PVandEAV().calc_present_and_annualized_values(batch_settings, annual_benefits_df)
     pv_and_eav_benefits_df = pd.DataFrame.from_dict(pv_and_eav_benefits_dict, orient='index')
 
+    # summarize costs, benefits and net benefits _______________________________________________________________________
     effects_log.logwrite('\nSummarizing social effects and calculating net benefits')
     social_effects_df = \
         calc_social_effects(pv_and_eav_costs_df, pv_and_eav_benefits_df,
@@ -203,10 +198,6 @@ def main():
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_annual.csv', output_file_id_info)
-
-    if batch_settings.context_session_name:
-        # only save this file if created here
-        context_fuel_cpm_df.to_csv(path_of_run_folder / 'context_fuel_cost_per_mile.csv', index=False)
 
     shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')
     set_paths.copy_code_to_destination(path_of_code_folder)

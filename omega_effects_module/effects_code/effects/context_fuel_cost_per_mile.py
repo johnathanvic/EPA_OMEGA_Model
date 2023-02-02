@@ -100,7 +100,6 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                     vehicle_fuel_cpm_dict.update({
                         'session_policy': session_settings.session_policy,
                         'session_name': session_settings.session_name,
-                        'key': key,
                         'base_year_vehicle_id': int(base_year_vehicle_id),
                         'calendar_year': int(calendar_year),
                         'model_year': int(model_year),
