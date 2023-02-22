@@ -60,9 +60,9 @@ class MarketClass(OMEGABase, MarketClassBase):
 
     _data = dict()
 
-    market_categories = ['ICE', 'BEV', 'sedan_wagon', 'cuv_suv_van', 'pickup']  #: overall market categories
+    market_categories = ['ICE', 'BEV', 'sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev', 'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: overall market categories
     responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
-    non_responsive_market_categories = ['sedan_wagon', 'cuv_suv_van', 'pickup']  #: market categories that do not have consumer response
+    non_responsive_market_categories = ['sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev', 'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: market categories that do not have consumer response
 
     @staticmethod
     def get_vehicle_market_class(vehicle):
@@ -77,21 +77,36 @@ class MarketClass(OMEGABase, MarketClassBase):
 
         """
 
-        if vehicle.body_style == 'sedan':
+        if vehicle.body_style == 'sedan_wagon_r1nonzev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
-                market_class_id = 'sedan_wagon.BEV'
+                market_class_id = 'sedan_wagon_r1nonzev.BEV'
             else:
-                market_class_id = 'sedan_wagon.ICE'
-        elif vehicle.body_style == 'cuv_suv':
+                market_class_id = 'sedan_wagon_r1nonzev.ICE'
+        elif vehicle.body_style == 'cuv_suv_van_r1nonzev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
-                market_class_id = 'cuv_suv_van.BEV'
+                market_class_id = 'cuv_suv_van_r1nonzev.BEV'
             else:
-                market_class_id = 'cuv_suv_van.ICE'
-        elif vehicle.body_style == 'pickup':
+                market_class_id = 'cuv_suv_van_r1nonzev.ICE'
+        elif vehicle.body_style == 'pickup_r1nonzev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
-                market_class_id = 'pickup.BEV'
+                market_class_id = 'pickup_r1nonzev.BEV'
             else:
-                market_class_id = 'pickup.ICE'
+                market_class_id = 'pickup_r1nonzev.ICE'
+        elif vehicle.body_style == 'sedan_wagon_r2zev':
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+                market_class_id = 'sedan_wagon_r2zev.BEV'
+            else:
+                market_class_id = 'sedan_wagon_r2zev.ICE'
+        elif vehicle.body_style == 'cuv_suv_van_r2zev':
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+                market_class_id = 'cuv_suv_van_r2zev.BEV'
+            else:
+                market_class_id = 'cuv_suv_van_r2zev.ICE'
+        elif vehicle.body_style == 'pickup_r2zev':
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+                market_class_id = 'pickup_r2zev.BEV'
+            else:
+                market_class_id = 'pickup_r2zev.ICE'
         else:
             1==1
 
@@ -109,12 +124,18 @@ class MarketClass(OMEGABase, MarketClassBase):
             The non-responsive market category of the given market class ID
 
         """
-        if 'sedan_wagon' in market_class_id.split('.'):
-            return 'sedan_wagon'
-        elif 'cuv_suv_van' in market_class_id.split('.'):
-            return 'cuv_suv_van'
-        elif 'pickup' in market_class_id.split('.'):
-            return 'pickup'
+        if 'sedan_wagon_r1nonzev' in market_class_id.split('.'):
+            return 'sedan_wagon_r1nonzev'
+        elif 'cuv_suv_van_r1nonzev' in market_class_id.split('.'):
+            return 'cuv_suv_van_r1nonzev'
+        elif 'pickup_r1nonzev' in market_class_id.split('.'):
+            return 'pickup_r1nonzev'
+        elif 'sedan_wagon_r2zev' in market_class_id.split('.'):
+            return 'sedan_wagon_r2zev'
+        elif 'cuv_suv_van_r2zev' in market_class_id.split('.'):
+            return 'cuv_suv_van_r2zev'
+        elif 'pickup_r2zev' in market_class_id.split('.'):
+            return 'pickup_r2zev'
         else:
             return ''
 

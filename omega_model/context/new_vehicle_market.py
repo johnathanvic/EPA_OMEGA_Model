@@ -443,7 +443,8 @@ class NewVehicleMarket(OMEGABase):
             from producer.vehicle_aggregation import sales_weight_average_dataframe
             NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(sales_weight_average_dataframe)
 
-            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
+            # NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
+            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_bs = df.set_index(['context_id', 'case_id', 'body_style', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
@@ -458,8 +459,8 @@ class NewVehicleMarket(OMEGABase):
                 df['reg_class_id'],
                 df['calendar_year'],
             ))
-            NewVehicleMarket._data = df.set_index(key).to_dict(orient='index')
-
+            # NewVehicleMarket._data = df.set_index(key).to_dict(orient='index')
+            NewVehicleMarket._data = df.set_index(key).to_dict(orient='series')
         return template_errors
 
 

@@ -71,6 +71,7 @@ Data Column Name and Description
 **CODE**
 
 """
+import numpy as np
 
 print('importing %s' % __file__)
 
@@ -84,6 +85,8 @@ class SalesShare(OMEGABase, SalesShareBase):
     """
     _data = dict()
     _calibration_data = dict()
+
+    prev_producer_decisions_and_responses = []
 
     @staticmethod
     def gcam_supports_market_class(market_class_id):
@@ -126,6 +129,59 @@ class SalesShare(OMEGABase, SalesShareBase):
         return SalesShare._data[cache_key]
 
     @staticmethod
+    def calc_consumer_generalized_cost(calendar_year, market_class_data, market_class_id, producer_decision):
+        """
+
+        Args:
+            calendar_year (int): calendar year to calculate market shares in
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
+            market_class_id (str}: e.g. 'hauling.ICE'
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+
+        Returns:
+            Consumer cost in $/mi
+
+        """
+        fuel_cost = producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
+        gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
+        price_amortization_period = float(gcam_data_cy['price_amortization_period'])
+        discount_rate = gcam_data_cy['discount_rate']
+        annualization_factor = discount_rate + discount_rate / (
+                ((1 + discount_rate) ** price_amortization_period) - 1)
+
+        if type(market_class_data) is pd.DataFrame:
+            total_capital_costs = market_class_data[
+                'average_modified_cross_subsidized_price_%s' % market_class_id].values
+        else:
+            total_capital_costs = market_class_data[
+                'average_modified_cross_subsidized_price_%s' % market_class_id]
+
+        average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
+        average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
+        carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
+                                                                  'direct_co2e_grams_per_unit')
+        refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
+                                                          'refuel_efficiency')
+        recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
+                                                            'refuel_efficiency')
+        annual_o_m_costs = gcam_data_cy['o_m_costs']
+        # TODO: will eventually need utility factor for PHEVs here
+        fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
+        fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
+        # consumer_generalized_cost_dollars = total_capital_costs
+        annualized_capital_costs = annualization_factor * total_capital_costs
+        annual_VMT = float(gcam_data_cy['annual_vmt'])
+        total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
+        total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
+        total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy['average_occupancy']
+
+        return total_cost_w_fuel_per_PMT
+
+    @staticmethod
     def calc_shares_gcam(producer_decision, market_class_data, calendar_year,
                          parent_market_class, child_market_classes):
         """
@@ -133,10 +189,12 @@ class SalesShare(OMEGABase, SalesShareBase):
         Relative shares are calculated within the parent market class and then converted to absolute shares.
 
         Args:
-            producer_decision (Series): selected producer compliance option
-            market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
-                'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
-                columns, where MC = market class ID
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
             calendar_year (int): calendar year to calculate market shares in
             parent_market_class (str): e.g. 'non_hauling'
             child_market_classes ([strs]): e.g. ['non_hauling.BEV', 'non_hauling.ICE']
@@ -155,64 +213,63 @@ class SalesShare(OMEGABase, SalesShareBase):
         sales_share_denominator = 0
         sales_share_numerator = dict()
 
+        market_class_data['consumer_constrained_%s' % parent_market_class] = False
+
         for pass_num in [0, 1]:
             for market_class_id in child_market_classes:
                 if pass_num == 0:
-                    fuel_cost = producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
+                    total_cost_w_fuel_per_PMT = SalesShare.calc_consumer_generalized_cost(calendar_year,
+                                                                                          market_class_data,
+                                                                                          market_class_id,
+                                                                                          producer_decision)
+
+                    market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = \
+                        total_cost_w_fuel_per_PMT
 
                     gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
-
                     logit_exponent_mu = gcam_data_cy['logit_exponent_mu']
-
-                    price_amortization_period = float(gcam_data_cy['price_amortization_period'])
-                    discount_rate = gcam_data_cy['discount_rate']
-                    annualization_factor = discount_rate + discount_rate / (
-                            ((1 + discount_rate) ** price_amortization_period) - 1)
-
-                    total_capital_costs = market_class_data[
-                        'average_modified_cross_subsidized_price_%s' % market_class_id].values
-                    average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
-                    average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
-
-                    carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
-                                                                              'direct_co2e_grams_per_unit')
-
-                    refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
-                                                                      'refuel_efficiency')
-
-                    recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
-                                                                        'refuel_efficiency')
-
-                    annual_o_m_costs = gcam_data_cy['o_m_costs']
-
-                    # TODO: will eventually need utility factor for PHEVs here
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
-                    fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
-
-                    # consumer_generalized_cost_dollars = total_capital_costs
-                    annualized_capital_costs = annualization_factor * total_capital_costs
-                    annual_VMT = float(gcam_data_cy['annual_vmt'])
-
-                    total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
-                    total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
-                    total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy['average_occupancy']
                     sales_share_numerator[market_class_id] = gcam_data_cy['share_weight'] * (
                             total_cost_w_fuel_per_PMT ** logit_exponent_mu)
-
-                    market_class_data[
-                        'consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
                     sales_share_denominator += sales_share_numerator[market_class_id]
 
                 else:
+                    min_constraints = Eval.eval(
+                        producer_decision['min_constraints_%s' % parent_market_class])
+
+                    max_constraints = Eval.eval(
+                        producer_decision['max_constraints_%s' % parent_market_class])
+
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
-                    demanded_absolute_share = \
-                        demanded_share * market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
+
+                    # constrain relative (and by extension, absolute) shares
+                    # TODO: only for context session....??
+                    share_name = market_class_id.replace(parent_market_class + '.', '')
+                    demanded_share = np.minimum(np.maximum(min_constraints[share_name], demanded_share),
+                                                max_constraints[share_name])
+
+                    if all(demanded_share == max_constraints[share_name]):
+                        market_class_data['consumer_constrained_%s' % parent_market_class] = True
+
+                    parent_share = market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
+
+                    demanded_absolute_share = demanded_share * parent_share
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
+                    # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
+                    for alt in ['NO_ALT', 'ALT']:
+                        share_id = 'consumer_abs_share_frac_%s.%s' % (market_class_id, alt)
+                        if alt == 'NO_ALT':
+                            market_class_data[share_id] = \
+                                min_constraints[share_id.replace('consumer', 'producer')] * parent_share
+                            demanded_absolute_share -= market_class_data[share_id]
+                        else:
+                            market_class_data[share_id] = demanded_absolute_share
+
         return market_class_data.copy()
+
 
     @staticmethod
     def calc_shares(calendar_year, compliance_id, producer_decision, market_class_data, mc_parent, mc_pair):
@@ -222,10 +279,12 @@ class SalesShare(OMEGABase, SalesShareBase):
         Args:
             calendar_year (int): calendar year to calculate market shares in
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
-            producer_decision (Series): selected producer compliance option
-            market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
-                'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
-                columns, where MC = market class ID
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
             mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
             mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
 
@@ -244,16 +303,45 @@ class SalesShare(OMEGABase, SalesShareBase):
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
 
-        market_class_data['consumer_abs_share_frac_hauling'] = \
-            producer_decision['producer_abs_share_frac_hauling']
-
-        market_class_data['consumer_abs_share_frac_non_hauling'] = \
-            producer_decision['producer_abs_share_frac_non_hauling']
-
         if all([SalesShare.gcam_supports_market_class(mc) for mc in mc_pair]):
-            # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
-            market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
-                                                        mc_parent, mc_pair)
+            if len(mc_pair) > 1:
+                # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
+                market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
+                                                            mc_parent, mc_pair)
+            else:
+                # can't calculate ICE/BEV shares since there is only ICE or only BEV
+                only_child = mc_pair[0]
+
+                # populate fields that normally come from cross subsidy iteration
+                market_class_data['average_cross_subsidized_price_%s' % only_child] = \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % only_child]
+
+                market_class_data['average_modified_cross_subsidized_price_%s' % only_child] = \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % only_child]
+
+                market_class_data['pricing_score'] = 0
+
+                total_cost_w_fuel_per_PMT = SalesShare.calc_consumer_generalized_cost(calendar_year,
+                                                                                      market_class_data,
+                                                                                      only_child,
+                                                                                      producer_decision)
+
+                market_class_data['consumer_generalized_cost_dollars_%s' % only_child] = \
+                    total_cost_w_fuel_per_PMT
+
+                parent_share = market_class_data['consumer_abs_share_frac_%s' % mc_parent]
+
+                market_class_data['consumer_share_frac_%s' % only_child] = 1.0
+                market_class_data['consumer_abs_share_frac_%s' % only_child] = parent_share
+
+                max_constraints = Eval.eval(
+                    producer_decision['max_constraints_%s' % mc_parent])
+
+                for alt in ['ALT', 'NO_ALT']:
+                    only_child = mc_pair[0] + '.' + alt
+                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_abs_share_frac_%s' % only_child] = \
+                        parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
         return market_class_data
 
@@ -266,7 +354,12 @@ class SalesShare(OMEGABase, SalesShareBase):
             filename (str): name of the calibration file
 
         """
-        pass
+        if omega_globals.options.standalone_run:
+            filename = omega_globals.options.output_folder_base + filename
+
+        calibration = pd.DataFrame.from_dict(SalesShare._calibration_data)
+
+        calibration.to_csv(filename)
 
     @staticmethod
     def store_producer_decision_and_response(producer_decision_and_response):
@@ -277,7 +370,7 @@ class SalesShare(OMEGABase, SalesShareBase):
             producer_decision_and_response (Series): producer decision and consumer response
 
         """
-        pass
+        SalesShare.prev_producer_decisions_and_responses.append(producer_decision_and_response)
 
     @staticmethod
     def calc_base_year_data(base_year_vehicles_df):
@@ -289,7 +382,17 @@ class SalesShare(OMEGABase, SalesShareBase):
             base_year_vehicles_df (DataFrame): base year vehicle data
 
         """
-        pass
+        base_year = max(base_year_vehicles_df['model_year'].values)
+        base_year_vehicles_df = base_year_vehicles_df[base_year_vehicles_df['model_year'] == base_year]
+
+        base_year_reg_class_data = \
+            base_year_vehicles_df.groupby(['reg_class_id']).apply(sales_weight_average_dataframe)
+
+        # for rc in legacy_reg_classes:
+        for rc in base_year_vehicles_df.reg_class_id.unique():
+            for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
+                SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
+
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -310,11 +413,13 @@ class SalesShare(OMEGABase, SalesShareBase):
         SalesShare._data.clear()
         SalesShare._calibration_data.clear()
 
+        SalesShare.prev_producer_decisions_and_responses = []
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = __name__
-        input_template_version = 0.12
+        input_template_version = 0.1
         input_template_columns = {'market_class_id', 'start_year', 'annual_vmt', 'payback_years',
                                   'price_amortization_period', 'share_weight', 'discount_rate',
                                   'o_m_costs', 'average_occupancy', 'logit_exponent_mu'
@@ -339,6 +444,13 @@ class SalesShare(OMEGABase, SalesShareBase):
 
             for mc in df['market_class_id'].unique():
                 SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
+
+            if omega_globals.options.generate_context_calibration_files:
+                SalesShare._calibration_data = dict()
+
+            else:
+                SalesShare._calibration_data = \
+                    pd.read_csv(omega_globals.options.sales_share_calibration_file).set_index('Unnamed: 0').to_dict()
 
         return template_errors
 
@@ -392,7 +504,7 @@ if __name__ == '__main__':
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, mcd, 'hauling',
+            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM', mcd, 'hauling',
                                                   ['hauling.ICE', 'hauling.BEV'])
 
         else:

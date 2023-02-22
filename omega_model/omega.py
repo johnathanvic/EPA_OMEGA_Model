@@ -369,7 +369,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
-            stock.update_stock(calendar_year, compliance_id)
+            # stock.update_stock(calendar_year, compliance_id)
 
             prior_producer_decision_and_response = producer_decision_and_response
 
@@ -1403,11 +1403,11 @@ def init_omega(session_runtime_options):
         init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                                      verbose=verbose_init)
 
-        init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.vehicle_reregistration_file,
-                                                                         verbose=verbose_init)
+        # init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.vehicle_reregistration_file,
+        #                                                                 verbose=verbose_init)
 
-        init_fail += omega_globals.options.OnroadVMT.init_from_file(omega_globals.options.onroad_vmt_file,
-                                                                    verbose=verbose_init)
+        # init_fail += omega_globals.options.OnroadVMT.init_from_file(omega_globals.options.onroad_vmt_file,
+        #                                                            verbose=verbose_init)
 
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=verbose_init)
@@ -1497,7 +1497,7 @@ def init_omega(session_runtime_options):
                 int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
 
             # update vehicle annual data for base year fleet
-            stock.update_stock(omega_globals.options.analysis_initial_year - 1)
+            # stock.update_stock(omega_globals.options.analysis_initial_year - 1)
 
     except:
         init_fail += ["\n#INIT FAIL\n%s\n" % traceback.format_exc()]
