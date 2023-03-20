@@ -710,6 +710,13 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         # insert code to cull production options based on policy here #
 
+        if prior_producer_decision_and_response is not None:
+            # all other things being equal, changes in producer shares from one year to the next increase costs:
+            delta_share_multiplier = 1 + sum(
+                [abs(production_options[k] - prior_producer_decision_and_response[k]) for k in production_options.keys()
+                 if 'producer_abs_share_frac' in k])
+            production_options['total_generalized_cost_dollars'] *= delta_share_multiplier
+
         if omega_globals.options.manufacturer_gigawatthour_data is None:
             # individual OEM data not yet be populated, use the default values
             battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
