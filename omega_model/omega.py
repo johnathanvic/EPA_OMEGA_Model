@@ -1595,13 +1595,16 @@ def init_omega(session_runtime_options):
     return init_fail
 
 
-def poolwait():
+def poolstart():
+    """
+    Placeholder for pool startup function
+
+    Returns:
+        ``None``
+
+    """
     return None
-    # print('pooltest')
-    # print('module name:', __name__)
-    # print('parent process:', os.getppid())
-    # print('process id:', os.getpid())
-    # return 42
+    # CU
 
 
 def error_callback(e):
@@ -1712,7 +1715,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                     results = []
                     for i in range(num_processes):
-                        results.append(omega_globals.pool.apply_async(func=omega.poolwait,
+                        results.append(omega_globals.pool.apply_async(func=omega.poolstart,
                                                                       callback=None,
                                                                       error_callback=omega.error_callback))
 
