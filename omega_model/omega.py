@@ -113,6 +113,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
     Args:
         calendar_year (int): calendar year of the data
+        producer_market_classes (list): list of producer market classes, e.g. ['hauling.ICE', 'hauling.BEV', ...]
         share_convergence_error (float): producer-consumer convergence error
         cross_subsidy_pricing_error (float): cross-subsidy pricing error
         producer_decision_and_response (Series): producer compliance search result with consumer share response
@@ -831,6 +832,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
     Args:
         calendar_year (int): calendar year of the iteration
         continue_search (bool): prior value of ``continue_search``, set to ``False`` if search collapses
+        mc_pair ([strs]):
         multiplier_columns ([strs]): list of cost multiplier columns,
             e.g. ['cost_multiplier_hauling.BEV', 'cost_multiplier_hauling.ICE', ...]
         prev_multiplier_range (dict): empty on first pass then contains a dict of previous multiplier ranges by market
@@ -1612,7 +1614,7 @@ def error_callback(e):
     Print multiprocess error callback to the console.
 
     Args:
-        e (str): error message
+        e (BaseException): exception info
 
     """
     print('error_callback_%s' % __name__)
