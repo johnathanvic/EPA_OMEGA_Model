@@ -700,9 +700,17 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         if prior_producer_decision_and_response is not None:
             # all other things being equal, changes in producer shares from one year to the next increase costs:
+            # RV maybe weight by GWh or delta GWh or by market category share...?
+            # delta_share_multiplier = 1 + sum(
+            #     [abs(production_options[k] - prior_producer_decision_and_response[k]) for k in production_options.keys()
+            #      if 'producer_abs_share_frac' in k])
             delta_share_multiplier = 1 + sum(
-                [abs(production_options[k] - prior_producer_decision_and_response[k]) for k in production_options.keys()
+                [abs((production_options[k] - prior_producer_decision_and_response[k]) *
+                     (production_options['total_battery_GWh'] -
+                      prior_producer_decision_and_response['total_battery_GWh']) /
+                     prior_producer_decision_and_response['total_battery_GWh']) for k in production_options.keys()
                  if 'producer_abs_share_frac' in k])
+
             production_options['total_generalized_cost_dollars'] *= delta_share_multiplier
 
         if omega_globals.options.manufacturer_gigawatthour_data is None:
