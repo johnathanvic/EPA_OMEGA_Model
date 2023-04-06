@@ -17,7 +17,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.2
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -96,7 +96,17 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
 
     @staticmethod
     def get_cumulative_vmt(market_class_id, age):
+        """
+        Get the cumulative VMT for the given market class and age
 
+        Args:
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            age (int): vehicle age in years
+
+        Returns:
+            The cumulative VMT for the given market class and age
+
+        """
         if (market_class_id, age) in OnroadVMT.cumulative_vmt:
             return OnroadVMT.cumulative_vmt[market_class_id, age]
         else:
@@ -138,7 +148,8 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}

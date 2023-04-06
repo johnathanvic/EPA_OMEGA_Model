@@ -10,7 +10,7 @@ The data represent safety values associated with mass reduction in the fleet.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,safety_values,input_template_version:,0.1
@@ -120,4 +120,3 @@ class SafetyValues:
         change_above = self._data[body_style]['change_per_100_lbs_at_or_above_threshold']
 
         return threshold, change_below, change_above
-

@@ -14,7 +14,7 @@ The data represent the legacy fleet that ages out as new vehicles enter the flee
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,legacy_fleet,input_template_version:,0.1
@@ -40,16 +40,16 @@ Data Column Name and Description
         The calendar year for which the data apply
 
     :reg_class_id:
-        The OMEGA reg_class_id (e.g., car, truck)
+        The OMEGA reg_class_id (e.g., 'car', 'truck')
 
     :body_style:
-        The OMEGA body_style (e.g., sedan, pickup)
+        The OMEGA body_style (e.g., 'sedan', 'pickup')
 
     :market_class_id:
-        The OMEGA market class id (e.g., sedan_wagon.BEV, pickup.ICE)
+        The OMEGA market class id (e.g., 'sedan_wagon.BEV', 'pickup.ICE')
 
     :in_use_fuel_id:
-        The OMEGA in use fuel id (e.g., pump gasoline, US electricity)
+        The OMEGA in use fuel id (e.g., 'pump gasoline', 'US electricity')
 
     :registered_count:
         The number of vehicles of the indicated model year sold as new (this is not the number of vehicles in the fleet
@@ -89,14 +89,17 @@ from omega_effects.effects_code.general.input_validation import \
 
 
 class LegacyFleet:
+    """
+    Legacy fleet class definition.
 
+    """
     def __init__(self):
         """
         Loads and provides access to legacy fleet data by model year and age.
 
         """
         self._data = dict()  # private dict, the legacy_fleet_file data
-        self._legacy_fleet = dict() # the built legacy fleet for the analysis
+        self._legacy_fleet = dict()  # the built legacy fleet for the analysis
         self.adjusted_legacy_fleet = dict()
         self.legacy_fleet_calendar_year_max = 0
         self.legacy_fleet_vehicle_id_start = pow(10, 6)
@@ -108,7 +111,8 @@ class LegacyFleet:
 
         Args:
             filepath: the Path object to the file.
-            vehicles_base_year (int): the model year of the input fleet - the legacy fleet calendar year will be adjusted
+            vehicles_base_year (int): the model year of the input fleet - the legacy fleet
+                calendar year will be adjusted
             if necessary for consistency with the analysis.
             effects_log: an instance of the EffectsLog class.
 

@@ -15,7 +15,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.2
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -116,7 +116,7 @@ class Reregistration:
         Args:
             model_year (int): the model year of the re-registration data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
-            age (int): vehicle age
+            age (int): vehicle age in years
 
         Returns:
             Re-registered proportion [0..1]

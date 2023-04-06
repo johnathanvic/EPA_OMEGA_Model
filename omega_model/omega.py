@@ -98,8 +98,8 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
             cross_subsidy_options_and_response, iteration_log = \
                 calc_cross_subsidy_options_and_response(calendar_year, market_class_tree[child], compliance_id,
                                                         producer_decision, cross_subsidy_options_and_response,
-                                                        producer_consumer_iteration_num, iteration_log, node_name=child,
-                                                        verbose=verbose)
+                                                        producer_consumer_iteration_num, iteration_log,
+                                                        node_name=child, verbose=verbose)
 
     return cross_subsidy_options_and_response, iteration_log
 
@@ -359,9 +359,10 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
-                                            and producer_consumer_iteration_num < omega_globals.options.producer_consumer_max_iterations \
-                                            and (not converged or producer_decision_and_response[
-                    'total_battery_GWh'] > GWh_limit)
+                                            and producer_consumer_iteration_num < \
+                                            omega_globals.options.producer_consumer_max_iterations \
+                                            and (not converged or producer_decision_and_response['total_battery_GWh']
+                                                 > GWh_limit)
 
                 if iterate_producer_consumer:
                     producer_consumer_iteration_num += 1
@@ -390,10 +391,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 omega_globals.cumulative_battery_GWh['total'] += production_battery_gigawatthours
                 omega_globals.cumulative_battery_GWh[calendar_year] = omega_globals.cumulative_battery_GWh['total']
 
-            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)
-
-            # credit_banks[compliance_id].handle_credit(calendar_year,
-            #                                          producer_decision_and_response['total_credits_co2e_megagrams'])
+            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)  # CU RV
 
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
@@ -464,9 +462,7 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
         abs(1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
 
-    # cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
-    #     _cross_subsidy_options_and_response.values()
-    # TODO: the above used to work... now it throws an error
+    # CU RV
     for k, v in _cross_subsidy_options_and_response.items():
         cross_subsidy_options_and_response[k] = v
 
@@ -534,7 +530,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     # temporarily assign shares to sales to calculate new consumer-share-weighted market_class values:
     for cv in candidate_mfr_composite_vehicles:
         cv.initial_registered_count = producer_decision_and_response[
-                                          'consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * cv.market_class_share_frac
+                                          'consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * \
+                                      cv.market_class_share_frac
 
     calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
@@ -543,10 +540,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                       producer_decision_and_response)
 
     # distribute total sales to vehicle sales in producer decision and response
-    compliance_search.create_production_options_from_shares(candidate_mfr_composite_vehicles,
-                                                            producer_decision_and_response,
-                                                            total_sales=
-                                                            producer_decision_and_response['new_vehicle_sales'])
+    compliance_search.create_production_options_from_shares(
+        candidate_mfr_composite_vehicles, producer_decision_and_response,
+        total_sales=producer_decision_and_response['new_vehicle_sales'])
 
     calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
@@ -678,7 +674,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cross_subsidy_options_and_response)
 
-        price_weight = 0.925  # 1-0.925
+        price_weight = 0.925
 
         # calculate score, weighted distance to the origin
         cross_subsidy_options_and_response['pricing_score'] = \
@@ -952,7 +948,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
         np.linspace(min_val, max_val, omega_globals.options.consumer_pricing_num_options),
         prev_multiplier))
 
-    # search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or ((max_val / min_val - 1) <= 1e-3))
+    # CU RV
     search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or (max_val - min_val <= 1e-4))
     if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
         mr_str = str(['%.8f' % m for m in multiplier_range]).replace("'", '')
@@ -968,7 +964,8 @@ def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehic
     data via ``calc_market_class_data()`` and ``calc_market_category_data()``
 
     Args:
-        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance cost
+        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance
+            cost
         producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
@@ -987,8 +984,7 @@ def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehic
 
     calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision)
 
-    return [k for k in market_class_vehicle_dict.keys() if
-            market_class_vehicle_dict[k]]
+    return [k for k in market_class_vehicle_dict.keys() if market_class_vehicle_dict[k]]
 
 
 def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision):
@@ -1039,7 +1035,6 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
                 weighted_value(market_class_vehicles, weight_by, 'footprint_ft2')
 
             if 'ICE' in mc:
-                # TODO: should get 8887 from PolicyFuel?, but need calendar year (set in omega_globals so we don't have to pass it in??)
                 producer_decision['average_onroad_mpg_%s' % mc] = \
                     OnroadFuel.grams_co2e_per_gallon / \
                     producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc]
@@ -1302,7 +1297,8 @@ def get_module(module_name):
     else:
         module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
         module_suffix = str.split(module_name, '.')[1]
-        module_path = omega_globals.options.omega_model_path + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
+        module_path = \
+            omega_globals.options.omega_model_path + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
 
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         module = importlib.util.module_from_spec(spec)
@@ -1723,7 +1719,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                     [r.get() for r in results]
 
-                    print('Elapsed init time = %f' % (time.time() - start_time))
+                    # print('Elapsed init time = %f' % (time.time() - start_time))
 
                 omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
 
@@ -1816,8 +1812,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                                                       4: 'input_template_name', 6: 'version_number', 7: 'notes:'})
 
             metadata_df.to_csv(
-                omega_globals.options.output_folder + f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv',
-                index=False, header=True)
+                omega_globals.options.output_folder +
+                f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv', index=False, header=True)
 
             omega_log.end_logfile("\nSession Complete")
 

@@ -34,11 +34,18 @@ _cache = dict()
 
 
 def error_callback(e):
+    """
+    Print multiprocess error callback to the console.
+
+    Args:
+        e (BaseException): exception info
+
+    """
     print('error_callback_%s' % __name__)
     print(e)
 
 
-def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range, verbose=False):
+def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range):
     """
     Create tech sweeps is responsible for creating tech (CO2e g/mi levels) options to
     develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
@@ -66,7 +73,6 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         candidate_production_decisions (None, DataFrame): zero or 1 or 2 candidate production decisions chosen from the
             results of the previous search iteration
         share_range (float): determines the numerical range of share and tech options that are considered
-        verbose (bool): enables additional console output if ``True``
 
     Returns:
         A dataframe containing a range of composite vehicle CO2e g/mi options factorially combined
@@ -74,10 +80,8 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
     """
     child_df_list = []
 
-    start_time = time.time()
     # Generate tech options (CO2e g/mi levels)
     for cv in composite_vehicles:
-        start_time = time.time()
         incremented = False
 
         if share_range == 1.0:
@@ -110,18 +114,21 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
                                         np.linspace(min_value, max_value, num=num_tech_options)), veh_cost_curve_index)
 
             if num_tech_options == 1:
-                # cost_curve_options = [veh_min_cost_curve_index]  # was max g/mi -> min credits
-                best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
+                # CU
+                best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle /
+                              cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
                 cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
                 cost_curve_options = np.unique(cost_curve_options)  # filter out redundant tech options
         else:  # first producer pass, generate full range of options
             if num_tech_options == 1:
-                # cost_curve_options = [veh_min_cost_curve_index]  # was max g/mi -> min credits
-                best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
+                # CU
+                best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle /
+                              cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
                 cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
-                cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index, num=num_tech_options)
+                cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index,
+                                                 num=num_tech_options)
 
         if len(cv.cost_curve['credits_co2e_Mg_per_vehicle']) > 1:
             from scipy.interpolate import interp1d
@@ -133,7 +140,7 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         else:
             cost_curve_options = [cv.cost_curve['credits_co2e_Mg_per_vehicle'].min()]
 
-        # omega_log.logwrite('%s cost_curve_options %d' % (cv.vehicle_id, len(cost_curve_options)))
+        # CU
 
         tech_cost_options = \
             cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', cost_curve_options)
@@ -141,27 +148,20 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
             cv.get_from_cost_curve('new_vehicle_mfr_generalized_cost_dollars', cost_curve_options)
         tech_kwh_options = \
             cv.get_from_cost_curve('battery_kwh', cost_curve_options)
-        # tech_kwh_per_mile_options = \
-        #     cv.get_from_cost_curve('cert_direct_kwh_per_mile', cost_curve_options)
+        # RV CU
 
         d = {'veh_%s_cost_curve_indices' % cv.vehicle_id: cost_curve_options,
              'veh_%s_battery_kwh' % cv.vehicle_id: tech_kwh_options,
-             # 'veh_%s_kwh_pmi' % cv.vehicle_id: tech_kwh_per_mile_options,
              'veh_%s_cost_dollars' % cv.vehicle_id: tech_cost_options,
              'veh_%s_generalized_cost_dollars' % cv.vehicle_id: tech_generalized_cost_options}
+        # RV CU
         df = pd.DataFrame.from_dict(d)
 
         child_df_list.append(df)
 
-        # print('for cv in composite_vehicles = %f' % (time.time() - start_time))
-
-    start_time = time.time()
-
     tech_combos_df = pd.DataFrame()
     for df in child_df_list:
         tech_combos_df = cartesian_prod(tech_combos_df, df)
-
-    # print('cartesian_prod tech options time = %f' % (time.time() - start_time))
 
     # handle 'linked' market classes:
     for lmc in omega_globals.options.MarketClass.linked_market_classes:
@@ -178,18 +178,20 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
 def round_constraints(constraints, min_val=0.0, max_val=1.0):
     """
+    Round constraints to some reasonable number of decimal places
 
     Args:
-        constraints:
-        min_val:
-        max_val:
+        constraints (dict): constraints dict
+        min_val (float): minimum allowed value
+        max_val (float): maximum allowed value
 
     Returns:
+        Nothing, updates constraints dict.
 
     """
     for k in constraints:
         constraints[k] = ASTM_round(max(min_val, min(max_val, constraints[k])), omega_globals.share_precision)
-        # constraints[k]= np.round(max(min_val, min(max_val, constraints[k])), omega_globals.share_precision)
+        # CU RV
 
 
 def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
@@ -231,6 +233,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         consumer_response (Series): a pandas Series containing the final producer decision from prior iterations and
             containing the consumer desired market shares based on that decision and the producer's cross-subsidy, if
             any
+        context_based_total_sales (float): context-based total vehicle sales for the given year
+        prior_producer_decision_and_response (Series): prior-year producer decision and response
+        producer_consumer_iteration_num (int): producer-consumer iteration number
         node_name (str): name of the node in the ``market_class_dict``, used to traverse the market class tree
         verbose (bool): enables additional console output if ``True``
 
@@ -244,7 +249,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
     children = [c for c in children if market_class_dict[c]]
 
-    start_time = time.time()
     for k in market_class_dict:
         if verbose:
             print('processing ' + k)
@@ -285,9 +289,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                            market_class_dict[s]]
 
     # Generate market share options
-    # if consumer_response is not None and \
-    #         consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
-    if consumer_response is not None and (not all(responsive_children)): # or producer_consumer_iteration_num>=30):
+    # CU
+    if consumer_response is not None and (not all(responsive_children)):  # CU RV
         # inherit absolute market shares from consumer response for non-responsive children
         sales_share_dict = dict()
         for cn in abs_share_column_names:
@@ -301,7 +304,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             sales_share_df['min_constraints_%s' % node_name] = consumer_response['min_constraints_%s' % node_name]
             sales_share_df['max_constraints_%s' % node_name] = consumer_response['max_constraints_%s' % node_name]
     else:
-    # if True:
         # generate producer desired market shares for responsive market sectors and/or adjust constraints to maintain
         # GWh limit
         if all(responsive_children):
@@ -323,7 +325,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                         if consumer_response is not None and \
                                 consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
-                            omega_log.logwrite("consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']")
+                            omega_log.logwrite("consumer_response['total_battery_GWh'] > "
+                                               "consumer_response['battery_GWh_limit']")
                             # adjust constraints
                             if consumer_response['total_ALT_battery_GWh'] > 0:
                                 constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
@@ -345,7 +348,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                         elif consumer_response is not None:
                             if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-                                print("consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']")
+                                print("consumer_response['total_battery_GWh'] <= "
+                                      "consumer_response['battery_GWh_limit']")
                             node_market_classes = [node_name + '.' + c for c in children]
 
                             # pop non-partition keys
@@ -355,13 +359,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 if k in max_constraints:
                                     max_constraints.pop(k)
 
-                            # print('min_constraints')
-                            # print_dict(min_constraints)
-                            # print('max_constraints')
-                            # print_dict(max_constraints)
-                            #
-                            # for nmc in node_market_classes:
-                            #     print('cost_multiplier_%s' % nmc, consumer_response['cost_multiplier_%s' % nmc])
+                            # CU RV
 
                             consumer_node_abs_share = consumer_response['consumer_abs_share_frac_%s' % node_name]
 
@@ -375,24 +373,35 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     for nmc in node_market_classes:
                                         if 'cost_multiplier_%s' % nmc in consumer_response:
                                             multiplier = consumer_response['cost_multiplier_%s' % nmc]
-                                            if ((multiplier >= 0.99 * omega_globals.options.consumer_pricing_multiplier_max or multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min) and (consumer_response['max_share_delta_market_class'] == node_name or consumer_response['max_share_delta_market_class'] is None)) or \
-                                                    (multiplier == 1.0 and consumer_response['consumer_constrained_%s' % node_name]):
+                                            if ((multiplier >= 0.99 *
+                                                 omega_globals.options.consumer_pricing_multiplier_max or
+                                                 multiplier <= 1.01 *
+                                                 omega_globals.options.consumer_pricing_multiplier_min)
+                                                and (consumer_response['max_share_delta_market_class'] == node_name or
+                                                     consumer_response['max_share_delta_market_class'] is None)) or \
+                                                    (multiplier == 1.0 and
+                                                     consumer_response['consumer_constrained_%s' % node_name]):
                                                 locked_consumer_shares = True
                                                 # record multipliers
-                                                for nmc in node_market_classes:
-                                                    if nmc in omega_globals.price_modification_data:
-                                                        omega_globals.locked_price_modification_data[nmc] = \
-                                                            omega_globals.price_modification_data[nmc]
+                                                for nmc_ in node_market_classes:
+                                                    if nmc_ in omega_globals.price_modification_data:
+                                                        omega_globals.locked_price_modification_data[nmc_] = \
+                                                            omega_globals.price_modification_data[nmc_]
                                                 for k in min_constraints.keys():
                                                     if '.ALT' in k:
-                                                        if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-                                                            print('%50s, %.5f, %.5f, %.5f, %.5f' % (
-                                                            k, min_constraints[k], max_constraints[k],
-                                                            consumer_response[k] / node_abs_share,
-                                                            consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share))
-                                                        min_constraints[k] = consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share
+                                                        if 'p-c_shares_and_costs' in \
+                                                                omega_globals.options.verbose_console_modules:
+                                                            print('%50s, %.5f, %.5f, %.5f, %.5f' %
+                                                                  (k, min_constraints[k], max_constraints[k],
+                                                                   consumer_response[k] / node_abs_share,
+                                                                   consumer_response[k.replace('producer', 'consumer')]
+                                                                   / consumer_node_abs_share))
+                                                        min_constraints[k] = \
+                                                            (consumer_response[k.replace('producer', 'consumer')] /
+                                                             consumer_node_abs_share)
                                                         max_constraints[k] = min_constraints[k]
-                                        else:  # no cross-subsidy, non-full-line manufacturer, possible epsilon discrepancy
+                                        else:
+                                            # no cross-subsidy, non-full-line manufacturer, possible epsilon discrepancy
                                             locked_consumer_shares = True
                                             max_constraints = min_constraints
 
@@ -401,7 +410,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                         else:
                             # set up initial constraints for mandatory "NO_ALT" vehicle shares
-                            # calculate RELATIVE share constraints for partition, even though the keys indicate absolute shares:
+                            # calculate RELATIVE share constraints for partition, even though the keys indicate
+                            # absolute shares:
                             # --- they will be USED to determine absolute shares ---
                             min_constraints = dict()
                             max_constraints = dict()
@@ -468,18 +478,21 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 for nmc in node_market_classes:
                                     onmc_add = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
-                                        onmc_add += max(production_max[onmc], max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - prior_market_class_shares_dict[onmc]
-                                    # max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
-                                    #            max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
+                                        onmc_add += max(production_max[onmc],
+                                                        max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - \
+                                                    prior_market_class_shares_dict[onmc]
+                                    # RV
                                     max_sub = min(onmc_add,
-                                                  (prior_market_class_shares_dict[nmc] - max(production_min[nmc],
-                                                                                             min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
+                                                  (prior_market_class_shares_dict[nmc] -
+                                                   max(production_min[nmc],
+                                                       min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
                                                   )
 
                                     max_sub_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
 
-                                # calc max addition = min(producer_damping_max_delta, sum of max subtract of all other shares)
+                                # calc max addition = min(producer_damping_max_delta, sum of max subtract of all other
+                                # shares)
                                 max_add_dict = dict()
                                 for nmc in node_market_classes:
                                     # add up max subtract for other node market classes
@@ -494,18 +507,18 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 # figure out ALT ranges based on prior shares and max add and max subtract limits
                                 for nmc in node_market_classes:
                                     max_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
-                                        max(0, min(1, prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
+                                        max(0, min(1, prior_market_class_shares_dict[nmc] + max_add_dict[nmc] -
                                         max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
                                     min_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
                                         min(max_constraints['producer_abs_share_frac_%s.ALT' % nmc],
-                                            max(0, prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
+                                            max(0, prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] -
                                             min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
 
                         round_constraints(min_constraints)
                         round_constraints(max_constraints)
 
                         if locked_consumer_shares:
-                            print('%s locked consumer shares' % node_name)
+                            # print('%s locked consumer shares' % node_name)
                             node_partition = pd.DataFrame.from_dict([min_constraints])
                         else:
                             node_partition = partition(abs_share_column_names,
@@ -569,7 +582,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                 sales_share_df = pd.DataFrame()
         else:
             # I'm not even sure if we need to do this... if we're setting absolute shares at the leaves...
-            # but I guess it adds some tracking info to the dataframe which might be useful for debugging?
+            # but I guess it adds some tracking info to the dataframe which might be useful for debugging
             sales_share_dict = dict()
             for c, scn in zip(children, abs_share_column_names):
                 sales_share_dict[scn] = [_cache['mcat_data_%d' % calendar_year][c]['abs_share']]
@@ -647,6 +660,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         strategic_target_offset_Mg (float): if positive, the raw compliance outcome will be under-compliance, if
             negative then the raw compliance outcome will be over-compliance. Used to strategically under- or over-
             comply, perhaps as a result of the desired to earn or burn prior credits in the credit bank
+        prior_producer_decision_and_response (Series): prior-year producer decision and response
 
     Returns:
         A tuple of ``composite_vehicles`` (list of CompositeVehicle objects),
@@ -670,7 +684,6 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     search_iteration = 0
     best_candidate_production_decision = None
     most_strategic_production_decision = None
-    constraint_ratio = 1.0
 
     while continue_search:
         share_range = omega_globals.options.producer_compliance_search_convergence_factor ** search_iteration
@@ -761,17 +774,21 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             most_strategic_index = candidate_production_decisions['strategic_compliance_error'].idxmin()
             most_strategic_points = candidate_production_decisions.loc[[most_strategic_index]]
-            most_strategic_point = most_strategic_points.loc[[most_strategic_points['total_generalized_cost_dollars'].idxmin()]].iloc[0]
+            most_strategic_point = \
+                most_strategic_points.loc[[most_strategic_points['total_generalized_cost_dollars'].idxmin()]].iloc[0]
             cheapest_index = candidate_production_decisions['total_generalized_cost_dollars'].idxmin()
             cheapest_points = candidate_production_decisions.loc[[cheapest_index]]
-            most_strategic_cheapest_point = cheapest_points.loc[[cheapest_points['strategic_compliance_ratio'].idxmin()]].iloc[0]
+            most_strategic_cheapest_point = \
+                cheapest_points.loc[[cheapest_points['strategic_compliance_ratio'].idxmin()]].iloc[0]
 
             most_strategic_compliant = most_strategic_cheapest_point['strategic_compliance_ratio'] <= 1.0
 
             if (most_strategic_production_decision is None) or \
                     (most_strategic_point['strategic_compliance_error'] <=
-                     most_strategic_production_decision['strategic_compliance_error']) or (most_strategic_point['strategic_compliance_error'] ==
-                     most_strategic_production_decision['strategic_compliance_error'] and (most_strategic_point['total_generalized_cost_dollars'] <=
+                     most_strategic_production_decision['strategic_compliance_error']) or \
+                    (most_strategic_point['strategic_compliance_error'] ==
+                     most_strategic_production_decision['strategic_compliance_error'] and
+                     (most_strategic_point['total_generalized_cost_dollars'] <=
                      most_strategic_production_decision['total_generalized_cost_dollars'])):
                 most_strategic_production_decision = most_strategic_point
 
@@ -784,14 +801,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                         # if cheapest is non-compliant, most strategic is the best
                         best_candidate_production_decision = most_strategic_point
                 else:
-                    # if new candidate is cheaper than the old best and compliant, it's the best
-                    # if (((most_strategic_cheapest_point['total_generalized_cost_dollars'] <
-                    #         best_candidate_production_decision['total_generalized_cost_dollars'])) or
-                    #         ((most_strategic_cheapest_point['total_generalized_cost_dollars'] ==
-                    #         best_candidate_production_decision['total_generalized_cost_dollars']) and
-                    #          (most_strategic_cheapest_point['strategic_compliance_error'] <
-                    #         best_candidate_production_decision['strategic_compliance_error']))) and \
-                    #         most_strategic_compliant:
+                    # RV
                     if (most_strategic_cheapest_point['total_generalized_cost_dollars'] <
                           best_candidate_production_decision['total_generalized_cost_dollars']) and \
                             most_strategic_compliant:
@@ -812,29 +822,29 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
-                                                  search_iteration)).ljust(12) + 'SR:%f CR:%.10f BCR:%.10f' % (share_range,
-                                        most_strategic_production_decision['strategic_compliance_ratio'],
-                                        best_candidate_production_decision['strategic_compliance_ratio']))
+                                                  search_iteration)).ljust(12) + 'SR:%f CR:%.10f BCR:%.10f' %
+                                   (share_range, most_strategic_production_decision['strategic_compliance_ratio'],
+                                    best_candidate_production_decision['strategic_compliance_ratio']))
 
             search_iteration += 1
 
-            # continue_search = producer_compliance_possible is not None and \
-            #                   ((abs(1 - most_strategic_production_decision['strategic_compliance_ratio']) >
-            #              omega_globals.options.producer_compliance_search_tolerance) or search_iteration < 10) and \
-            #               (share_range > omega_globals.options.producer_compliance_search_min_share_range)
-
-            continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range)
+            continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range)  # RV
 
     if producer_compliance_possible is not None:
         if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-            omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
+            omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' %
+                               abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
                                echo_console=True)
 
-            omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' % (-best_candidate_production_decision['strategic_target_offset_Mg'], best_candidate_production_decision['total_credits_co2e_megagrams']),
+            omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' %
+                               (-best_candidate_production_decision['strategic_target_offset_Mg'],
+                                best_candidate_production_decision['total_credits_co2e_megagrams']),
                                echo_console=True)
 
             omega_log.logwrite('Target Compliance Ratio %3.3f, Actual Compliance Ratio %3.3f' %
-                               ((best_candidate_production_decision['total_cert_co2e_megagrams']-best_candidate_production_decision['strategic_target_offset_Mg'])/max(1, best_candidate_production_decision['total_target_co2e_megagrams']),
+                               ((best_candidate_production_decision['total_cert_co2e_megagrams'] -
+                                 best_candidate_production_decision['strategic_target_offset_Mg']) /
+                                max(1, best_candidate_production_decision['total_target_co2e_megagrams']),
                                 best_candidate_production_decision['strategic_compliance_ratio']),
                                echo_console=True)
 
@@ -847,13 +857,6 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         # log the final iteration, as opposed to the winning iteration:
         selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
-        # if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-        #     for mc in sorted(omega_globals.options.MarketClass.market_classes):
-        #         if 'producer_abs_share_frac_%s' % mc in selected_production_decision:
-        #             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
-        #                            (selected_production_decision['producer_abs_share_frac_%s' % mc]))
-        #     omega_log.logwrite('')
-
         composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
                                                                              selected_production_decision)
 
@@ -861,7 +864,20 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
            producer_compliance_possible, battery_GWh_limit
 
 
-def calc_composite_vehicles(mc, rc, alt, mctrc):
+def calc_composite_vehicle(mc, rc, alt, mctrc):
+    """
+    Calculate composite vehicle for the set of vehicles in the given market class / reg class / alt class
+
+    Args:
+        mc (str): market classs id, e.g. 'hauling.ICE'
+        rc (str): regulatory class, e.g. 'car', 'truck'
+        alt (str): 'ALT' or 'NO_ALT'
+        mctrc (dict): market-class/reg-clas tree
+
+    Returns:
+        The composite vehicle for the set of vehicles in the given market class / reg class / alt class
+
+    """
     cv = CompositeVehicle(mctrc[mc][rc][alt], vehicle_id='%s.%s.%s' % (mc, rc, alt), weight_by='model_year_prevalence')
     # cv.market_class_share_frac = sum([v.projected_sales for v in cv.vehicle_list]) / mctrc[mc]['sales']
     cv.market_class_share_frac = sum([v.projected_sales for v in cv.vehicle_list]) / mctrc[mc]['%s_sales' % alt]
@@ -923,7 +939,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for new_veh in manufacturer_vehicles:
                 calc_vehicle_frontier(new_veh)
 
-        print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
+        # print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
         alt_vehs = [new_veh for new_veh in manufacturer_vehicles if not new_veh.base_year_product]
         byp_vehs = [new_veh for new_veh in manufacturer_vehicles if new_veh.base_year_product]
@@ -932,20 +948,10 @@ def create_composite_vehicles(calendar_year, compliance_id):
         byp_byvids = set([v.base_year_vehicle_id for v in byp_vehs])
         non_covered_byvids = set.difference(byp_byvids, alt_byvids)
 
-        non_covered_vehs = [v for v in manufacturer_vehicles if v.base_year_vehicle_id in non_covered_byvids]
-        covered_vehs = [v for v in manufacturer_vehicles if v.base_year_vehicle_id not in non_covered_byvids]
-
-        # for v in non_covered_vehs:
-        #     print('%80s %20s %10s %20s' % (v.name, v.market_class_id, v.reg_class_id, v.context_size_class))
-        #
-        # print('\nEND non_covered_vehs ##################################\n')
-
-        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) ~= 2.0 at this point
-        # (if all vehicles were available for redesign) due to intentional duplicate entries for "alternative"
-        # powertrain vehicles, but "base year market share" is used for relative proportions
+        # CU
 
         context_based_total_sales = 0  # sales total by compliance id size class share
-        for csc in NewVehicleMarket.base_year_context_size_class_sales: # for each context size class
+        for csc in NewVehicleMarket.base_year_context_size_class_sales:  # for each context size class
             context_based_total_sales += \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
                 * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
@@ -965,7 +971,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 csc_dict[new_veh.context_size_class].append(new_veh)
 
         # distribute context size class sales to manufacturer_vehicles by relative market share
-        for csc in csc_dict: # for each context size class
+        for csc in csc_dict:  # for each context size class
             projection_initial_registered_count = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
                 * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
@@ -985,12 +991,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 myp_dict['myp_%s' % new_veh.base_year_vehicle_id] = new_veh.model_year_prevalence
                 myp_dict['ps_%s' % new_veh.base_year_vehicle_id] = new_veh.projected_sales
 
-        # for v in manufacturer_vehicles:
-        #     print('%80s %20s %10s %20s %10f %10d' % (
-        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
-        #         v.projected_sales))
-        #
-        # print('\nEND manufacturer_vehicles ##################################\n')
+        # CU
 
         # np.sum([new_veh.model_year_prevalence for new_veh in manufacturer_vehicles]) == 1.0 at this point,
         # np.sum([new_veh.projected_sales for new_veh in manufacturer_vehicles]) = context_based_total_sales
@@ -999,36 +1000,13 @@ def create_composite_vehicles(calendar_year, compliance_id):
             v.model_year_prevalence = myp_dict['myp_%s' % v.base_year_vehicle_id]
             v.projected_sales = myp_dict['ps_%s' % v.base_year_vehicle_id]
 
-        # for v in manufacturer_vehicles:
-        #     print('%80s %20s %10s %20s %10f %10d' % (
-        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
-        #         v.projected_sales))
-        #
-        # print('\nEND manufacturer_vehicles ##################################\n')
-        #
-        # for v in non_covered_vehs:
-        #     print('%80s %20s %10s %20s %10f %10d' % (
-        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
-        #         v.projected_sales))
-        #
-        # print('\nEND non_covered_vehs ##################################\n')
+        # CU
 
         # sum([v.model_year_prevalence for v in manufacturer_vehicles]) >= 1.0 and that's ok
-        # sum([v.model_year_prevalence for v in byp_vehs]) == 1.0 and alt vehicles get the myp of their respective base vehicles
+        # sum([v.model_year_prevalence for v in byp_vehs]) == 1.0 and alt vehicles get the myp of their respective
+        # base vehicles
 
-        # # group by market class (base year products) just to double check total prevalence for debugging
-        # mct = dict()
-        # for mc in omega_globals.options.MarketClass.market_classes:
-        #     mct[mc] = []
-        # for new_veh in manufacturer_vehicles:
-        #     if new_veh.base_year_product:
-        #         mct[new_veh.market_class_id].append(new_veh)
-        #
-        # mc_sum = 0
-        # for k in mct:
-        #     print(k, sum([v.model_year_prevalence for v in mct[k]]))
-        #     mc_sum += sum([v.model_year_prevalence for v in mct[k]])
-        # print('total %f' % mc_sum)
+        # CU RV
 
         # sales by market category, ALT / NO_ALT
         _cache['mcat_data_%d' % calendar_year] = dict()
@@ -1052,7 +1030,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
                             _cache['mcat_data_%d' % calendar_year][mcat]['ALT_abs_share'] += new_veh_abs_share
                             _cache['mcat_data_%d' % calendar_year][mcat]['sales'] += new_veh.projected_sales
                             _cache['mcat_data_%d' % calendar_year][mcat]['abs_share'] += new_veh_abs_share
-        # print_dict(_cache['mcat_data_%d' % calendar_year])
 
         # group by market class / reg class
         mctrc = {'ALT_sales': 0, 'NO_ALT_sales': 0}
@@ -1078,8 +1055,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 if new_veh.base_year_product:
                     mctrc['ALT_sales'] += new_veh.projected_sales
             mctrc[new_veh.market_class_id]['sales'] += new_veh.projected_sales
-            mctrc[new_veh.market_class_id]['byp_prevalence'] += new_veh.model_year_prevalence * new_veh.base_year_product
-        # print_dict(mctrc)
+            mctrc[new_veh.market_class_id]['byp_prevalence'] += \
+                new_veh.model_year_prevalence * new_veh.base_year_product
 
         mcrc_priority_list = []
         for mc in omega_globals.options.MarketClass.market_classes:
@@ -1099,7 +1076,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             results = []
             # start longest jobs first!
             for mc, rc, alt, _ in mcrc_priority_list:
-                results.append(omega_globals.pool.apply_async(func=calc_composite_vehicles,
+                results.append(omega_globals.pool.apply_async(func=calc_composite_vehicle,
                                                               args=[mc, rc, alt, mctrc],
                                                               callback=None,
                                                               error_callback=error_callback))
@@ -1107,9 +1084,10 @@ def create_composite_vehicles(calendar_year, compliance_id):
             composite_vehicles = [r.get() for r in results]
         else:
             for mc, rc, alt, _ in mcrc_priority_list:
-                composite_vehicles.append(calc_composite_vehicles(mc, rc, alt, mctrc))
+                composite_vehicles.append(calc_composite_vehicle(mc, rc, alt, mctrc))
 
-        print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
+        # print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
+
         # get empty market class tree
         market_class_tree = omega_globals.options.MarketClass.get_market_class_tree()
 
@@ -1123,15 +1101,15 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # cull branches that don't contain vehicles (e.g. missing body styles)
         keys = list(market_class_tree.keys())
         for k in keys:
-            if k not in VehicleFinal.mfr_base_year_share_data[compliance_id] or VehicleFinal.mfr_base_year_share_data[compliance_id][k] == 0.0:
+            if k not in VehicleFinal.mfr_base_year_share_data[compliance_id] or \
+                    VehicleFinal.mfr_base_year_share_data[compliance_id][k] == 0.0:
                 market_class_tree.pop(k)
 
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
                              'pre_production_vehicles': pre_production_vehicles,
                              'market_class_tree': market_class_tree,
                              'context_based_total_sales': context_based_total_sales,
-                             # 'context_based_alt_sales': context_based_alt_sales,
-                             # 'context_based_no_alt_sales': context_based_no_alt_sales,
+                             # CU
                              }
     else:
         # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
@@ -1154,6 +1132,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         calendar_year (int): the year of the compliance search
         compliance_id (str): manufacturer name, or 'consolidated_OEM'
         candidate_mfr_composite_vehicles (list): list of ``CompositeVehicle`` objects
+        pre_production_vehicles (list): list of the vehicles that have not entered production yet
         producer_decision (Series): the production decision as a result of the compliance search
 
     Returns:
@@ -1165,7 +1144,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     manufacturer_new_vehicles = []
 
     # pull final vehicles from composite vehicles
-    decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision)
+    decompose_candidate_vehicles(candidate_mfr_composite_vehicles, producer_decision)
 
     production_battery_gigawatthours = 0
 
@@ -1219,8 +1198,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                         compliance_id=compliance_id,
                                         target_co2e_Mg=target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
-                                        manufacturer_vehicle_cost_dollars=
-                                            producer_decision['total_cost_dollars'],
+                                        manufacturer_vehicle_cost_dollars=producer_decision['total_cost_dollars']
                                         )
     omega_globals.session.flush()
 
@@ -1229,7 +1207,21 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     return target_co2e_Mg - cert_co2e_Mg, production_battery_gigawatthours
 
 
-def decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision):
+def decompose_candidate_vehicles(candidate_mfr_composite_vehicles, producer_decision):
+    """
+    Propagate sales to source vehicles and interpolate cost curve data.
+
+    Args:
+        candidate_mfr_composite_vehicles (list): list of ``CompositeVehicle`` objects
+        producer_decision (Series): the production decision as a result of the compliance search
+
+    Returns:
+        Nothing, updates composite vehicles.
+
+    See Also:
+        ``producer.vehicles.CompositeVehicle.decompose()``
+
+    """
     for cv in candidate_mfr_composite_vehicles:
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = producer_decision['veh_%s_sales' % cv.vehicle_id]
@@ -1323,9 +1315,6 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
             composite_veh_cost_curve_options = production_options[
                 'veh_%s_cost_curve_indices' % composite_veh.vehicle_id].values
-
-        # composite_veh_credits_co2e_Mg = \
-        #     composite_veh_sales * composite_veh_cost_curve_options
 
         # get cert and target Mg for the composite vehicle from the composite cost curve
         composite_veh_cert_co2e_Mg = \
@@ -1457,17 +1446,20 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         ``compliance_possible`` (bool indicating whether compliance was possible)
 
     """
-    # production_options = production_options.drop_duplicates('total_credits_co2e_megagrams')
+    # RV
 
     global prior_most_strategic_compliant_tech_share_option, prior_most_strategic_non_compliant_tech_share_option, \
         cloud_slope
 
     cost_name = 'total_generalized_cost_dollars'
 
-    if production_options['total_generalized_cost_dollars'].max() != production_options['total_generalized_cost_dollars'].min():
+    if production_options['total_generalized_cost_dollars'].max() != \
+            production_options['total_generalized_cost_dollars'].min():
         production_options['normalized_total_generalized_cost_dollars'] = \
-            ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
-             (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
+            ((production_options['total_generalized_cost_dollars'] -
+              production_options['total_generalized_cost_dollars'].min()) /
+             (production_options['total_generalized_cost_dollars'].max() -
+              production_options['total_generalized_cost_dollars'].min()))
     else:
         production_options['normalized_total_generalized_cost_dollars'] = 0
 
@@ -1482,7 +1474,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
     mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
-    mini_df['normalized_total_generalized_cost_dollars'] = production_options['normalized_total_generalized_cost_dollars']
+    mini_df['normalized_total_generalized_cost_dollars'] = \
+        production_options['normalized_total_generalized_cost_dollars']
 
     if search_iteration == 0:
         prior_most_strategic_compliant_tech_share_option = None
@@ -1540,7 +1533,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
                       lowest_cost_compliant_tech_share_option[cost_name].item())
 
                 non_compliant_tech_share_options['weighted_slope'] = \
-                    non_compliant_tech_share_options['strategic_compliance_ratio'].values * dy / (dx + sys.float_info.epsilon)
+                    non_compliant_tech_share_options['strategic_compliance_ratio'].values * dy / \
+                    (dx + sys.float_info.epsilon)
 
                 most_strategic_non_compliant_tech_share_option = \
                     production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
@@ -1567,13 +1561,15 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
                     # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
                     compliant_tech_share_options['weighted_slope'] = \
-                        compliant_tech_share_options['strategic_compliance_ratio'].values * dy / (dx + sys.float_info.epsilon)
+                        compliant_tech_share_options['strategic_compliance_ratio'].values * dy / \
+                        (dx + sys.float_info.epsilon)
 
                     most_strategic_compliant_tech_share_option = \
                         production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
             else:
                 if len(compliant_tech_share_options.columns) == len(mini_df.columns):
-                    most_strategic_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options.index[0]]]
+                    most_strategic_compliant_tech_share_option = \
+                        production_options.loc[[compliant_tech_share_options.index[0]]]
                 else:
                     most_strategic_compliant_tech_share_option = compliant_tech_share_options.iloc[[0]]
 
@@ -1586,22 +1582,14 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         most_strategic_normalized_cost = \
             most_strategic_compliant_tech_share_option['normalized_total_generalized_cost_dollars'].item()
 
-        lowest_cost_dollars = lowest_cost_compliant_tech_share_option[cost_name].item()
-        most_strategic_cost_dollars = most_strategic_compliant_tech_share_option[cost_name].item()
-
-        # if three_points:
-        #     print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
-
-        # if three_points and omega_globals.options.producer_voluntary_overcompliance and \
-        #     lowest_cost_dollars / most_strategic_cost_dollars < \
-        #     (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
+        # RV CU
         if three_points and omega_globals.options.producer_voluntary_overcompliance and \
                 (most_strategic_normalized_cost - lowest_normalized_cost) >= \
                 omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac:
-                # take lowest cost if it's at least X percent cheaper than the most strategic
-                candidate_production_decisions =\
-                    pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
-                        lowest_cost_compliant_tech_share_option])
+            # take lowest cost if it's at least X percent cheaper than the most strategic
+            candidate_production_decisions =\
+                pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
+                    lowest_cost_compliant_tech_share_option])
         else:
             candidate_production_decisions = \
                 pd.concat(
@@ -1638,18 +1626,15 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         if len(compliant_tech_share_options.columns) == len(mini_df.columns):
 
             lowest_normalized_cost = \
-                production_options.loc[[compliant_tech_share_options['normalized_total_generalized_cost_dollars'].idxmin()]]['normalized_total_generalized_cost_dollars'].item()
+                production_options.loc[
+                    [compliant_tech_share_options['normalized_total_generalized_cost_dollars'].idxmin()]
+                ]['normalized_total_generalized_cost_dollars'].item()
             most_strategic_normalized_cost = \
-                production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]]['normalized_total_generalized_cost_dollars'].item()
+                production_options.loc[
+                    [compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]
+                ]['normalized_total_generalized_cost_dollars'].item()
 
-            lowest_cost_dollars = \
-                production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]][cost_name].item()
-            most_strategic_cost_dollars = \
-                production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]][cost_name].item()
-
-            # if omega_globals.options.producer_voluntary_overcompliance and \
-            #         lowest_cost_dollars / most_strategic_cost_dollars < \
-            #         (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
+            # CU RV
             if omega_globals.options.producer_voluntary_overcompliance and \
                     (most_strategic_normalized_cost - lowest_normalized_cost) >= \
                     omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac:
@@ -1691,12 +1676,15 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
 def cull_compliant_points(compliant_tech_share_options, prior_most_strategic_compliant_tech_share_option):
     """
+    Remove compliant points that aren't as good as the prior most strategic compliant point.
 
     Args:
-        compliant_tech_share_options:
-        prior_most_strategic_compliant_tech_share_option:
+        compliant_tech_share_options (dataframe): compliant tech share options
+        prior_most_strategic_compliant_tech_share_option (series): prior most strategic compliant tech share option
+            if any, ``None`` otherwise
 
     Returns:
+        ``compliant_tech_share_options`` with non-optimal points removed
 
     """
     if prior_most_strategic_compliant_tech_share_option is not None:
@@ -1711,12 +1699,15 @@ def cull_compliant_points(compliant_tech_share_options, prior_most_strategic_com
 
 def cull_non_compliant_points(non_compliant_tech_share_options, prior_most_strategic_non_compliant_tech_share_option):
     """
+    Remove non-compliant points that aren't as good as the prior most strategic non-compliant point.
 
     Args:
-        non_compliant_tech_share_options:
-        prior_most_strategic_non_compliant_tech_share_option:
+        non_compliant_tech_share_options (dataframe): non-compliant tech share options
+        prior_most_strategic_non_compliant_tech_share_option(series): prior most strategic non-compliant tech share
+            option if any, ``None`` otherwise
 
     Returns:
+        ``non_compliant_tech_share_options`` with non-optimal points removed
 
     """
     if prior_most_strategic_non_compliant_tech_share_option is not None:

@@ -17,7 +17,7 @@ The data represents fuel property data for compliance purposes, by policy year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,policy-fuels,input_template_version:,0.1
@@ -101,7 +101,7 @@ class PolicyFuel(OMEGABase):
 
                 PolicyFuel._data[cache_key] = PolicyFuel._data[fuel_id, year][attribute]
             else:
-                raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
+                raise Exception('Missing policy fuel values for %s, %d or prior' % (fuel_id, calendar_year))
 
         return PolicyFuel._data[cache_key]
 
@@ -119,8 +119,6 @@ class PolicyFuel(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         PolicyFuel._data.clear()
 
         if verbose:
@@ -138,7 +136,8 @@ class PolicyFuel(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'unit': ['gallon', 'kWh']}
@@ -166,7 +165,8 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         if not init_fail:
             print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2e_grams_per_unit'))

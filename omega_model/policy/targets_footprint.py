@@ -20,7 +20,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
-    input_template_name:, ``[module_name]``, input_template_version:, ``[template_version]``
+    .. csv-table::
+
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -209,7 +211,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             raise Exception('Missing GHG target parameters for %s, %d or prior'
                             % (vehicle.reg_class_id, vehicle.model_year))
 
-
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
         """
@@ -273,8 +274,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             List of template/input errors, else empty list on success
 
         """
-
-
         VehicleTargets._data.clear()
 
         if verbose:
@@ -292,7 +291,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             # validate columns
@@ -329,12 +329,22 @@ if __name__ == '__main__':
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = None
                 reg_class_id = None
                 footprint_ft2 = None
                 initial_registered_count = None
 
                 def get_initial_registered_count(self):
+                    """
+                    Get initial registered count
+
+                    Returns:
+                        Initial registered count
+                    """
                     return self.initial_registered_count
 
             car_vehicle = dummyVehicle()
@@ -352,18 +362,27 @@ if __name__ == '__main__':
             truck_vehicle.fueling_class = 'ICE'
 
             car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
+
             car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
-            car_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
-                                                                                     co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
-                                                                                           co2_gpmi_variants=[0, 50, 100, 150],
-                                                                                           sales_variants=[1, 2, 3, 4])
+
+            car_certs_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
+                                                                       co2_gpmi_variants=[0, 50, 100, 150])
+            car_certs_sales_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
+                                                                       co2_gpmi_variants=[0, 50, 100, 150],
+                                                                       sales_variants=[1, 2, 3, 4])
 
             truck_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(truck_vehicle)
+
             truck_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(truck_vehicle)
-            truck_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
-                                                                                             sales_variants=[1, 2, 3, 4])
+
+            truck_certs_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
+
+            truck_certs_sales_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                       sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

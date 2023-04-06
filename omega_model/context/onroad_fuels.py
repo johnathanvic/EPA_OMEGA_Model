@@ -20,7 +20,7 @@ The data represents fuel property data for on-road/in-use purposes.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,onroad-fuels,input_template_version:,0.1
@@ -74,7 +74,7 @@ class OnroadFuel(OMEGABase):
 
     fuel_ids = []  # list of known fuel ids
 
-    # TODO: I don't know where this should be defined, or if it should be a user input
+    # RV
     kilowatt_hours_per_gallon = 33.7  # for MPGe calcs from kWh/mi ...
     grams_co2e_per_gallon = 8887  # for MPG calcs from gCO2e/mi
 
@@ -108,7 +108,7 @@ class OnroadFuel(OMEGABase):
 
                 OnroadFuel._data[cache_key] = OnroadFuel._data[in_use_fuel_id, year][attribute]
             else:
-                raise Exception('Missing policy fuel values for %s, %d or prior' %(in_use_fuel_id, calendar_year))
+                raise Exception('Missing policy fuel values for %s, %d or prior' % (in_use_fuel_id, calendar_year))
 
         return OnroadFuel._data[cache_key]
 
@@ -126,8 +126,6 @@ class OnroadFuel(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         OnroadFuel._data.clear()
 
         if verbose:
@@ -145,7 +143,8 @@ class OnroadFuel(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'unit': ['gallon', 'kWh']}

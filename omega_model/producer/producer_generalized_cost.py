@@ -15,7 +15,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.1
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -67,7 +67,8 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
 
         Args:
             market_class_id (str): market class id, e.g. 'hauling.ICE'
-            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g. ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
+            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g.
+                ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
 
         Returns:
             The requested generalized cost attributes.
@@ -76,7 +77,8 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
         cache_key = (market_class_id, attribute_types)
 
         if cache_key not in ProducerGeneralizedCost._data:
-            ProducerGeneralizedCost._data[cache_key] = [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
+            ProducerGeneralizedCost._data[cache_key] = \
+                [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
 
         return ProducerGeneralizedCost._data[cache_key]
 
@@ -132,8 +134,6 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
                                               producer_generalized_cost_annual_vmt *
                                               producer_generalized_cost_fuel_years)
 
-        # TODO: if we keep this, the 1300 should be an input somewhere
-        # WLTP updated to 400 per footprint-equilibrium searching runs - BDE 06/14/22
         delta_footprint_ft2 = cost_cloud['footprint_ft2'] - vehicle.base_year_footprint_ft2
         footprint_wtp = delta_footprint_ft2 * omega_globals.options.producer_footprint_wtp
 

@@ -5,12 +5,13 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents tailpipe emission rates by model year, age, reg-class and fuel type as estimated by EPA's MOVES model.
+The data represents tailpipe emission rates by model year, age, reg-class and fuel type as estimated by
+EPA's MOVES model.
 
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,emission_rates_vehicles,input_template_version:,0.2
@@ -19,15 +20,14 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,sourcetype_name,reg_class_id,market_class_id,in_use_fuel_id,rate_name,independent_variable,equation
-        2017,passenger car,car,non_hauling.ICE,pump gasoline,pm25_exhaust_grams_per_mile,age,((0.00020321 * age) + 0.0017372)
-        2017,passenger car,car,non_hauling.ICE,pump gasoline,nmog_exhaust_grams_per_mile,age,((0.00039006 * age) + 0.05267)
-
+        start_year,sourcetype_name,reg_class_id,market_class_id,in_use_fuel_id,rate_name,independent_variable,slope,intercept,ind_variable_data,rate_data,equation
+        1995,passenger car,car,non_hauling.ICE,pump gasoline,pm25_exhaust_grams_per_mile,age,0.000020575,0.02556,"[22, 30]","[0.02601255162083171, 0.026177151337127946]",((2.0575e-05 * age) + 0.02556)
+        1995,passenger car,car,non_hauling.ICE,pump gasoline,nmog_exhaust_grams_per_mile,age,-0.00059478,0.77323,"[22, 30]","[0.7601447516760625, 0.7553865333609487]",((-0.00059478 * age) + 0.77323)
 
 Data Column Name and Description
     :start_year:
-        The model year to which the rate applies; model years not shown will apply the start_year rate less than or equal
-        to the model year.
+        The model year to which the rate applies; model years not shown will apply the start_year rate
+        less than or equal to the model year.
 
     :sourcetype_name:
         The MOVES sourcetype name (e.g., passenger car, passenger truck, light-commercial truck, etc.).
@@ -50,8 +50,21 @@ Data Column Name and Description
     :independent_variable:
         The independent variable used in calculating the emission rate (e.g., age).
 
+    :slope:
+        The slope of the linear fit to the emission rate input data.
+
+    :intercept:
+        The intercept of the linear fit to the emission rate input data.
+
+    :ind_variable_data:
+        Input data for the independent variable used to generate the emission rate curve where data represent the age
+        associated with the corresponding input data.
+
+    :rate_data:
+        The emission rate data used to generate the emission rate curve.
+
     :equation:
-        The emission rate equation used to calculate an emission rate at the given age (or other independent variable).
+        The linear fit emission rate equation used to calculate an emission rate at the given independent variable.
 
 ----
 
@@ -72,7 +85,7 @@ class EmissionRatesVehicles:
 
     """
     def __init__(self):
-        self._data = dict() # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
+        self._data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
         self._cache = dict()
         self.startyear_min = 0
 
@@ -134,7 +147,7 @@ class EmissionRatesVehicles:
             sourcetype_name (str): the MOVES sourcetype name (e.g., 'passenger car', 'light commercial truck')
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
             in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
-            age (int): the vehicle age
+            age (int): vehicle age in years
             rate_names: name of emission rate(s) to get
 
         Returns:

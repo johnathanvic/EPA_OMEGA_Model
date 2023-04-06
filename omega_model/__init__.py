@@ -2,7 +2,7 @@
 
 Top-level includes/definitions for the OMEGA model
 
-Defines class OMEGARuntimeOptions which control an individual simulation session
+Defines class OMEGASessionSettings which control an individual simulation session
 
 
 ----
@@ -20,14 +20,7 @@ import os, sys
 if 'darwin' in sys.platform:
     os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for pyqtgraph on MacOS
 
-# print('omega_model __init__.py path = %s' % os.path.abspath(__file__))
-# print('SYS Path = %s' % sys.path)
-
-# print(sys._MEIPASS)
-# path = os.path.dirname(os.path.abspath(__file__))
-# print(sys.path)
-# sys.path.insert(0, path)
-# print(sys.path)
+# CU
 
 import traceback
 
@@ -71,15 +64,14 @@ try:
         """
         def __init__(self):
             """
-            Create an OMEGARuntimeOptions object with default settings used for testing and development.
+            Create an OMEGASessionSettings object with default settings used for testing and development.
 
-            The primary way to create an OMEGARuntimeOptions object is via the batch process.
+            The primary way to create an OMEGASessionSettings object is via the batch process.
 
             See Also:
                 omega_batch.py
 
             """
-
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
@@ -160,13 +152,13 @@ try:
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
-            self.analysis_dollar_basis = 2020  # Note that the implicit_price_deflator.csv input file must contain data for this entry.
+
+            # Note that the implicit_price_deflator.csv input file must contain data for this entry:
+            self.analysis_dollar_basis = 2020
 
             self.allow_ice_of_bev = False
 
-            # effects modeling files
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
-            self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
 
             self.start_time = 0
             self.end_time = 0
@@ -189,7 +181,8 @@ try:
             self.rlhp60_min_scaler = 1.0
             self.rlhp60_max_scaler = 1.0
             self.producer_voluntary_overcompliance = False  # disable voc by default
-            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  # minimum benefit of overcompliance, as a fraction of compliance cost
+            # minimum benefit of overcompliance, as a fraction of compliance cost:
+            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01
             self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
             self.producer_price_modification_scaler = 0.0
             self.producer_footprint_wtp = 200
@@ -223,17 +216,24 @@ try:
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search',
-                                            'p-c_shares_and_costs', 'p-c_max_iterations_',
-                                            'cross_subsidy_search_', 'cross_subsidy_multipliers',
+            self.verbose_console_modules = ['producer_compliance_search_',
+                                            'p-c_shares_and_costs_', 'p-c_max_iterations_',
+                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
             self.verbose_postproc = ['iteration_']
 
-            self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_vehicle_cloud_years = []
+
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_producer_compliance_search_years = []
+
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_consumer_iteration_years = [2050]
+
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_producer_decision_and_response_years = []
 
             # list of vehicles to plot in log_producer_compliance_search_years:
             self.plot_and_log_vehicles = []  # ['ICE Large Van truck minivan 4WD']

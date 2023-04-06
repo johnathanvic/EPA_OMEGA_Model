@@ -20,7 +20,7 @@ The data represents fuel property data for on-road/in-use purposes.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,onroad-fuels,input_template_version:,0.1
@@ -74,7 +74,7 @@ class OnroadFuel:
         self._data = dict()  # private dict, in-use fuel properties
         self.fuel_ids = []  # list of known fuel ids
 
-        # TODO: I don't know where this should be defined, or if it should be a user input
+        # RV
         self.kilowatt_hours_per_gallon = 33.7  # for MPGe calcs from kWh/mi ...
         self.grams_co2e_per_gallon = 8887  # for MPG calcs from gCO2e/mi
 
@@ -144,6 +144,6 @@ class OnroadFuel:
 
                 self._data[cache_key] = self._data[in_use_fuel_id, year][attribute]
             else:
-                raise Exception('Missing policy fuel values for %s, %d or prior' %(in_use_fuel_id, calendar_year))
+                raise Exception('Missing policy fuel values for %s, %d or prior' % (in_use_fuel_id, calendar_year))
 
         return self._data[cache_key]

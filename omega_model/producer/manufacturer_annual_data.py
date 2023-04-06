@@ -27,6 +27,7 @@ class ManufacturerAnnualData(SQABase):
     """
     # --- database table properties ---
     __tablename__ = 'manufacturer_annual_data'  # database table name
+    __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
     index = Column('index', Integer, primary_key=True)  #: database table index
     compliance_id = Column('compliance_id', Integer, ForeignKey('manufacturers.manufacturer_id'))  #: manufacturer id, e..g 'consolidated_OEM'
     model_year = Column(Numeric)  #: model year of the data
@@ -46,17 +47,20 @@ class ManufacturerAnnualData(SQABase):
             model_year (numeric): the compliance model year
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
             target_co2e_Mg (numeric): target CO2e Mg for the model year
-            calendar_year_cert_co2e_Mg (numeric): initial compliance state (CO2e Mg) of the vehicles produced in the model year
-            manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost (sum of vehicle sales X vehicle cost)
+            calendar_year_cert_co2e_Mg (numeric): initial compliance state (CO2e Mg) of the vehicles
+                produced in the model year
+            manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost
+                (sum of vehicle sales X vehicle cost)
 
         """
-        omega_globals.session.add(ManufacturerAnnualData(compliance_id=compliance_id,
-                                                         model_year=model_year,
-                                                         target_co2e_Mg=target_co2e_Mg,
-                                                         calendar_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,
-                                                         model_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,  # to start with
-                                                         manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
-                                                         ))
+        omega_globals.session.add(
+            ManufacturerAnnualData(compliance_id=compliance_id,
+                                   model_year=model_year,
+                                   target_co2e_Mg=target_co2e_Mg,
+                                   calendar_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,
+                                   model_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,  # to start with
+                                   manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
+                                   ))
         omega_globals.session.flush()
 
     @staticmethod
@@ -71,7 +75,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.target_co2e_Mg)
-                                 .filter(ManufacturerAnnualData.compliance_id==compliance_id).all())
+                                 .filter(ManufacturerAnnualData.compliance_id == compliance_id).all())
 
     @staticmethod
     def get_calendar_year_cert_co2e_Mg(compliance_id):
@@ -86,7 +90,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.calendar_year_cert_co2e_Mg)
-                                 .filter(ManufacturerAnnualData.compliance_id==compliance_id).all())
+                                 .filter(ManufacturerAnnualData.compliance_id == compliance_id).all())
 
     @staticmethod
     def get_model_year_cert_co2e_Mg(compliance_id):
@@ -101,7 +105,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.model_year_cert_co2e_Mg)
-                                 .filter(ManufacturerAnnualData.compliance_id==compliance_id).all())
+                                 .filter(ManufacturerAnnualData.compliance_id == compliance_id).all())
 
     @staticmethod
     def get_total_cost_billions(compliance_id):
@@ -117,7 +121,7 @@ class ManufacturerAnnualData(SQABase):
         """
         return float(
             omega_globals.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars))
-                .filter(ManufacturerAnnualData.compliance_id==compliance_id).scalar()) / 1e9
+                .filter(ManufacturerAnnualData.compliance_id == compliance_id).scalar()) / 1e9
 
     @staticmethod
     def update_model_year_cert_co2e_Mg(model_year, compliance_id, transaction_amount_Mg):
@@ -127,7 +131,8 @@ class ManufacturerAnnualData(SQABase):
         Args:
             model_year (numeric): the model year of the transaction
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
-            transaction_amount_Mg (numeric): the transaction amount, may be positive (receiving credits) or negative (transferring credits)
+            transaction_amount_Mg (numeric): the transaction amount, may be positive (receiving credits) or negative
+                (transferring credits)
 
         """
         mad = omega_globals.session.query(ManufacturerAnnualData)\

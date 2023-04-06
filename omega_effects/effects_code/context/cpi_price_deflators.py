@@ -16,7 +16,7 @@ The data represents the price deflator by calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_cpi_price_deflators,input_template_version:,0.22
@@ -63,7 +63,6 @@ class CPIPriceDeflators:
 
         Args:
             filepath: the Path object to the file.
-            batch_settings: an instance of the BatchSettings class.
             effects_log: an instance of the EffectsLog class.
 
         Returns:
@@ -94,6 +93,7 @@ class CPIPriceDeflators:
 
         Args:
             calendar_year (int): the calendar year to get the function for
+            effects_log: an instance of the EffectsLog class
 
         Returns:
             The CPI price deflator for the given calendar year.

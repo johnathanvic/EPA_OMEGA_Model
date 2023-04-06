@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects vehicle annual data module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 
 from omega_effects.effects_code.general.general_functions import read_input_file
@@ -5,7 +15,10 @@ from omega_effects.effects_code.general.general_functions import calc_rebound_ef
 
 
 class VehicleAnnualData:
+    """
+    Vehicle annual data class definition
 
+    """
     def __init__(self):
         self._dict = dict()
         self.vad_adjusted = dict()
@@ -34,15 +47,44 @@ class VehicleAnnualData:
         self._dict = df.to_dict('index')
 
     def get_vehicle_annual_data_by_calendar_year(self, calendar_year):
+        """
+        Get vehicle annual data by calendar year.
 
+        Args:
+            calendar_year (int): the calendar year to retrieve data for
+
+        Returns:
+            Vehicle annual data for the given calendar year.
+
+        """
         return [v for k, v in self._dict.items() if k[1] == calendar_year]
 
     def get_adjusted_vehicle_annual_data_by_calendar_year(self, calendar_year):
+        """
+        Get adjusted vehicle annual data by calendar year.
 
+        Args:
+            calendar_year (int): the calendar year to retrieve data for
+
+        Returns:
+            Adjusted vehicle annual data for the given calendar year.
+
+        """
         return [v for k, v in self.vad_adjusted.items() if k[1] == calendar_year]
 
     def get_vehicle_annual_data_by_vehicle_id(self, calendar_year, vehicle_id, *attribute_names):
+        """
+        Get vehicle annual data by vehicle id.
 
+        Args:
+            calendar_year (int): the calendar year to retrieve data for
+            vehicle_id: vehicle id
+            *attribute_names: the attribute names to retrieve
+
+        Returns:
+            Vehicle annual data by vehicle id.
+
+        """
         attribute_list = list()
         for attribute_name in attribute_names:
             attribute_list.append(self._dict[(vehicle_id, calendar_year)][attribute_name])
@@ -128,15 +170,17 @@ class VehicleAnnualData:
                                     = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel,
                                                                                      'refuel_efficiency')
                                 co2_emissions_grams_per_unit \
-                                    = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel,
-                                                                                     'direct_co2e_grams_per_unit') / refuel_efficiency
-                                onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
+                                    = batch_settings.onroad_fuels.get_fuel_attribute(
+                                        calendar_year, fuel, 'direct_co2e_grams_per_unit') / refuel_efficiency
+                                onroad_gallons_per_mile += \
+                                    onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                                 fuel_cpm += onroad_gallons_per_mile * retail_price
                                 rebound_rate = rebound_rate_ice
                                 fuel_flag += 1
 
                         # get context fuel cost per mile
-                        context_fuel_cpm_dict_key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), age)
+                        context_fuel_cpm_dict_key = \
+                            (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), age)
                         context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
 
                         if fuel_flag == 2:

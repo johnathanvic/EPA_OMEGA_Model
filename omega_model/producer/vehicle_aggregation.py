@@ -13,23 +13,23 @@ credit attributes which may vary by policy).
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents base-year (and eventually 'historic') vehicle attributes and sales.
+The data represents base-year vehicle attributes and sales.
 
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
-       input_template_name:,vehicles,input_template_version:,0.43
+       input_template_name:,vehicles,input_template_version:,0.49,notes:,20220926 Added fields for prior_redesign_year and redesign_interval to 20220819 ver from base_year_compilation_LD_2b3_20220926.xlsx
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,eng_cyls_num,eng_disp_liters,high_eff_alternator,start_stop,hev,phev,bev,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,target_coef_a,target_coef_b,target_coef_c
-        COOPER HARDTOP 2 DOOR,BMX,2019,car,Subcompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},4459,,,40,134,10.7,3000,153.5,,55.8,5.1,99.2,,23900,4.3,775,,0,sedan,steel,2,3680,,2743,3,1.5,0,0,0,0,0,0,0,0,0,1,1,0,1,0,27.6,0.156,0.01806
-        Panamera 4 e-Hybrid,VGA,2019,car,Large,PHEV,,{'pump gasoline':1.0},{'gasoline':1.0},458,,,52.7,330,15.8,5500,200.8,,56.1,,118.1,,107783,4.3,,,0,sedan,steel,4,5860,,4547,6,2.9,0,1,0,1,0,0,0,0,0,1,1,0,1,0,51.706,0.39797,0.01863
+        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,prior_redesign_year,redesign_interval,drive_system,alvw_lbs,gvwr_lbs,gcwr_lbs,curbweight_lbs,dual_rear_wheel,long_bed_8ft,eng_cyls_num,eng_disp_liters,high_eff_alternator,start_stop,ice,hev,phev,bev,fcv,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,awd,fwd,trx10,trx11,trx12,trx21,trx22,ecvt,target_coef_a,target_coef_b,target_coef_c
+        DB11 V12,Aston Martin Lagonda,2019,car,Minicompact,N,TDS_TRX22_SS0,{'pump gasoline':1.0},{'gasoline':1.0},118,,,50,600,14.6,4500,186,77.26666667,50.53333333,3.5,110.4,81,311230,4,,,1,sedan,steel,2014,5,2,,,,3933,0,,12,5.2,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1,0,,,,,,,,,40.94,0.0169,0.0271
+        Grand Cherokee 4X4,FCA,2019,truck,Large Crossover,N,GDI_TRX22_SS1,{'pump gasoline':1.0},{'gasoline':1.0},155936,,,51.1,295,17.2,5000,189.8,76.5,68.82,8.6,114.71,140.5,43538.5,5,,,1,cuv_suv,steel,2014,5,4,5662.35,6500,,4824.7,0,,6,3.6,0,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,,,,,,,,,51.46511874,-0.260687329,0.036235437
 
 Data Column Name and Description
 
@@ -72,38 +72,53 @@ Data Column Name and Description
     :sales:
         Number of vehicles sold in the ``model_year``
 
-    :cert_direct_oncycle_co2e_grams_per_mile:
-        Vehicle direct oncycle emissions CO2e grams/mile
-
-    :cert_direct_oncycle_kwh_per_mile:
-        Vehicle direct oncycle electricity consumption kWh/mile
-
     :footprint_ft2:
         Vehicle footprint based on vehicle wheelbase and track (square feet)
 
     :eng_rated_hp:
         Vehicle engine rated power (horsepower)
 
-    :tot_road_load_hp:
-        Vehicle roadload power (horsepower) at a vehicle speed of 50 miles per hour
-
-    :etw_lbs:
-        Vehicle equivalent test weight (ETW) (pounds)
-
-    :msrp_dollars:
-        Vehicle manufacturer suggested retail price (MSRP)
-
     :unibody_structure:
         Vehicle body structure; 1 = unibody, 0 = body-on-frame
+
+    :drive_system:
+        Vehicle drive system, 2=FWD/RWD, 4=AWD
+
+    :dual_rear_wheel:
+        = 1 if vehicle has dual rear wheels, i.e. 'duallies', = 0 otherwise
+
+    :curbweight_lbs:
+        Vehicle curb weight (pounds)
+
+    :gvwr_lbs:
+       Gross Vehicle Weight Rating (pounds)
+
+    :gcwr_lbs:
+       Gross Combined Weight Rating (pounds)
+
+    :target_coef_a:
+       Coast down target A coefficient (lbf)
+
+    :target_coef_b:
+       Coast down target B coefficient (lbf/mph)
+
+    :target_coef_c:
+       Coast down target C coefficient (lbf/mph**2)
 
     :body_style:
         Vehicle body style; sedan, cuv_suv, pickup
 
+    :msrp_dollars:
+        Vehicle manufacturer suggested retail price (MSRP)
+
     :structure_material:
         Primary material of the body structure; steel, aluminum
 
-    :curbweight_lbs:
-        Vehicle curb weight (pounds)
+    :prior_redesign_year:
+        The vehicle's prior redesign year
+
+    :redesign_interval:
+        The vehicle's redesign interval, in years
 
     :eng_cyls_num:
         Number of engine cylinders
@@ -117,6 +132,9 @@ Data Column Name and Description
     :start_stop:
         Technology flag for engine start-stop system (1 = Equipped, 0 = Not equipped)
 
+    :ice:
+        Technology flag for internal combustion engine (1 = Equipped, 0 = Not equipped)
+
     :hev:
         Technology flag for non plug-in hybrid system (1 = Equipped, 0 = Not equipped)
 
@@ -127,12 +145,14 @@ Data Column Name and Description
         Technology flag for battery electric vehicle (1 = Equipped, 0 = Not equipped)
 
     :deac_pd:
-        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders (1 = Equipped, 0 = Not equipped)
+        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders
+        (1 = Equipped, 0 = Not equipped)
 
     :deac_fc:
-        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders (1 = Equipped, 0 = Not equipped)
+        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders
+        (1 = Equipped, 0 = Not equipped)
 
-    :deac_fc:
+    :cegr:
         Technology flag for cooled exhaust gas recirculation (1 = Equipped, 0 = Not equipped)
 
     :atk2:
@@ -142,34 +162,55 @@ Data Column Name and Description
         Technology flag for gasoline direct injection system (1 = Equipped, 0 = Not equipped)
 
     :turb12:
-        Technology turbocharged engine, 18-21bar 2nd generation (1 = Equipped, 0 = Not equipped)
+        Technology flag for turbocharged engine, 18-21bar 2nd generation (1 = Equipped, 0 = Not equipped)
 
     :turb11:
-        Technology turbocharged engine, 18-21bar 1st generation (1 = Equipped, 0 = Not equipped)
+        Technology flag for turbocharged engine, 18-21bar 1st generation (1 = Equipped, 0 = Not equipped)
 
-    :gas_fuel
-        Technology gasoline-fueled engines (1 = Equipped, 0 = Not equipped)
+    :gas_fuel:
+        Technology flag for gasoline-fueled engine (1 = Equipped, 0 = Not equipped)
 
-    :diesel_fuel
-        Technology diesel-fueled engines (1 = Equipped, 0 = Not equipped)
+    :diesel_fuel:
+        Technology flag for diesel-fueled engine (1 = Equipped, 0 = Not equipped)
 
-    :target_coef_a:
-       Coast down target A coeffient (lbf)
+    :awd:
+        Technology flag for all-wheel drive (1 = Equipped, 0 = Not equipped)
 
-    :target_coef_b:
-       Coast down target B coeffient (lbf/mph)
+    :fwd:
+        Technology flag for front-wheel drive (1 = Equipped, 0 = Not equipped)
 
-    :target_coef_c:
-       Coast down target C coeffient (lbf/mph**2)
+    :trx10:
+        Technology flag for a baseline transmission (1 = Equipped, 0 = Not equipped)
+
+    :trx11:
+        Technology flag for an improved transmission (1 = Equipped, 0 = Not equipped)
+
+    :trx12:
+        Technology flag for an advanced transmission (1 = Equipped, 0 = Not equipped)
+
+    :trx21:
+        Technology flag for a high gear count transmission or equivalent (1 = Equipped, 0 = Not equipped)
+
+    :trx22:
+        Technology flag for an advanced high gear count transmission or equivalent (1 = Equipped, 0 = Not equipped)
+
+    :ecvt:
+        Technology flag for a powersplit-type hybrid vehicle transmission (1 = Equipped, 0 = Not equipped)
 
     **OPTIONAL COLUMNS**
         These columns become object attributes that may be used to determine vehicle regulatory class
         (e.g. 'car','truck') based on the simulated policy, or they may be used for other purposes.
 
-    :cert_co2e_grams_per_mile:
+    :tot_road_load_hp:
+        Vehicle roadload power (horsepower) at a vehicle speed of 50 miles per hour
+
+    :etw_lbs:
+        Vehicle equivalent test weight (ETW) (pounds)
+
+    :cert_direct_oncycle_co2e_grams_per_mile:
         Vehicle certification emissions CO2e grams/mile
 
-    :cert_direct_kwh_per_mile:
+    :cert_direct_oncycle_kwh_per_mile:
         Vehicle certification electricity consumption kWh/mile
 
     :length_in:
@@ -199,11 +240,8 @@ Data Column Name and Description
     :towing_capacity_lbs:
         Vehicle towing capacity (pounds)
 
-    :gvwr_lbs:
-       Gross Vehicle Weight Rating (pounds)
-
-    :gcwr_lbs:
-       Gross Combined Weight Rating (pounds)
+    :alvw_lbs:
+        Average loaded vehicle weight (pounds)
 
 ----
 
@@ -249,17 +287,13 @@ class VehicleAggregation(OMEGABase):
         #     ``DecompositionAttributes``
 
         """
-        template_errors = []
-
-        # DecompositionAttributes.init()   # offcycle_credits must be initalized first
-
         from producer.vehicles import Vehicle, VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
         from context.powertrain_cost import PowertrainCost
         from policy.workfactor_definition import WorkFactor
 
-        omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
+        # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
         input_template_version = 0.49
@@ -291,7 +325,7 @@ class VehicleAggregation(OMEGABase):
                                                   "{'US electricity':1.0}"],
                                'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
                                                 "{'electricity':1.0}"],
-                               'drive_system': [2, 4],  # for now, anyway... 1,2,3??
+                               'drive_system': [2, 4],  # RV
                                'dual_rear_wheel': [0, 1],
                                'high_eff_alternator': [0, 1],
                                'start_stop': [0, 1],
@@ -332,17 +366,18 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_mass_lbs'] = 0
 
             # fill in missing values
-            df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6) # dummy value, sales-weighted
+            df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6)  # RV
 
-            df['height_in'] = df['height_in'].fillna(62.4)  # dummy value, sales-weighted
+            df['height_in'] = df['height_in'].fillna(62.4)  # RV
 
             df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
 
-            # TODO: FCV battery size = 2?? Mirai=1.8
+            # RV
             df['battery_kwh'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
 
+            # RV
             df['motor_kw'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 20,
                                              'PHEV': 50,
@@ -350,17 +385,17 @@ class VehicleAggregation(OMEGABase):
                                              'FCV': 150 + (100 * (df['drive_system'] == 4)),
                                              'ICE': 0}})
 
-            # TODO: FCV range = 0??
+            # RV
             df['charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
-            df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-            df['engine_displacement_L'] = df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+            df['engine_cylinders'] = df['eng_cyls_num']  # RV
+            df['engine_displacement_L'] = df['eng_disp_liters']  # RV
 
             import time
             start_time = time.time()
-            print('starting iterrows')
+            # print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
 
@@ -387,7 +422,7 @@ class VehicleAggregation(OMEGABase):
                 veh.body_style = row['body_style']
 
                 if veh.base_year_powertrain_type == 'FCV':
-                    veh.base_year_powertrain_type = 'BEV'  # TODO: for costing purposes, for now
+                    veh.base_year_powertrain_type = 'BEV'  # RV
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.base_year_cert_fuel_id = row['cert_fuel_id']
@@ -399,12 +434,6 @@ class VehicleAggregation(OMEGABase):
                 veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
 
                 powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
-
-                # powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost
-                # powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
-                #                          'electrified_driveline_cost']
-                # for i, ct in enumerate(powertrain_cost_terms):
-                #     df.loc[idx, ct] = float(powertrain_costs[i])
 
                 # calc glider cost
                 veh.structure_material = row['structure_material']
@@ -429,23 +458,20 @@ class VehicleAggregation(OMEGABase):
                 workfactor = 0
                 if row['reg_class_id'] == 'mediumduty':
                     model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
-                        = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
-                    workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
+                        = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], \
+                        row['drive_system']
+                    workfactor = \
+                        WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
                 df.at[idx, 'workfactor'] = workfactor
                 veh.gvwr_lbs = row['gvwr_lbs']
                 veh.gcwr_lbs = row['gcwr_lbs']
                 veh.base_year_gvwr_lbs = row['gvwr_lbs']
                 veh.base_year_gcwr_lbs = row['gcwr_lbs']
 
-                # glider_costs = GliderCost.calc_cost(veh, pd.DataFrame([row]))  # includes structure_cost and glider_non_structure_cost
-                # glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
-                # for i, ct in enumerate(glider_cost_terms):
-                #     df.loc[idx, ct] = [gc[i] for gc in glider_costs]
-
             df['glider_non_structure_mass_lbs'] = df['curbweight_lbs'] - df['powertrain_mass_lbs'] \
                                                   - df['structure_mass_lbs'] - df['battery_mass_lbs']
 
-            print('done %.2f' % (time.time() - start_time))
+            # print('done %.2f' % (time.time() - start_time))
 
             df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 
@@ -460,7 +486,7 @@ class VehicleAggregation(OMEGABase):
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
-            agg_df['rated_hp'] = agg_df['eng_rated_hp']  # TODO: we need to figure out this 'engine' rated hp biz
+            agg_df['rated_hp'] = agg_df['eng_rated_hp']  # RV
 
             omega_globals.options.vehicles_df = agg_df
 

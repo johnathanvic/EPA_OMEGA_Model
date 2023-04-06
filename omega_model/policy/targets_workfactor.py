@@ -19,7 +19,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
-    input_template_name:, ``[module_name]``, input_template_version:, ``[template_version]``
+    .. csv-table::
+
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -31,9 +33,9 @@ Sample Data Columns
         :widths: auto
 
         reg_class_id,start_year,cert_fuel_id,useful_life_miles,co2_gram_per_mile
-        mediumduty,2020,{'gasoline':1.0},120000,0.0440 * work_factor + 339
-        mediumduty,2021,{'gasoline':1.0},120000,0.0429 * work_factor + 331
-        mediumduty,2022,{'gasoline':1.0},120000,0.0418 * work_factor + 322
+        mediumduty,2020,{'gasoline':1.0},120000,0.0440 * workfactor + 339
+        mediumduty,2021,{'gasoline':1.0},120000,0.0429 * workfactor + 331
+        mediumduty,2022,{'gasoline':1.0},120000,0.0418 * workfactor + 322
 
 Data Column Name and Description
 
@@ -87,7 +89,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
     **Implements vehicle workfactor-based GHG targets (CO2e g/mi).**
 
     """
-    _cache = dict() # the input file target equations
+    _cache = dict()  # the input file target equations
     start_years = dict()
     _data = dict()  # private dict, workfactor-based GHG target by cert_fuel_id and start year
 
@@ -110,28 +112,34 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             workfactor = 0
             if vehicle.reg_class_id == 'mediumduty':
                 model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
-                    = vehicle.model_year, vehicle.curbweight_lbs, vehicle.gvwr_lbs, vehicle.gcwr_lbs, vehicle.drive_system
+                    = vehicle.model_year, vehicle.curbweight_lbs, vehicle.gvwr_lbs, vehicle.gcwr_lbs, \
+                    vehicle.drive_system
                 workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
 
             vehicle.workfactor = workfactor
             year = max([yr for yr in start_years if yr <= vehicle.model_year])
-            target = eval(VehicleTargets._cache[(vehicle.reg_class_id, year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals())
+            target = \
+                eval(VehicleTargets._cache[(vehicle.reg_class_id, year, vehicle.cert_fuel_id)]['co2_gram_per_mile'],
+                     locals())
 
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '
+                            f'{vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
         return target
 
     @staticmethod
     def calc_cert_useful_life_vmt(reg_class_id, model_year, cert_fuel_id):
         """
-        Calculate vehicle target CO2e g/mi.
+        Calculate the certification useful life vehicle miles travelled.
 
         Args:
-            vehicle (Vehicle): the vehicle to get the target for
+            reg_class_id (str): e.g. 'car', 'truck'
+            model_year (int): the model year to get useful life VMT for
+            cert_fuel_id (str): certification fuel id, e.g. 'gasoline'
 
         Returns:
-            Vehicle target CO2e in g/mi.
+            The certification useful life vehicle miles travelled.
 
         """
         cache_key = (reg_class_id, model_year, cert_fuel_id)
@@ -146,7 +154,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
             useful_life = VehicleTargets._cache[(reg_class_id, year, cert_fuel_id)]['useful_life_miles']
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, {model_year}, {cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, '
+                            f'{model_year}, {cert_fuel_id} or prior')
 
         return useful_life
 
@@ -192,8 +201,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
 
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
-
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '
+                            f'{vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
@@ -242,7 +251,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             # return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
             return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '
+                            f'{vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -282,7 +292,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             # validate columns
@@ -358,6 +369,10 @@ if __name__ == '__main__':
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = None
                 reg_class_id = None
                 footprint_ft2 = None
@@ -369,6 +384,12 @@ if __name__ == '__main__':
                 drive_system = 4
 
                 def get_initial_registered_count(self):
+                    """
+                    Get initial registered count
+
+                    Returns:
+                        Initial registered count
+                    """
                     return self.initial_registered_count
 
             car_vehicle = dummyVehicle()
@@ -386,18 +407,27 @@ if __name__ == '__main__':
             truck_vehicle.fueling_class = 'ICE'
 
             car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
+
             car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
-            car_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
-                                                                                     co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
-                                                                                           co2_gpmi_variants=[0, 50, 100, 150],
-                                                                                           sales_variants=[1, 2, 3, 4])
+
+            car_certs_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle, co2_gpmi_variants=[0, 50, 100, 150])
+
+            car_certs_sales_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
+                                                                       co2_gpmi_variants=[0, 50, 100, 150],
+                                                                       sales_variants=[1, 2, 3, 4])
 
             truck_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(truck_vehicle)
+
             truck_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(truck_vehicle)
-            truck_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
-                                                                                             sales_variants=[1, 2, 3, 4])
+
+            truck_certs_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
+
+            truck_certs_sales_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                       sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

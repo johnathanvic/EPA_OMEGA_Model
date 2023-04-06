@@ -16,7 +16,7 @@ The data represents production multiplier incentives as a function of vehicle at
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,production_multipliers,input_template_version:,0.21
@@ -36,8 +36,8 @@ Data Column Name and Description
         Zero or more dynamic columns with the format
         ``{attribute_name}:{attribute_value}``
 
-        Unspecified vehicle attribute-value pairs will have a production multiplier of 1.0, so only non-1.0 multipliers need
-        to be specified here.
+        Unspecified vehicle attribute-value pairs will have a production multiplier of 1.0, so only non-1.0
+        multipliers need to be specified here.
 
         Example:
             ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply production multiplier``
@@ -102,8 +102,6 @@ class Incentives(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         Incentives._data.clear()
 
         if verbose:
@@ -121,14 +119,15 @@ class Incentives(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 df = df.set_index('start_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 Incentives._data = df.to_dict(orient='index')
-                Incentives._data['start_year'] = np.array([*Incentives._data]) # np.array(list(Incentives._data.keys()))
+                Incentives._data['start_year'] = np.array([*Incentives._data])  # CU
 
         return template_errors
 
@@ -149,6 +148,10 @@ if __name__ == '__main__':
 
         if not init_fail:
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = 2020
                 fueling_class = 'BEV'
 

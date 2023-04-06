@@ -17,7 +17,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
-       input_template_name:, ``[module_name]``, input_template_version:, 0.1
+    .. csv-table::
+
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -28,9 +30,10 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        reg_class_id,description,,
-        car,“cars” as defined by the regulations,,
-        truck,“trucks” as defined by the regulations,,
+        reg_class_id,description
+        car,'cars' as defined by the regulations
+        truck,'trucks' as defined by the regulations
+        mediumduty,'2b3' as defined by the regulations
 
 Data Column Name and Description
 
@@ -106,7 +109,8 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 RegulatoryClasses._data = df.set_index('reg_class_id').to_dict(orient='index')
@@ -136,8 +140,9 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
 
-        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(omega_globals.options.policy_reg_classes_file,
-                                                                            verbose=omega_globals.options.verbose)
+        init_fail += \
+            omega_globals.options.RegulatoryClasses.init_from_file(omega_globals.options.policy_reg_classes_file,
+                                                                   verbose=omega_globals.options.verbose)
 
         if not init_fail:
             print(omega_globals.options.RegulatoryClasses.reg_classes)

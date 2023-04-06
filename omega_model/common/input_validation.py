@@ -77,10 +77,10 @@ def validate_template_version_info(filename, input_template_name, input_template
 
     df = df[cols]
 
-    hash = hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
+    df_hash = hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
 
     omega_globals.options.inputfile_metadata.append([file_io.get_filepath(filename), file_io.get_basename(filename),
-                                                     hash] + version_data)
+                                                     df_hash] + version_data)
 
     if verbose:
         omega_log.logwrite('Validating Template Version [%s]' % filename)
@@ -106,7 +106,8 @@ def validate_template_version_info(filename, input_template_name, input_template
     template_version = version_data[version_index + 1]
     if not template_version == input_template_version:
         error_list.append(
-            '*** Wrong input template version, got "%f", was expecting "%f" ***' % (template_version, input_template_version))
+            '*** Wrong input template version, got "%f", was expecting "%f" ***' %
+            (template_version, input_template_version))
     elif verbose:
         omega_log.logwrite('Template version OK')
 
@@ -163,7 +164,8 @@ def _validate_dataframe_column(df, column_name, allowed_values, header_lines=2):
         df (DataFrame): pandas dataframe containing data to validate
         column_name (str): name of the dataframe column
         allowed_values (iterable): a list / set of allowed values
-        header_lines (int): number of header lines in the input file, offset used to calculate the row number of the error
+        header_lines (int): number of header lines in the input file,
+            offset used to calculate the row number of the error
 
     Returns:
         Empty list on success or list of errors on failure
@@ -191,7 +193,8 @@ def validate_dataframe_columns(df, validation_dict, error_source=None, header_li
         df (DataFrame): pandas dataframe containing data to validate
         validation_dict (dict): dict of one or more column name / allowed value pairs
         error_source (str): typically the name of the file containing the error
-        header_lines (int): header_lines (int): number of header lines in the input file, offset used to calculate the row number of the error
+        header_lines (int): header_lines (int): number of header lines in the input file,
+            offset used to calculate the row number of the error
 
     Returns:
         Empty list on success or list of errors on failure

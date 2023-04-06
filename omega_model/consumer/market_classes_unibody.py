@@ -15,12 +15,12 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.32
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.market_classes,input_template_version:,0.32
+       input_template_name:,consumer.market_classes_unibody,input_template_version:,0.32
 
 Sample Data Columns
     .. csv-table::
@@ -155,10 +155,11 @@ class MarketClass(OMEGABase, MarketClassBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
                                'ownership_class': ['private'],  # for now...
                                }
 

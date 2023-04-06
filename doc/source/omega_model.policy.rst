@@ -17,6 +17,14 @@ omega\_model.policy.credit\_banking module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.policy.drive\_cycle\_ballast module
+------------------------------------------------
+
+.. automodule:: omega_model.policy.drive_cycle_ballast
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.policy.drive\_cycle\_weights module
 ------------------------------------------------
 
@@ -73,22 +81,6 @@ omega\_model.policy.regulatory\_classes module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.policy.regulatory\_classes\_demo\_alt0 module
-----------------------------------------------------------
-
-.. automodule:: omega_model.policy.regulatory_classes_demo_alt0
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-omega\_model.policy.regulatory\_classes\_demo\_alt1 module
-----------------------------------------------------------
-
-.. automodule:: omega_model.policy.regulatory_classes_demo_alt1
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.policy.required\_sales\_share module
 -------------------------------------------------
 
@@ -113,10 +105,26 @@ omega\_model.policy.targets\_footprint module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.policy.targets\_workfactor module
+----------------------------------------------
+
+.. automodule:: omega_model.policy.targets_workfactor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.policy.upstream\_methods module
 --------------------------------------------
 
 .. automodule:: omega_model.policy.upstream_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.policy.workfactor\_definition module
+-------------------------------------------------
+
+.. automodule:: omega_model.policy.workfactor_definition
    :members:
    :undoc-members:
    :show-inheritance:

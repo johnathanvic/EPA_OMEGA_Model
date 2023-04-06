@@ -18,21 +18,22 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.12
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share,input_template_version:,0.12
+       input_template_name:,consumer.sales_share_ice_bev_responsive_body_style,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
-        hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
-        hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
-        hauling.BEV,2022,12000,5,5,0.168,0.1,1600,1.58,-8
+        sedan_wagon.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
+        sedan_wagon.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
+        sedan_wagon.BEV,2022,12000,5,5,0.168,0.1,1600,1.58,-8
+
 
 Data Column Name and Description
 
@@ -84,35 +85,35 @@ from common import TRUE, FALSE
 import math
 
 sedan_wagon_constants = {'Constant': 0.654042341423643,
-                 'Xprice': -0.0180171809091689,
-                 'Xcpm': -0.461372743184231,
-                 'Xfoot': 0.557877300321091,
-                 'Xhpwt': 0.00920608496452878,
-                 'y_lag': 0.76336704353215,
-                 'inc_growth': -0.663778795048909,
-                 'y_hat_historic': 2.599148
-
-                 }
+                         'Xprice': -0.0180171809091689,
+                         'Xcpm': -0.461372743184231,
+                         'Xfoot': 0.557877300321091,
+                         'Xhpwt': 0.00920608496452878,
+                         'y_lag': 0.76336704353215,
+                         'inc_growth': -0.663778795048909,
+                         'y_hat_historic': 2.599148
+                         }
 
 cuv_suv_van_constants = {'Constant': -0.855185491214764,
-                 'Xprice': -0.0180171809091689,
-                 'Xcpm': -0.107849853426846,
-                 'Xfoot': 0.188693199606348,
-                 'Xhpwt': 0.104957947064753,
-                 'y_lag': 0.814995420534703,
-                 'inc_growth': 0.878066934600003,
-                 'y_hat_historic': 3.035549
-                 }
+                         'Xprice': -0.0180171809091689,
+                         'Xcpm': -0.107849853426846,
+                         'Xfoot': 0.188693199606348,
+                         'Xhpwt': 0.104957947064753,
+                         'y_lag': 0.814995420534703,
+                         'inc_growth': 0.878066934600003,
+                         'y_hat_historic': 3.035549
+                         }
 
 pickup_constants = {'Constant': -0.220428824716918,
-                 'Xprice': -0.0180171809091689,
-                 'Xcpm': -0.747888235402595,
-                 'Xfoot': 0.188693199606348,
-                 'Xhpwt': 0.103118883181103,
-                 'y_lag': 0.863491530280403,
-                 'inc_growth': -0.319399443869625,
-                 'y_hat_historic': 1.893975
-                 }
+                    'Xprice': -0.0180171809091689,
+                    'Xcpm': -0.747888235402595,
+                    'Xfoot': 0.188693199606348,
+                    'Xhpwt': 0.103118883181103,
+                    'y_lag': 0.863491530280403,
+                    'inc_growth': -0.319399443869625,
+                    'y_hat_historic': 1.893975
+                    }
+
 
 class SalesShare(OMEGABase, SalesShareBase):
     """
@@ -275,8 +276,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
 
-                    # constrain relative (and by extension, absolute) shares
-                    # TODO: only for context session....??
+                    # constrain relative (and by extension, absolute) shares RV
                     share_name = market_class_id.replace(parent_market_class + '.', '')
                     demanded_share = np.minimum(np.maximum(min_constraints[share_name], demanded_share),
                                                 max_constraints[share_name])
@@ -306,17 +306,17 @@ class SalesShare(OMEGABase, SalesShareBase):
     @staticmethod
     def calc_shares_body_style_helper(calendar_year, producer_decision, body_style):
         """
+        Calculate non-normalized fleet share for the given body style in the current year based on the producer decision
 
         Args:
-            calendar_year (int):
-            producer_decision:
-            market_class (str): e.g. 'hauling' or 'non_hauling'
+            calendar_year (int): calendar year to calculate market shares in
+            producer_decision (Series): the producer decision
+            body_style (str): e.g. 'sedan_wagon', etc
 
         Returns:
-            Non-normalized fleet share for the given vehicle class
+            Non-normalized fleet share for the given body style
 
         """
-
         dfs_coeffs = pd.Series({'sedan_wagon': sedan_wagon_constants, 'cuv_suv_van': cuv_suv_van_constants,
                                 'pickup': pickup_constants}[body_style])
 
@@ -329,33 +329,75 @@ class SalesShare(OMEGABase, SalesShareBase):
         y_hat_prior = SalesShare._data['y_hat_%s_%s' % (body_style, calendar_year - 1)]
         price = producer_decision['average_new_vehicle_mfr_cost_%s' % body_style]
         footprint = producer_decision['average_footprint_ft2_%s' % body_style]
-        gasoline_dollars_per_gallon = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
-        electricity_dollars_per_kwh = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity')
-        carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline', 'direct_co2e_grams_per_unit')
-        gasoline_cpm = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_%s' % body_style + '.ICE'] / carbon_intensity_gasoline
-        electricity_cpm = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_%s' % body_style + '.ICE']
-        cpm = gasoline_cpm + electricity_cpm # only includes ICE vehicle cpm, consistent with original regression
-        hpwt = producer_decision['average_rated_hp_%s' % body_style + '.ICE'] / producer_decision['average_curbweight_lbs_%s' % body_style + '.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        gasoline_dollars_per_gallon = \
+            FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
+        electricity_dollars_per_kwh = \
+            FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity')
+        carbon_intensity_gasoline = \
+            OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline', 'direct_co2e_grams_per_unit')
+        gasoline_cpm = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_%s' % body_style + '.ICE'] / carbon_intensity_gasoline
+        electricity_cpm = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_%s' % body_style + '.ICE']
+        cpm = gasoline_cpm + electricity_cpm  # only includes ICE vehicle cpm, consistent with original regression
 
-        gasoline_cpm_sedan_wagon = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_sedan_wagon.ICE'] / carbon_intensity_gasoline
-        electricity_cpm_sedan_wagon = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_sedan_wagon.ICE']
-        cpm_sedan_wagon = gasoline_cpm_sedan_wagon + electricity_cpm_sedan_wagon # only includes ICE vehicle cpm, consistent with original regression
-        hpwt_sedan_wagon = producer_decision['average_rated_hp_sedan_wagon.ICE'] / producer_decision['average_curbweight_lbs_sedan_wagon.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        # hpwt ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        hpwt = producer_decision['average_rated_hp_%s' % body_style + '.ICE'] / \
+               producer_decision['average_curbweight_lbs_%s' % body_style + '.ICE']
 
-        gasoline_cpm_cuv_suv_van = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_cuv_suv_van.ICE'] / carbon_intensity_gasoline
-        electricity_cpm_cuv_suv_van = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_cuv_suv_van.ICE']
-        cpm_cuv_suv_van = gasoline_cpm_cuv_suv_van + electricity_cpm_cuv_suv_van # only includes ICE vehicle cpm, consistent with original regression
-        hpwt_cuv_suv_van = producer_decision['average_rated_hp_cuv_suv_van.ICE'] / producer_decision['average_curbweight_lbs_cuv_suv_van.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        gasoline_cpm_sedan_wagon = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_sedan_wagon.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_sedan_wagon = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_sedan_wagon.ICE']
 
-        gasoline_cpm_pickup = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_pickup.ICE'] / carbon_intensity_gasoline
-        electricity_cpm_pickup = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_pickup.ICE']
-        cpm_pickup = gasoline_cpm_pickup + electricity_cpm_pickup # only includes ICE vehicle cpm, consistent with original regression
-        hpwt_pickup = producer_decision['average_rated_hp_pickup.ICE'] / producer_decision['average_curbweight_lbs_pickup.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        # cpm_sedan_wagon only includes ICE vehicle cpm, consistent with original regression
+        cpm_sedan_wagon = gasoline_cpm_sedan_wagon + electricity_cpm_sedan_wagon
+        # hpwt_sedan_wagon ICE only. BEV hp values would be needed for meaningful
+        # power-to-weight values over all vehicles
+        hpwt_sedan_wagon = producer_decision['average_rated_hp_sedan_wagon.ICE'] / \
+                           producer_decision['average_curbweight_lbs_sedan_wagon.ICE']
 
-        geometric_mean_price = np.exp(np.average([math.log(producer_decision['average_new_vehicle_mfr_cost_sedan_wagon']), math.log(producer_decision['average_new_vehicle_mfr_cost_cuv_suv_van']), math.log(producer_decision['average_new_vehicle_mfr_cost_pickup'])]))
-        geometric_mean_footprint = np.exp(np.average([math.log(producer_decision['average_footprint_ft2_sedan_wagon']), math.log(producer_decision['average_footprint_ft2_cuv_suv_van']), math.log(producer_decision['average_footprint_ft2_pickup'])]))
-        geometric_mean_cpm = np.exp(np.average([math.log(cpm_sedan_wagon), math.log(cpm_cuv_suv_van), math.log(cpm_pickup)]))
-        geometric_mean_hpwt = np.exp(np.average([math.log(hpwt_sedan_wagon), math.log(hpwt_cuv_suv_van), math.log(hpwt_pickup)]))
+        gasoline_cpm_cuv_suv_van = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_cuv_suv_van.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_cuv_suv_van = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_cuv_suv_van.ICE']
+        # cpm_cuv_suv_van only includes ICE vehicle cpm, consistent with original regression
+        cpm_cuv_suv_van = gasoline_cpm_cuv_suv_van + electricity_cpm_cuv_suv_van
+        # hpwt_cuv_suv_van ICE only. BEV hp values would be needed for
+        # meaningful power-to-weight values over all vehicles
+        hpwt_cuv_suv_van = \
+            producer_decision['average_rated_hp_cuv_suv_van.ICE'] / \
+            producer_decision['average_curbweight_lbs_cuv_suv_van.ICE']
+
+        gasoline_cpm_pickup = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_pickup.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_pickup = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_pickup.ICE']
+        # cpm_pickup only includes ICE vehicle cpm, consistent with original regression
+        cpm_pickup = gasoline_cpm_pickup + electricity_cpm_pickup
+        # hpwt_pickup ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        hpwt_pickup = \
+            producer_decision['average_rated_hp_pickup.ICE'] / \
+            producer_decision['average_curbweight_lbs_pickup.ICE']
+
+        geometric_mean_price = \
+            np.exp(np.average([math.log(producer_decision['average_new_vehicle_mfr_cost_sedan_wagon']),
+                               math.log(producer_decision['average_new_vehicle_mfr_cost_cuv_suv_van']),
+                               math.log(producer_decision['average_new_vehicle_mfr_cost_pickup'])]))
+
+        geometric_mean_footprint = \
+            np.exp(np.average([math.log(producer_decision['average_footprint_ft2_sedan_wagon']),
+                               math.log(producer_decision['average_footprint_ft2_cuv_suv_van']),
+                               math.log(producer_decision['average_footprint_ft2_pickup'])]))
+        geometric_mean_cpm = \
+            np.exp(np.average([math.log(cpm_sedan_wagon), math.log(cpm_cuv_suv_van), math.log(cpm_pickup)]))
+
+        geometric_mean_hpwt = \
+            np.exp(np.average([math.log(hpwt_sedan_wagon), math.log(hpwt_cuv_suv_van), math.log(hpwt_pickup)]))
 
         y_hat = (dfs_coeffs.Constant +
                  dfs_coeffs.Xprice * math.log(price / geometric_mean_price) +
@@ -447,7 +489,7 @@ class SalesShare(OMEGABase, SalesShareBase):
             for bs in body_styles:
                 if bs in VehicleFinal.mfr_base_year_share_data[compliance_id]:
                     bs_share = VehicleFinal.mfr_base_year_share_data[compliance_id][bs]
-                    denom +=  bs_share
+                    denom += bs_share
                     if bs == 'sedan_wagon':
                         analysis_sedan_wagon_share = bs_share
                     elif bs == 'cuv_suv_van':
@@ -520,9 +562,14 @@ class SalesShare(OMEGABase, SalesShareBase):
             else:
                 SalesShare._calibration_data[calibration_key][calendar_year] = 0
 
-        analysis_sedan_wagon_share *= SalesShare._calibration_data['%s_sedan_wagon_calibration' % compliance_id][calendar_year]
-        analysis_cuv_suv_van_share *= SalesShare._calibration_data['%s_cuv_suv_van_calibration' % compliance_id][calendar_year]
-        analysis_pickup_share *= SalesShare._calibration_data['%s_pickup_calibration' % compliance_id][calendar_year]
+        analysis_sedan_wagon_share *= \
+            SalesShare._calibration_data['%s_sedan_wagon_calibration' % compliance_id][calendar_year]
+
+        analysis_cuv_suv_van_share *= \
+            SalesShare._calibration_data['%s_cuv_suv_van_calibration' % compliance_id][calendar_year]
+
+        analysis_pickup_share *= \
+            SalesShare._calibration_data['%s_pickup_calibration' % compliance_id][calendar_year]
 
         total_corrected_share = analysis_sedan_wagon_share + analysis_cuv_suv_van_share + analysis_pickup_share
 
@@ -573,7 +620,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                 for alt in ['ALT', 'NO_ALT']:
                     only_child = mc_pair[0] + '.' + alt
-                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_share_frac_%s' % only_child] = \
+                        1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
                     market_class_data['consumer_abs_share_frac_%s' % only_child] = \
                         parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
@@ -624,9 +672,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         # for rc in legacy_reg_classes:
         for rc in base_year_vehicles_df.reg_class_id.unique():
-            for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
+            for c in ['curbweight_lbs', 'rated_hp']:
                 SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
-
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -667,7 +714,8 @@ class SalesShare(OMEGABase, SalesShareBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
@@ -791,7 +839,6 @@ if __name__ == '__main__':
                                         omega_globals.options.bev_vehicle_simulation_results_file,
                                         omega_globals.options.phev_vehicle_simulation_results_file,
                                         verbose=omega_globals.options.verbose)
-
 
         init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                        verbose=omega_globals.options.verbose)

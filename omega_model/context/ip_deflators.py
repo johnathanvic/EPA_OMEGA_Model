@@ -16,7 +16,7 @@ The data represents the price deflator by calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_implicit_price_deflators,input_template_version:,0.22
@@ -25,9 +25,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,price_deflator,,
-        2001,79.79,,
-        2002,81.052,,
+        calendar_year,price_deflator
+        2001,79.783
+        2002,81.026
 
 Data Column Name and Description
 
@@ -88,11 +88,11 @@ class ImplictPriceDeflators(OMEGABase):
         """
 
         Args:
-            deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
             dollar_basis_input (int): the dollar basis of the input value.
 
         Returns:
-            The multiplicative factor that can be applied to a cost in dollar_basis_input to express that value in analysis_dollar_basis.
+            The multiplicative factor that can be applied to a cost in dollar_basis_input to express that
+            value in analysis_dollar_basis.
 
         """
         analysis_basis = omega_globals.options.analysis_dollar_basis
@@ -118,8 +118,6 @@ class ImplictPriceDeflators(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         ImplictPriceDeflators._data.clear()
 
         ImplictPriceDeflators._cache.clear()
@@ -138,7 +136,8 @@ class ImplictPriceDeflators(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 ImplictPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')

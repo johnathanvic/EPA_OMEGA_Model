@@ -14,7 +14,7 @@ The data represent various inputs for use in maintenance cost calculations.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,maintenance_cost,input_template_version:,0.2
@@ -135,10 +135,12 @@ class MaintenanceCost:
         """
 
         Args:
-            input_df: DataFrame reflecting the maintenance_cost_inputs.csv file with costs updated to analysis_basis_dollars.
+            input_df: DataFrame reflecting the maintenance_cost_inputs.csv file
+                with costs updated to analysis_basis_dollars.
 
         Returns:
-            A dictionary of maintenance cost curve coefficients (slope with intercept=0) having keys of 'ICE', 'HEV', 'PHEV', 'BEV'.
+            A dictionary of maintenance cost curve coefficients (slope with intercept=0)
+                having keys of 'ICE', 'HEV', 'PHEV', 'BEV'.
 
         Notes:
             Dividing the cumulative_cost by miles gives a constant cost/mile for every mile. However, costs/mile should
@@ -156,9 +158,9 @@ class MaintenanceCost:
         # determine the max odometer included in the input table
         max_series = input_df[[col for col in input_df.columns if 'miles' in col]].max()
         max_value = 0
-        for max in max_series:
-            if max > max_value:
-                max_value = int(max)
+        for val in max_series:
+            if val > max_value:
+                max_value = int(val)
 
         # generate curve coefficients for each of the veh_types in a for loop and store in maint_cost_curve_dict
         for veh_type in veh_types:
@@ -166,10 +168,12 @@ class MaintenanceCost:
             df.insert(0, 'miles', pd.Series(range(0, max_value + 1, 100)))
             intervals = input_df[f'miles_per_event_{veh_type}'].dropna().unique()
             for interval in intervals:
-                cost_at_interval = input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
+                cost_at_interval = \
+                    input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
                 df.insert(1, f'cost_for_{int(interval)}', 0)
 
-                # determine miles for all events in this interval series (%1=0 divides by 1 and looks for a remainder of 0)
+                # determine miles for all events in this interval series
+                # (%1=0 divides by 1 and looks for a remainder of 0)
                 events = [odo[1] for odo in df['miles'].items() if odo[1] != 0 and odo[1] / interval % 1 == 0]
 
                 for event in events:
@@ -207,15 +211,17 @@ class MaintenanceCost:
 
         return maint_cost_curve_dict
 
-    def calc_maintenance_cost_per_mile(self, input_dict):
+    @staticmethod
+    def calc_maintenance_cost_per_mile(input_dict):
         """
+        Calc maintenance cost per mile.
 
         Args:
             input_dict: Dictionary of the maintenance cost inputs.
 
         Returns:
-            The input_dict with the total maintenance cost per mile added; this cost per mile would be a constant for all
-            miles.
+            The input_dict with the total maintenance cost per mile added; this cost per mile would be a
+            constant for all miles.
 
         Notes:
             This method is not being used currently in favor of the calc_maintenance_cost_per_mile_curve method within
@@ -229,7 +235,7 @@ class MaintenanceCost:
             cost_per_event = input_dict[key]['dollars_per_event']
             for veh_type in veh_types:
                 miles_per_event = input_dict[key][f'miles_per_event_{veh_type}']
-                try: # protect against divide by zero
+                try:  # protect against divide by zero
                     input_dict[key].update({f'dollars_per_mile_{veh_type}': cost_per_event / miles_per_event})
                 finally:
                     input_dict[key].update({f'dollars_per_mile_{veh_type}': 0})

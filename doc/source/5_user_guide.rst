@@ -22,29 +22,28 @@ Batch Input Files and Loaders
         Context Fuel Prices File, :any:`omega_model/context/fuel_prices.py<omega_model.context.fuel_prices>`
         Context New Vehicle Market File, :any:`omega_model/context/new_vehicle_market.py<omega_model.context.new_vehicle_market>`
         Manufacturers File, :any:`omega_model/producer/manufacturers.py<omega_model.producer.manufacturers>`
-        Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes.py<omega_model.consumer.market_classes>`
+        Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes_unibody.py<omega_model.consumer.market_classes_unibody>`
         Onroad Fuels File, :any:`omega_model/context/onroad_fuels.py<omega_model.context.onroad_fuels>`
         Onroad Vehicle Calculations File, :any:`omega_model/producer/vehicles.py<omega_model.producer.vehicles>`
         Onroad VMT File, ``user_definable`` e.g. :any:`omega_model/consumer/annual_vmt_fixed_by_age.py<omega_model.consumer.annual_vmt_fixed_by_age>`
         Producer Generalized Cost File, ``user_definable`` e.g. :any:`omega_model/producer/producer_generalized_cost.py<omega_model.producer.producer_generalized_cost>`
         Production Constraints File, :any:`omega_model/context/production_constraints.py<omega_model.context.production_constraints>`
-        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share.py<omega_model.consumer.sales_share>`
+        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share_ice_bev.py<omega_model.consumer.sales_share_ice_bev>`
         Vehicle Price Modifications File, :any:`omega_model/context/price_modifications.py<omega_model.context.price_modifications>`
         Vehicle Reregistration File, ``user_definable`` e.g. :any:`omega_model/consumer/reregistration_fixed_by_age.py<omega_model.consumer.reregistration_fixed_by_age>`
-        Vehicle Simulation Results and Costs File, :any:`omega_model/context/cost_clouds.py<omega_model.context.cost_clouds>`
-        Vehicles File, :any:`omega_model/producer/vehicles.py<omega_model.producer.vehicles>`
-        Context Criteria Cost Factors File, :any:`omega_model/effects/cost_factors_criteria.py<omega_model.effects.cost_factors_criteria>`
-        Context SCC Cost Factors File, :any:`omega_model/effects/cost_factors_scc.py<omega_model.effects.cost_factors_scc>`
-        Context Energy Security Cost Factors File, :any:`omega_model/effects/cost_factors_energysecurity.py<omega_model.effects.cost_factors_energysecurity>`
-        Context Congestion-Noise Cost Factors File, :any:`omega_model/effects/cost_factors_congestion_noise.py<omega_model.effects.cost_factors_congestion_noise>`
-        Context Powersector Emission Factors File, :any:`omega_model/effects/emission_factors_powersector.py<omega_model.effects.emission_factors_powersector>`
-        Context Refinery Emission Factors File, :any:`omega_model/effects/emission_factors_refinery.py<omega_model.effects.emission_factors_refinery>`
-        Context Vehicle Emission Factors File, :any:`omega_model/effects/emission_factors_vehicles.py<omega_model.effects.emission_factors_vehicles>`
-        Context Implicit Price Deflators File, :any:`omega_model/effects/ip_deflators.py<omega_model.effects.ip_deflators>`
-        Context Consumer Price Index File, :any:`omega_model/effects/cpi_price_deflators<omega_model.effects.cpi_price_deflators>`
+        ICE Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
+        BEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
+        PHEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
+        Vehicles File, :any:`omega_model/producer/vehicle_aggregation.py<omega_model.producer.vehicle_aggregation>`
+        Powertrain Cost File, :any:`omega_model/context/powertrain_cost.py<omega_model.context.powertrain_cost>`
+        Glider Cost File, :any:`omega_model/context/glider_cost.py<omega_model.context.glider_cost>`
+        Body Styles File, :any:`omega_model/context/body_styles.py<omega_model.context.body_styles>`
+        Mass Scaling File, :any:`omega_model/context/mass_scaling.py<omega_model.context.mass_scaling>`
+        Workfactor Definition File, :any:`omega_model/policy/workfactor_definition.py<omega_model.policy.workfactor_definition>`
         ,
         Session Policy Alternatives Settings,
         Drive Cycle Weights File, :any:`omega_model/policy/drive_cycle_weights.py<omega_model.policy.drive_cycle_weights>`
+        Drive Cycle Ballast File, :any:`omega_model/policy/drive_cycle_ballast.py<omega_model.policy.drive_cycle_ballast>`
         Drive Cycles File, :any:`omega_model/policy/drive_cycles.py<omega_model.policy.drive_cycles>`
         GHG Credit Params File, :any:`omega_model/policy/credit_banking.py<omega_model.policy.credit_banking>`
         GHG Credits File, :any:`omega_model/policy/credit_banking.py<omega_model.policy.credit_banking>`
@@ -55,6 +54,9 @@ Batch Input Files and Loaders
         Production Multipliers File, :any:`omega_model/policy/incentives.py<omega_model.policy.incentives>`
         Regulatory Classes File, ``user_definable`` e.g. :any:`omega_model/policy/regulatory_classes.py<omega_model.policy.regulatory_classes>`
         Required Sales Share File, :any:`omega_model/policy/required_sales_share.py<omega_model.policy.required_sales_share>`
+        ,
+        Session Postproc Settings,
+        Context Implicit Price Deflators File, :any:`omega_model/context/ip_deflators.py<omega_model.context.ip_deflators>`
 
 Simulation Context
     The context inputs apply to all sessions within a batch.  Multiple batch files must be defined to run multiple contexts.
@@ -74,18 +76,23 @@ OMEGA Batch Command Line Interface
 
     >>python omega_model/omega_batch.py --bundle_path path/to/my/bundle_folder --batch_file path/to/my/batch_file.csv
 
+    or
+
+    >>python omega_model/omega_batch.py --bundle_path path/to/my/bundle_folder --ui_batch_file
+
+
 In fact, the GUI can be thought of as a wrapper to a command line call to ``omega_batch.py``.  The paths supplied to the GUI fill in the ``--bundle_path`` and ``--batch_file`` arguments.
 
-Typical Command Line Usage
+Typical Command Line Usage (not all available command-line options shown)
 
 .. highlight:: none
 
 ::
 
     usage: omega_batch.py
-            [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]
+            [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]  [--ui_batch_file]
             [--session_num SESSION_NUM] [--analysis_final_year ANALYSIS_FINAL_YEAR]
-            [--calc_effects CALC_EFFECTS] [--verbose] [--show_figures]
+            [--verbose] [--show_figures]
 
     Run OMEGA batch simulation
 
@@ -98,15 +105,14 @@ Typical Command Line Usage
       --batch_file BATCH_FILE
                             Path to batch definition file
 
+      --ui_batch_file
+                            Select batch file from dialog box
+
       --session_num SESSION_NUM
                             ID # of session to run from batch
 
       --analysis_final_year ANALYSIS_FINAL_YEAR
                             Override analysis final year
-
-      --calc_effects CALC_EFFECTS
-                            Type of effects calcs to run: "None", "Physical",
-                            or "Physical and Costs"
 
       --verbose             Enable verbose omega_batch messages
 
@@ -128,13 +134,13 @@ Selecting Sessions to Run
     Sessions can be enabled or disabled within the batch file by setting the ``Enable Session`` field to ``TRUE`` or ``FALSE``, respectively.  Alternatively, the ``--session_num`` argument can be passed to ``omega_batch``.  The reference session is session number ``0``.  The reference session cannot be disabled, regardless of the ``Enable Session`` field value, as it generates reference vehicle prices that the other sessions require in order to calculate overall vehicle sales.
 
 Understanding the Batch Process
-    The first step in the batch process is to copy the complete source code to the bundle folder (in the ``omega_model`` directory) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  The bundle folder contains the original batch definition file as well as a timestamped batch definition file that is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.  The bundle folder contains a ``requirements.txt`` file for reference.  When running from source code the requirements file indicates the version of Python used to run the batch and contains the list of installed Python packages and their versions at the time, e.g. ``python_3_8_10_requirements.txt``.  When running from the executable the contents of the ``GUI_requirements.txt`` file indicates the version number of the GUI.
+    The first step in the batch process is to copy the complete source code to the ``bundle`` folder (in the ``omega_model`` directory, or as specified by the user via the ``--bundle_path`` argument) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  The bundle folder contains the original batch definition file as well as a timestamped batch definition file that is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.  The bundle folder contains a ``requirements.txt`` file for reference.  When running from source code the requirements file indicates the version of Python used to run the batch and contains the list of installed Python packages and their versions at the time, e.g. ``python_3_8_10_requirements.txt``.  When running from the executable the contents of the ``GUI_requirements.txt`` file indicates the version number of the GUI.
 
     The batch itself and each session will have a log file indicating the progress and success or failure of the process.  The batch log file is named ``batch_logfile.txt`` and exists at the top of the bundle folder.  Session logs have the prefix ``o2log_`` and are located in each session's ``out`` folder.
 
     If a session completes successfully, the session folder is renamed and prepended with an underscore, ``_``.  Failed session folders are prepended with ``#FAIL_``.  In this way the session status can be monitored by observing the folder names as the batch runs.
 
-    Since the bundle folder contains the source code and all inputs for every session it is possible to re-run a batch, or part of a batch, at a later time and reproduce the results if desired.  To do so, remove any session folder prefixes and use ``omega_batch.py`` to re-run the timestamped batch file, while supplying the advanced ``--no_bundle`` and ``--no_validate`` arguments, since the batch has already been bundled.  As in:
+    Since the bundle folder contains the source code and all inputs for every session it is possible to re-run a batch, or part of a batch, at a later time and reproduce the results if desired.  To do so, remove any session folder prefixes and use ``omega_batch.py`` to re-run the timestamped batch file, while supplying the ``--no_bundle`` and ``--no_validate`` arguments, since the batch has already been bundled.  As in:
 
 ::
 

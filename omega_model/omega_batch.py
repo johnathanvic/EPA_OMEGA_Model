@@ -31,61 +31,61 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        Parameter,Type,Value
-        Batch Settings,,
-        Batch Name,String,test_batch
-        Analysis Final Year,#,2030
-        Credit Market Efficiency,#,1.0
-        Analysis Dollar Basis,#,2020
-        ,,
-        Batch Analysis Context Settings,,
-        Context Name,String,AEO2021
-        Context Case,String,Reference case
-        Context Fuel Prices File,String,context_fuel_prices.csv
-        Context New Vehicle Market File,String,context_new_vehicle_market.csv
-        Manufacturers File,String,manufacturers.csv
-        Market Classes File,String,market_classes.csv
-        New Vehicle Price Elasticity of Demand,#,-0.4
-        Onroad Fuels File,String,onroad_fuels.csv
-        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv
-        Onroad VMT File,String,annual_vmt_fixed_by_age.csv
-        Producer Cross Subsidy Multiplier Max,#,1.1
-        Producer Cross Subsidy Multiplier Min,#,0.9
-        Producer Generalized Cost File,String,producer_generalized_cost.csv
-        Production Constraints File,String,production_constraints.csv
-        Sales Share File,String,sales_share_params.csv
-        Vehicle Price Modifications File,String,vehicle_price_modifications.csv
-        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv
-        ICE Vehicle Simulation Results File,String,simulated_vehicles_ice.csv
-        BEV Vehicle Simulation Results File,String,simulated_vehicles_bev.csv
-        PHEV Vehicle Simulation Results File,String,simulated_vehicles_phev.csv
-        Vehicles File,String,vehicles.csv
-        Powertrain Cost File,String,powertrain_cost.csv
-        Glider Cost File,String,glider_cost.csv
-        Body Styles File,String,body_styles.csv
-        Mass Scaling File,String,mass_scaling.csv
-        ,,
-        Session Settings,,
-        Enable Session,TRUE / FALSE,TRUE
-        Session Name,String,NoActionPolicy
-        ,,
-        Session Policy Alternatives Settings,,
-        Drive Cycle Weights File,String,drive_cycle_weights.csv
-        Drive Cycles File,String,drive_cycles.csv
-        GHG Credit Params File,String,ghg_credit_params.csv
-        GHG Credits File,String,ghg_credits.csv
-        GHG Standards File,String,ghg_standards-footprint.csv
-        Off-Cycle Credits File,String,offcycle_credits.csv
-        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv
-        Policy Fuels File,String,policy_fuels.csv
-        Production Multipliers File,String,production_multipliers.csv
-        Regulatory Classes File,String,regulatory_classes.csv
-        Required Sales Share File,String,required_sales_share.csv
-        Workfactor Definition File,String,workfactor_definition.csv
-        ,,
-        Session Postproc Settings,,
-        Context Implicit Price Deflators File,String,implicit_price_deflators.csv
-        Context Consumer Price Index File,String,cpi_price_deflators.csv
+        Parameter,Type,Value,
+        Batch Settings,,,
+        Batch Name,String,test_batch,
+        Analysis Final Year,#,2021,
+        Analysis Dollar Basis,#,2020,
+        ,,,
+        Batch Analysis Context Settings,,,
+        Context Name,String,AEO2021,
+        Context Case,String,Reference case,
+        Credit Market Efficiency,#,1,
+        Context Fuel Prices File,String,context_fuel_prices.csv,
+        Context New Vehicle Market File,String,context_new_vehicle_market-body_style.csv,
+        Manufacturers File,String,manufacturers.csv,
+        Market Classes File,String,market_classes-body_style.csv,
+        New Vehicle Price Elasticity of Demand,#,-0.4,
+        Onroad Fuels File,String,onroad_fuels.csv,
+        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
+        Onroad VMT File,String,annual_vmt_fixed_by_age-body_style.csv,
+        Producer Cross Subsidy Multiplier Max,#,1.1,
+        Producer Cross Subsidy Multiplier Min,#,0.9,
+        Producer Generalized Cost File,String,producer_generalized_cost-body_style.csv,
+        Production Constraints File,String,production_constraints-body_style.csv,
+        Sales Share File,String,sales_share_params_ice_bev_body_style.csv,
+        Vehicle Price Modifications File,String,vehicle_price_modifications-body_style.csv,
+        Vehicle Reregistration File,String,reregistration_fixed_by_age-body_style.csv,
+        ICE Vehicle Simulation Results File,String,simulated_vehicles_rse_ice.csv,
+        BEV Vehicle Simulation Results File,String,simulated_vehicles_rse_bev.csv,
+        PHEV Vehicle Simulation Results File,String,simulated_vehicles_rse_phev.csv,
+        Vehicles File,String,vehicles.csv,
+        Powertrain Cost File,String,powertrain_cost.csv,
+        Glider Cost File,String,glider_cost.csv,
+        Body Styles File,String,body_styles.csv,
+        Mass Scaling File,String,mass_scaling.csv,
+        Workfactor Definition File,String,workfactor_definition.csv,
+        ,,,
+        Session Settings,,,
+        Enable Session,TRUE / FALSE,TRUE,TRUE
+        Session Name,String,NoActionPolicy,ActionAlternative
+        ,,,
+        Session Policy Alternatives Settings,,,
+        Drive Cycle Weights File,String,drive_cycle_weights_5545.csv,drive_cycle_weights_5545.csv
+        Drive Cycle Ballast File,String,drive_cycle_ballast.csv,drive_cycle_ballast.csv
+        Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
+        GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
+        GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
+        GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
+        Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
+        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+        Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
+        Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
+        Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
+        Required Sales Share File,String,required_sales_share-body_style.csv,required_sales_share-body_style.csv
+        ,,,
+        Session Postproc Settings,,,
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
@@ -104,11 +104,10 @@ Data Row Name and Description
 :Analysis Final Year *(int)*:
     Analysis Final Year, e.g. ``2050``
 
-:Credit Market Efficiency *(float)*:
-    0.0 = no trading between manufacturers, 1.0 = perfect trading, 0..1 = variable trading
-
 :Analysis Dollar Basis:
     The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
+
+----
 
 :Batch Analysis Context Settings:
     Decorator, not evaluated
@@ -118,6 +117,9 @@ Data Row Name and Description
 
 :Context Case *(str)*:
     Context case name, e.g. ``Reference case``
+
+:Credit Market Efficiency *(float)*:
+    The "credit market efficiency", [0..1].  1 = perfect ghg credit trading, 0 = no ghg credit trading
 
 :Context Fuel Prices File *(str)*:
     The relative or absolute path to the context fuel prices file,
@@ -183,21 +185,21 @@ Data Row Name and Description
     loaded dynamically by the ``Reregistration`` class defined in the module specified by the file header,
     e.g. ``consumer.reregistration_fixed_by_age``
 
-:ICE Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the ICE vehicle simulation results and costs file,
+:ICE Vehicle Simulation Results File *(str)*:
+    The relative or absolute path to the ICE vehicle simulation results file,
     loaded by user-definable CostCloud class
 
-:BEV Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the BEV vehicle simulation results and costs file,
+:BEV Vehicle Simulation Results File *(str)*:
+    The relative or absolute path to the BEV vehicle simulation results file,
     loaded by user-definable CostCloud class
 
-:PHEV Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the PHEV vehicle simulation results and costs file,
+:PHEV Vehicle Simulation Results File *(str)*:
+    The relative or absolute path to the PHEV vehicle simulation results file,
     loaded by user-definable CostCloud class
 
 :Vehicles File *(str)*:
     The relative or absolute path to the vehicles (base year fleet) file,
-    loaded by ``producer.vehicles.VehicleFinal``
+    loaded by ``producer.vehicle_aggregation``
 
 :Powertrain Cost File *(str)*:
     The relative or absolute path to the powertrain cost file,
@@ -218,14 +220,6 @@ Data Row Name and Description
 :Workfactor Definition File *(str)*:
     The relative or absolute path to the workfactor definition file,
     loaded by ``policy.workfactor_definition.WorkFactor``
-
-:Context Implicit Price Deflators File *(str)*:
-    The relative or absolute path to the implicit price deflators file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Consumer Price Index File *(str)*:
-    The relative or absolute path to the consumer price index file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
 ----
 
@@ -254,6 +248,10 @@ Data Row Name and Description
 :Drive Cycles File *(str)*:
     The relative or absolute path to the drive cycles file,
     loaded by ``policy.drive_cycles.DriveCycles``
+
+:GHG Credit Params File *(str)*:
+    The relative or absolute path to the GHG credit parameters file,
+    loaded by ``policy.credit_banking.CreditBank``
 
 :GHG Credits File *(str)*:
     The relative or absolute path to the GHG credits file,
@@ -291,94 +289,21 @@ Data Row Name and Description
 
 ----
 
-**DEVELOPER SETTINGS**
-
-These settings are primarily for debugging or code development, if not provided by the user then default values will be
-applied.
-
-:Developer Settings:
+:Session Postproc Settings:
     Decorator, not evaluated
 
-:Cost Curve Frontier Affinity Factor *(float, ...)*:
-    Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
-    Supports multiple comma-separated values
+:Context Implicit Price Deflators File *(str)*:
+    The relative or absolute path to the implicit price deflators file,
+    loaded by ``context.ip_deflators``
 
-:Flat Context *(TRUE or FALSE)*:
-    If TRUE then all context values will come from a fixed year
+----
 
-:Flat Context Year *(int)*:
-    The fixed year when using flat context, default value is ``2020``
+**DEVELOPER SETTINGS**
 
-:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
-    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
-    Supports multiple comma-separated values
-
-:Log Consumer Iteration Years *(['all'] or [int(s)])*:
-    List of year(s) to log producer-consumer market share iteration, default value is ``2050``, which writes the log
-    file in the year 2050 and contains all prior years
-
-:Log Producer Decision and Response Years *(['all'] or [int(s)])*:
-    List of year(s) to log producer decision and consumer response data (costs, market shares and tech decision).
-    Default value is ``[]``
-
-:Log Producer Compliance Search Years *(['all'] or [int(s)])*:
-    List of year(s) to log detailed producer iteration data, including composite vehicle cost curves and compliance
-    search data (cost clouds).  Default value is ``[]``
-
-:Num Market Share Options *(int, ...)*:
-    Number of market share options to generate as part of the producer compliance search, typically ``5``.
-    Supports multiple comma-separated values
-
-:Num Tech Options per BEV Vehicle *(int, ...)*:
-    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
-    Supports multiple comma-separated values
-
-:Num Tech Options per ICE Vehicle *(int, ...)*:
-    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
-    Supports multiple comma-separated values
-
-:Producer Compliance Search Convergence Factor *(float)*:
-    Determines the search progression of tech options and market shares, used in
-    ``producer.compliance_search.create_tech_and_share_sweeps()`` and
-    ``producer.compliance_search.search_production_options()``.  Default value is ``0.33``
-
-:Producer Compliance Search Min Share Range *(float)*:
-    Used in ``producer.compliance_search.search_production_options()``, minimum share range limit, stops compliance
-    search when below.
-    Default value is ``1e-4``
-
-:Producer Compliance Search Tolerance *(float)*:
-    Used in ``producer.compliance_search.search_production_options()``, used to determine accuracy of compliance
-    outcome relative to the targeted CO2e Mg, default value is ``1e-6``
-
-:Producer Cross Subsidy Price Tolerance *(float)*:
-    Used in ``omega_model.detect_convergence()``, applied to the total average cost accuracy, default value is ``1e-4``
-
-:Producer-Consumer Convergence Tolerance *(float)*:
-    Used in ``omega_model.detect_convergence()``, compared with the convergence error.  Default is ``1e-3``
-
-:Producer-Consumer Max Iterations *(int)*:
-    Maximum number of market share iterations between the producer and consumer.  Recommended minimum is ``2``
-
-:Run Profiler *(TRUE or FALSE)*:
-    If TRUE then the model with run with profiling enabled.  See ``omega_model.run_omega()``
-
-:Slice Tech Combo Tables *(TRUE or FALSE)*:
-    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
-
-:Verbose Log Modules *([strs])*:
-    List of modules to activate detailed logfile output, may contain ``'database'``, ``'producer_compliance_search'``,
-        ``'cv_cost_curves'``, ``'v_cost_curves'``. Default value is ``[]``
-
-:Verbose Console Modules *([strs])*:
-    List of modules to activate detailed console output, may contain ``'producer_compliance_search'``,
-                                            ``'p-c_shares_and_costs'``, ``'p-c_max_iterations'``,
-                                            ``'cross_subsidy_search'``, ``'cross_subsidy_multipliers'``,
-                                            ``'cross_subsidy_convergence'``. Default value is ``[]``
-
-:Verbose Output *(TRUE or FALSE, ...)*:
-    Enables detailed console and logfile output if ``TRUE``
-    Supports multiple comma-separated values
+Developer settings can be specified by defining a row in the format ``settings.attribute_name`` where ``attribute_name``
+is an attribute of the OMEGASessionSettings class.  In fact, all the default rows could be specified as 'developer'
+settings as well.  Use caution when using developer settings, as there are no guardrails to their use and
+inappropriate settings may create unexpected behavior.
 
 """
 
@@ -777,7 +702,6 @@ class OMEGABatchObject(OMEGABase):
 
         # read postproc settings
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
-        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
     def num_sessions(self):
         """
@@ -921,7 +845,6 @@ class OMEGASessionObject(OMEGABase):
 
         # read postproc settings
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
-        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
@@ -1109,7 +1032,7 @@ def validate_folder(batch_root, batch_name='', session_name=''):
         except:
             import traceback
 
-            print('Couldn''t access or create {"%s"}' % (dstfolder), file=sys.stderr)
+            print('Couldn''t access or create {"%s"}' % dstfolder, file=sys.stderr)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             raise Exception(traceback.format_exc())
 
@@ -1409,22 +1332,19 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
                 # automatically validate files and folders based on parameter naming convention
                 for i in batch.dataframe.index:
-                    # if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
-                    #     batch.batch_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
-                    # elif str(i).endswith(' Folder Name'):
-                    #     validate_folder(session.read_parameter(i))
-                    # elif str(i).endswith(' File'):
-                    #     validate_file(session.read_parameter(i))
+                    # CU RV
                     if str(i).endswith(' File'):
                         source_file_path = session.read_parameter(i)
                         if type(source_file_path) is str:
                             source_file_path = source_file_path.replace('\\', os.sep)
                             if is_absolute_path(source_file_path):
-                                if options.verbose: batch.batch_log.logwrite('validating %s=%s' % (i, source_file_path))
+                                if options.verbose:
+                                    batch.batch_log.logwrite('validating %s=%s' % (i, source_file_path))
                                 validate_file(source_file_path)
                             else:
-                                if options.verbose: batch.batch_log.logwrite(
-                                    'validating %s=%s' % (i, batch.batch_definition_path + source_file_path))
+                                if options.verbose:
+                                    batch.batch_log.logwrite('validating %s=%s' %
+                                                             (i, batch.batch_definition_path + source_file_path))
                                 validate_file(batch.batch_definition_path + source_file_path)
 
                 batch.batch_log.logwrite('Validating Session %d Parameters...' % s)
@@ -1434,7 +1354,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
         if not options.no_bundle:
             # copy files to network_batch_path
-
             batch.batch_log.logwrite('Bundling Source Files and Requirements...')
             v = sys.version_info
             if getattr(sys, 'frozen', False):
@@ -1471,8 +1390,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 if '.csv' in options.batch_file:
                     expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
                 else:
-                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
-                                                      "Sessions")
+                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep +
+                                                      expanded_batch.name, "Sessions")
 
             if options.session_num is None:
                 if not batch.sessions[0].settings.use_prerun_context_outputs:
@@ -1512,13 +1431,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
                     # automatically rename and relocate source files
                     for i in batch.dataframe.index:
-                        # if str(i).endswith(' Folder Name'):
-                        #     if options.verbose:
-                        #         batch.batch_log.logwrite('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
-                        #                                      session.name + os.sep + batch.dataframe.loc[i][
-                        #                                          session.num]))
-                        #     batch.dataframe.loc[i][session.num] = \
-                        #         session.name + os.sep + batch.dataframe.loc[i][session.num]
+                        # CU RV
                         if str(i).endswith(' File') or (str(i).startswith('settings.') and str(i).endswith('_file')):
                             source_file_path = batch.dataframe.loc[i][session.num]
 
@@ -1533,18 +1446,22 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                             if is_absolute_path(source_file_path):
                                 # file_path is absolute path
                                 if options.verbose:
-                                    batch.batch_log.logwrite('relocating %s to %s' % (
-                                    source_file_path, options.session_path + get_filenameext(source_file_path)))
-                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                    options.session_path + bundle_input_folder_name, source_file_path)
+                                    batch.batch_log.logwrite('relocating %s to %s' %
+                                                             (source_file_path, options.session_path +
+                                                              get_filenameext(source_file_path)))
+                                batch.dataframe.loc[i][session.num] = \
+                                    session.name + os.sep + bundle_input_folder_name + os.sep + \
+                                    relocate_file(options.session_path + bundle_input_folder_name, source_file_path)
                             else:
                                 # file_path is relative path
                                 if options.verbose:
                                     batch.batch_log.logwrite('relocating %s to %s' % (
                                         batch.batch_definition_path + source_file_path,
                                         options.session_path + bundle_input_folder_name))
-                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                    options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
+                                batch.dataframe.loc[i][session.num] = \
+                                    session.name + os.sep + bundle_input_folder_name + os.sep + \
+                                    relocate_file(options.session_path + bundle_input_folder_name,
+                                                  batch.batch_definition_path + source_file_path)
 
         import time
 
@@ -1555,7 +1472,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         remote_batchfile = batch.name + '.csv'
         batch.dataframe.to_csv(remote_batchfile)
 
-        # print("Batch name = " + batch.name)
         batch.batch_log.logwrite("Batch name = " + batch.name)
 
         if options.session_num is None:
@@ -1574,8 +1490,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 dispy_session_list = dispy_session_list[1:]
 
                 if dispy_session_list:
-                    retry_count = dict()  # track retry attempts for terminated or abandoned jobs
-
                     dispycluster = DispyCluster(options)
                     dispycluster.find_nodes()
                     dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root,
@@ -1595,7 +1509,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 for idx, s_index in enumerate(session_list):
                     if not batch.sessions[s_index].result or options.dispy:
                         if not (s_index == 0 and batch.sessions[s_index].settings.use_prerun_context_outputs):
-                            batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
+                            batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" %
+                                                     (s_index, batch.sessions[s_index].name))
                             session_summary_filename = options.batch_path + '_' \
                                                        + batch.sessions[s_index].settings.output_folder_base \
                                                        + batch.sessions[s_index].settings.session_unique_name \
@@ -1621,7 +1536,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_bundle', action='store_true',
                         help='Do NOT gather and copy all source files to bundle_path')
     parser.add_argument('--batch_file', type=str, help='Path to batch definition file')
-    parser.add_argument('--ui_batch_file', action='store_true', help='Select batch file from UI')
+    parser.add_argument('--ui_batch_file', action='store_true', help='Select batch file from dialog box')
     parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
     parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
     parser.add_argument('--calc_effects', type=str,
@@ -1637,7 +1552,8 @@ if __name__ == '__main__':
     parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
     parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
                         default=None)
-    parser.add_argument('--collate_bundle', action='store_true', help='Find and collate summary files in a bundle folder')
+    parser.add_argument('--collate_bundle', action='store_true',
+                        help='Find and collate summary files in a bundle folder')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')

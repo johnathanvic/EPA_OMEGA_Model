@@ -1,7 +1,7 @@
 """
 
-A series of functions to calculate costs associated with the policy. The calc_cost_effects function is called by the omega_effects module and
-other functions here are called from within the calc_cost_effects function.
+A series of functions to calculate costs associated with the policy. The calc_cost_effects function is called by the
+omega_effects module and other functions here are called from within the calc_cost_effects function.
 
 ----
 
@@ -77,7 +77,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
-            mfr_cost_dollars  = purchase_price_dollars = purchase_credit_dollars = battery_cost_dollars = 0
+            mfr_cost_dollars = purchase_price_dollars = purchase_credit_dollars = battery_cost_dollars = 0
             avg_mfr_cost = avg_purchase_price = avg_purchase_credit = battery_cost_dollars_per_kwh = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0
@@ -91,7 +91,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
             battery_credit_dollars = 0
 
             base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
-                market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor, battery_kwh \
+                market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor, \
+                battery_kwh \
                 = physical['base_year_vehicle_id'], \
                 physical['model_year'], \
                 physical['manufacturer_id'], \
@@ -132,11 +133,13 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                         'mhev',
                         'charge_depleting_range_mi',
                     ]
-                    vehicle_info_dict[vehicle_id] = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
+                    vehicle_info_dict[vehicle_id] = \
+                        session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
 
                 else:
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
-                    price_data = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
+                    price_data = \
+                        batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
                     avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [price_data]
                     battery_cost = 0  # this won't matter for legacy fleet since calculated only for age==0
                     charge_depleting_range = 0
@@ -219,7 +222,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, charge_depleting_range)]
                 else:
                     refueling_cost_per_mile \
-                        = batch_settings.refueling_cost.calc_bev_refueling_cost_per_mile(operating_veh_type, charge_depleting_range)
+                        = batch_settings.refueling_cost.calc_bev_refueling_cost_per_mile(operating_veh_type,
+                                                                                         charge_depleting_range)
                     refueling_bev_dict.update({(operating_veh_type, charge_depleting_range): refueling_cost_per_mile})
                 refueling_cost_dollars = refueling_cost_per_mile * vmt
             else:

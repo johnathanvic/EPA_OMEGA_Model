@@ -11,7 +11,7 @@ be left blank to avoid calculating health effects (criteria air pollution effect
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,cost_factors_criteria,input_template_version:,0.4
@@ -26,6 +26,7 @@ Sample Data Columns
         2035,2020,car pump gasoline,938850.3917,169075.4785,9195.259845,843175.5181,151847.912,8259.336809,1890653.219,340989.946,18455.67509,1700420.74,306683.2824,16599.76534
 
 Data Column Name and Description
+
     :calendar_year:
         The calendar year for which specific cost factors are applicable.
 
@@ -37,7 +38,8 @@ Data Column Name and Description
         The source of the pollutant, whether it be a gasoline car or an EGU or refinery.
 
     :pm25_low_3.0_USD_per_uston:
-        The structure for all cost factors is pollutant_study_discount-rate_units, where study refers to the low or high valuation and units are in US dollars per US ton.
+        The structure for all cost factors is pollutant_study_discount-rate_units, where study refers to the low or
+        high valuation and units are in US dollars per US ton.
 
 ----
 

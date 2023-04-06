@@ -18,26 +18,26 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.12
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share,input_template_version:,0.12
+       input_template_name:,consumer.sales_share_ice_bev_body_style_zevregion,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
-        hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
-        hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
-        hauling.BEV,2022,12000,5,5,0.168,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.BEV,2020,12000,,5,0.5,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.BEV,2021,12000,,5,0.599,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.BEV,2022,12000,,5,0.69,0.1,1600,1.58,-8
 
 Data Column Name and Description
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon_r1nonzev.ICE'
 
 :start_year:
     Start year of parameters, parameters apply until the next available start year
@@ -245,8 +245,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
 
-                    # constrain relative (and by extension, absolute) shares
-                    # TODO: only for context session....??
+                    # constrain relative (and by extension, absolute) shares RV
                     share_name = market_class_id.replace(parent_market_class + '.', '')
                     demanded_share = np.minimum(np.maximum(min_constraints[share_name], demanded_share),
                                                 max_constraints[share_name])
@@ -419,7 +418,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                 for alt in ['ALT', 'NO_ALT']:
                     only_child = mc_pair[0] + '.' + alt
-                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_share_frac_%s' % only_child] = \
+                        1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
                     market_class_data['consumer_abs_share_frac_%s' % only_child] = \
                         parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
@@ -470,7 +470,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         # for rc in legacy_reg_classes:
         for rc in base_year_vehicles_df.reg_class_id.unique():
-            for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
+            for c in ['curbweight_lbs', 'rated_hp']:
                 SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
 
     @staticmethod
@@ -512,7 +512,8 @@ class SalesShare(OMEGABase, SalesShareBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}

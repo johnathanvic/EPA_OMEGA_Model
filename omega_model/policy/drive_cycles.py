@@ -16,7 +16,7 @@ The data represents drive cycles by name/phase, a distance and a brief descripti
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,drive_cycles,input_template_version:,0.2
@@ -120,7 +120,8 @@ class DriveCycles(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 DriveCycles._data = df.set_index('drive_cycle_id').to_dict(orient='index')

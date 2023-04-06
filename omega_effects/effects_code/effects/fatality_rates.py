@@ -10,7 +10,7 @@ The data represent fatality rates (fatalities per billion miles) for the fleet.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,fatality_rates,input_template_version:,0.1
@@ -105,6 +105,7 @@ class FatalityRates:
 
         Args:
             model_year (int): the model year for which a fatality rate is needed.
+            age (age): vehicle age in years
 
         Returns:
             The average fatality rate for vehicles of a specific model year and age.

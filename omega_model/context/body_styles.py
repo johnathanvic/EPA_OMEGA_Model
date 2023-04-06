@@ -16,7 +16,7 @@ The data represents body style names and a brief description.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,body_styles,input_template_version:,0.1
@@ -71,7 +71,7 @@ class BodyStyles(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        body_styles = []
+        BodyStyles.body_styles = []
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

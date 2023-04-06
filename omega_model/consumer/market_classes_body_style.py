@@ -15,25 +15,25 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.32
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.market_classes,input_template_version:,0.32
+       input_template_name:,consumer.market_classes_body_style,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         market_class_id,fueling_class,ownership_class
-        non_hauling.BEV,BEV,private
-        hauling.ICE,ICE,private
+        sedan_wagon.BEV,BEV,private
+        cuv_suv_van.ICE,ICE,private
 
 Data Column Name and Description
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon.ICE'
 
 :fueling_class:
     Market class fueling class, e.g. 'BEV', 'ICE'
@@ -93,7 +93,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             else:
                 market_class_id = 'pickup.ICE'
         else:
-            1==1
+            Exception('Unable to assign market_class_id')
 
         return market_class_id
 
@@ -169,10 +169,11 @@ class MarketClass(OMEGABase, MarketClassBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
                                'ownership_class': ['private'],  # for now...
                                }
 

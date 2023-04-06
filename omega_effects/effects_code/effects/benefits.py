@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects benefits module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 
 
@@ -312,7 +322,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                     pm25_Pope_7, sox_Pope_7, nox_Pope_7 = get_cap_cf(batch_settings, calendar_year, source_id)
 
                 pm25_tons, sox_tons, nox_tons = \
-                    cap_tons_dict['pm25_vehicle_ustons'], cap_tons_dict['sox_vehicle_ustons'], cap_tons_dict['nox_vehicle_ustons']
+                    cap_tons_dict['pm25_vehicle_ustons'], cap_tons_dict['sox_vehicle_ustons'], \
+                        cap_tons_dict['nox_vehicle_ustons']
                 pm25_veh_Wu_3_benefit_dollars = pm25_tons * pm25_Wu_3
                 sox_veh_Wu_3_benefit_dollars = sox_tons * sox_Wu_3
                 nox_veh_Wu_3_benefit_dollars = nox_tons * nox_Wu_3
@@ -526,7 +537,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'sox_total_ustons': - cap_tons_dict['sox_total_ustons'],
                 'nmog_vehicle_ustons': - cap_tons_dict['nmog_vehicle_ustons'],
                 'voc_upstream_ustons': - cap_tons_dict['voc_upstream_ustons'],
-                'nmog_and_voc_total_ustons':- cap_tons_dict['nmog_and_voc_total_ustons'],
+                'nmog_and_voc_total_ustons': - cap_tons_dict['nmog_and_voc_total_ustons'],
                 'co_vehicle_ustons': - cap_tons_dict['co_vehicle_ustons'],
                 'co_upstream_ustons': - cap_tons_dict['co_upstream_ustons'],
                 'co_total_ustons': - cap_tons_dict['co_total_ustons'],

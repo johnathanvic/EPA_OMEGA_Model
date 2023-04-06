@@ -17,18 +17,12 @@ to the market category, not absolute.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,required_sales_share,input_template_version:,0.2
 
 The data header consists of a ``start_year`` column followed by zero or more required sales share columns.
-
-Dynamic Data Header
-    .. csv-table::
-        :widths: auto
-
-        start_year, ``{market_class_id}:minimum_share``, ...
 
 Sample Data Columns
     .. csv-table::
@@ -117,8 +111,6 @@ class RequiredSalesShare(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         RequiredSalesShare._data = pd.DataFrame()
 
         RequiredSalesShare._cache.clear()
@@ -137,7 +129,8 @@ class RequiredSalesShare(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             share_columns = [c for c in df.columns if (min_share_units_str in c)]

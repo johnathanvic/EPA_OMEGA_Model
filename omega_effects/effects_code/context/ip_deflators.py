@@ -16,7 +16,7 @@ The data represents the price deflator by calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_implicit_price_deflators,input_template_version:,0.22
@@ -25,9 +25,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,price_deflator,,
-        2001,79.79,,
-        2002,81.052,,
+        calendar_year,price_deflator
+        2001,79.783
+        2002,81.026
 
 Data Column Name and Description
 
@@ -94,6 +94,7 @@ class ImplicitPriceDeflators:
 
         Args:
             calendar_year (int): the calendar year to get the function for
+            effects_log: an instance of the EffectsLog class.
 
         Returns:
             The implicit price deflator for the given calendar year.

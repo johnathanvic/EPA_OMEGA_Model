@@ -21,7 +21,7 @@ The data represents GHG credit parameters such as credit carry-forward and carry
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,ghg_credit_params,input_template_version:,0.2
@@ -31,7 +31,7 @@ Sample Data Columns
         :widths: auto
 
         start_model_year,credit_carryforward_years,credit_carryback_years
-        2020,5,3
+        2016,5,3
 
 Data Column Name and Description
 
@@ -56,7 +56,7 @@ The data represents GHG credits that are available to manufacturers in the compl
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,ghg_credit_history,input_template_version:,0.21
@@ -302,6 +302,17 @@ class CreditBank(OMEGABase):
         return new_credit_transaction
 
     def get_credit_param(self, model_year, param):
+        """
+        Get the given credit parameter for the given model year.
+
+        Args:
+            model_year (int): the model year
+            param (str): the name of the paramter to retrieve
+
+        Returns:
+            The given credit parameter for the given model year.
+
+        """
         start_years = self.credit_params.index
 
         model_year = max(start_years[start_years <= model_year])
@@ -502,9 +513,9 @@ class CreditBank(OMEGABase):
         # if credit is negative, see if there are any credits that can pay it
         elif new_credit['ending_balance_Mg'] < 0:
             debit = new_credit
-            credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
-            if not credits.empty:
-                for _, credit in credits.iterrows():
+            available_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
+            if not available_credits.empty:
+                for _, credit in available_credits.iterrows():
                     if debit['ending_balance_Mg'] < 0:
                         if credit['ending_balance_Mg'] > 0:
                             self.pay_debit(credit, debit, this_years_credits)
@@ -542,8 +553,10 @@ class CreditBank(OMEGABase):
         self.transaction_log = pd.concat([self.transaction_log, t])
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
-        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['compliance_id'], -transaction_amount_Mg)
-        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['compliance_id'], +transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['compliance_id'],
+                                                              -transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['compliance_id'],
+                                                              +transaction_amount_Mg)
 
 
 if __name__ == '__main__':
