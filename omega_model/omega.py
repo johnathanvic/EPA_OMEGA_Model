@@ -309,6 +309,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             best_winning_combo_with_sales_response = None
 
             producer_consumer_iteration_num = 0
+            omega_globals.locked_price_modification_data = dict()
             iterate_producer_consumer = True
 
             if omega_globals.options.producer_shares_mode == 'auto':
@@ -606,8 +607,6 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in sorted(producer_market_classes)]
 
     omega_globals.price_modification_data = dict()
-    if producer_consumer_iteration_num == 0:
-        omega_globals.locked_price_modification_data = dict()
 
     if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
         for mc, cc in zip(sorted(producer_market_classes), multiplier_columns):
