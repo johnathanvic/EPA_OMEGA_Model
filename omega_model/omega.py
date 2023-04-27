@@ -285,15 +285,16 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
 
-            if manufacturer_annual_data_table is None:
+            if manufacturer_annual_data_table is None or omega_globals.options.credit_market_efficiency == 0.0:
                 # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
                 strategic_target_offset_Mg = 0
                 current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
                 for c in current_credits + current_debits:
                     if c.model_year < omega_globals.options.analysis_initial_year:
                         # allow strategic under-compliance for historical credits
-                        strategic_target_offset_Mg += \
-                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
+                        if c.remaining_balance_Mg < 0 or omega_globals.options.credit_market_efficiency != 0.0:
+                            strategic_target_offset_Mg += \
+                                c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
                     else:
                         # don't allow strategic under-compliance for analysis year credits
                         strategic_target_offset_Mg += \
@@ -308,11 +309,11 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             best_winning_combo_with_sales_response = None
 
             producer_consumer_iteration_num = 0
+            omega_globals.locked_price_modification_data = dict()
             iterate_producer_consumer = True
 
             if omega_globals.options.producer_shares_mode == 'auto':
-                # in order to hit the strategic offset we need to bypass the consumer a bit
-                # omega_globals.producer_shares_mode = omega_globals.pass_num == 1
+                # CU RV
                 omega_globals.producer_shares_mode = False
             elif omega_globals.options.producer_shares_mode is True:
                 omega_globals.producer_shares_mode = True
@@ -331,8 +332,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                                                 strategic_target_offset_Mg,
                                                                 prior_producer_decision_and_response)
 
-                if producer_compliant is None:
-                    omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
+                # if producer_compliant is None:
+                #     omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
 
                 # composite vehicles have been updated from producer_decision at this point
                 producer_market_classes = \
@@ -606,8 +607,6 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in sorted(producer_market_classes)]
 
     omega_globals.price_modification_data = dict()
-    if producer_consumer_iteration_num == 0:
-        omega_globals.locked_price_modification_data = dict()
 
     if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
         for mc, cc in zip(sorted(producer_market_classes), multiplier_columns):
