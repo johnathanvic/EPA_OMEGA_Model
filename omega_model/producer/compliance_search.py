@@ -717,12 +717,17 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             # delta_share_multiplier = 1 + sum(
             #     [abs(production_options[k] - prior_producer_decision_and_response[k]) for k in production_options.keys()
             #      if 'producer_abs_share_frac' in k])
-            delta_share_multiplier = 1 + sum(
-                [abs((production_options[k] - prior_producer_decision_and_response[k]) *
-                     (production_options['total_battery_GWh'] -
-                      prior_producer_decision_and_response['total_battery_GWh']) /
-                     prior_producer_decision_and_response['total_battery_GWh']) for k in production_options.keys()
-                 if 'producer_abs_share_frac' in k])
+            if prior_producer_decision_and_response['total_battery_GWh'] > 0:
+                delta_share_multiplier = 1 + sum(
+                    [abs((production_options[k] - prior_producer_decision_and_response[k]) *
+                         (production_options['total_battery_GWh'] -
+                          prior_producer_decision_and_response['total_battery_GWh']) /
+                         prior_producer_decision_and_response['total_battery_GWh']) for k in production_options.keys()
+                     if 'producer_abs_share_frac' in k])
+            else:
+                delta_share_multiplier = 1 + sum(
+                    [abs(production_options[k] - prior_producer_decision_and_response[k]) for k in
+                     production_options.keys() if 'producer_abs_share_frac' in k])
 
             production_options['total_generalized_cost_dollars'] *= delta_share_multiplier
 
