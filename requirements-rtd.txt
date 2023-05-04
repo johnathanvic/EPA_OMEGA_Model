@@ -19,7 +19,7 @@ parquet==1.3.1
 fastparquet
 
 # for readthedocs:
-sphinx-rtd-theme>=1.0.0,<=2.0.0
+sphinx-rtd-theme # >=1.0.0,<=2.0.0
 
 # for dispy parallel processing:
 dispy==4.15.2
