@@ -4,6 +4,7 @@ env
 build
 dist
 /omega_model/output/*
+/JV_info/*
 /omega_preproc/output_context_aeo
 outputs
 .pytest_cache
