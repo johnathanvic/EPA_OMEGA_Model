@@ -1166,6 +1166,14 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
 
             manufacturer_new_vehicles.append(veh_final)
 
+    from producer import full_industry_vehicles
+    # define last vehicle index, if last, save: if not, append; VehicleFinal.compliance_ids
+    # look into omega_globals.session.add_all(manufacturer_new_vehicles)
+    if compliance_id == 'consolidated_OEM':
+        full_industry_vehicles.industry_cv_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles)
+    else:
+        full_industry_vehicles.industry_v_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles)
+
     # propagate pre-production vehicles
     for ppv in pre_production_vehicles:
         veh_final = VehicleFinal()

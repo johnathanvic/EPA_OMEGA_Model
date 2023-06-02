@@ -89,7 +89,7 @@ try:
             self.prerun_context_folder = ''
             self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = None
-            self.force_two_pass = False
+            self.force_two_pass = True
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
@@ -120,7 +120,7 @@ try:
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
 
             self.analysis_initial_year = None
-            self.analysis_final_year = 2021
+            self.analysis_final_year = 2020
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
@@ -212,8 +212,8 @@ try:
             self.manufacturer_gigawatthour_data = None
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
-                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_',
+            self.verbose_log_modules = ['database', 'producer_compliance_search', 'cross_subsidy_search_',
+                                        'cv_cost_curves', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_',
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
@@ -225,7 +225,7 @@ try:
             self.verbose_postproc = ['iteration_']
 
             # = 'all' or list of years to log, empty list to disable logging:
-            self.log_vehicle_cloud_years = []
+            self.log_vehicle_cloud_years = [2020]
 
             # = 'all' or list of years to log, empty list to disable logging:
             self.log_producer_compliance_search_years = []

@@ -1662,6 +1662,10 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
 
+            # Initilize industry_v_cost_curve dataframe (see full_industry_vehicles.py)
+            if session_runtime_options.consolidate_manufacturers == False:
+                omega_globals.industry_v_df = pd.DataFrame()
+
             if session_runtime_options.use_prerun_context_outputs:
                 session_runtime_options.context_new_vehicle_generalized_costs_file = \
                     '%s%scontext_new_vehicle_prices_%d.csv' % \
@@ -1788,6 +1792,11 @@ def run_omega(session_runtime_options, standalone_run=False):
                 # shut down the db
                 if 'database' in omega_globals.options.verbose_log_modules:
                     dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+
+                # Save industry_v_df
+                if session_runtime_options.consolidate_manufacturers == False:
+                    from producer import full_industry_vehicles
+                    full_industry_vehicles.save_industry_v_cost_curve()
 
                 omega_globals.session.close()
                 omega_globals.engine.dispose()
