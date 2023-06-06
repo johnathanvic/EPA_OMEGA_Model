@@ -43,23 +43,30 @@ def industry_cv_cost_curve(calendar_year, compliance_id, candidate_mfr_composite
                 
 # # v_cost_curve
 def industry_v_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles):
-    mfr_df = pd.DataFrame()
-    # Imported
-    for cv in candidate_mfr_composite_vehicles:
+    # Construct full industry candidate vehicles by extracting cost curve for each manufacturer's composite candidate vehicle
+    # Gets called for each manufacturer & appends to running list omega_globals.industry_v_df, which is initilized in omega.py
 
-        # Make pandas
+    mfr_df = pd.DataFrame()
+    # Iterate through manufacturer's vehicles
+    for vehNo,cv in enumerate(candidate_mfr_composite_vehicles):
+
+        # Make dataframe
         cv_df = cv.cost_curve.copy()
-        cv_df.insert(0, 'compliance_id',compliance_id)
-        cv_df.insert(1,'veh_name',cv.name)
-        cv_df.insert(2,'market_class',cv.market_class_id)
-        cv_df.insert(3,'fueling_class',cv.fueling_class)
-        # note: add veh identifier number or something
-        mfr_df = mfr_df.append(cv_df)
+        # Declare vehicle id
+        veh_id = [compliance_id[:3] +'_'+str(vehNo+1)+'-'+ str(val) for val in range(len(cv_df.index.values))]
+        # Add orginization col
+        cv_df.insert(0,'compliance_id',compliance_id)
+        cv_df.insert(1,'veh_id',veh_id)
+        cv_df.insert(2,'veh_name',cv.name)
+        cv_df.insert(3,'market_class',cv.market_class_id)
+        cv_df.insert(4,'fueling_class',cv.fueling_class)
+        cv_df.insert(5,'techNo', cv_df.index.values)
+        mfr_df = mfr_df.append(cv_df.iloc[:,:21])
 
     omega_globals.industry_v_df = omega_globals.industry_v_df.append(mfr_df)
 
 def save_industry_v_cost_curve():
-    omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df.columns[:19],index=False) # move to end so not re-saving every automaker
+    omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df.columns[:20],index=False) # move to end so not re-saving every automaker
 
     # before run, need to 
     # ) initilize industry_df
