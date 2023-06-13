@@ -66,7 +66,8 @@ def industry_v_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_
     omega_globals.industry_v_df = omega_globals.industry_v_df.append(mfr_df)
 
 def save_industry_v_cost_curve():
-    omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df.columns[:20],index=False) # move to end so not re-saving every automaker
+    omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df,index=False) # move to end so not re-saving every automaker
+    # omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df.columns[:21],index=False) # move to end so not re-saving every automaker
 
     # before run, need to 
     # ) initilize industry_df
