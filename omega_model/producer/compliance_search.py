@@ -1107,6 +1107,14 @@ def create_composite_vehicles(calendar_year, compliance_id):
         market_class_tree = _cache[cache_key]['market_class_tree']
         context_based_total_sales = _cache[cache_key]['context_based_total_sales']
 
+    from producer import full_industry_vehicles
+    # define last vehicle index, if last, save: if not, append; VehicleFinal.compliance_ids
+    # look into omega_globals.session.add_all(manufacturer_new_vehicles)
+    if compliance_id == 'consolidated_OEM':
+        full_industry_vehicles.industry_cv_cost_curve(calendar_year, compliance_id, composite_vehicles) # replaced candidate_mfr_composite_vehicles with composite_vehs
+    else:
+        full_industry_vehicles.industry_v_cost_curve(calendar_year, compliance_id, composite_vehicles)
+
     return composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales
 
 
