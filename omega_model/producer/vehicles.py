@@ -87,6 +87,7 @@ from context.fuel_prices import FuelPrice
 from context.onroad_fuels import OnroadFuel
 
 from producer.vehicle_annual_data import VehicleAnnualData
+# from producer import full_industry_vehicles
 
 cost_curve_interp_key = 'credits_co2e_Mg_per_vehicle'  # was 'cert_co2e_grams_per_mile'
 
@@ -1204,6 +1205,7 @@ class Vehicle(OMEGABase):
                                                           self.name.replace(' ', '_').replace(':', '-'),
                                                           self.vehicle_id)
                 cost_cloud.to_csv(filename, columns=sorted(cost_cloud.columns), index=False)
+                # self.cost_cloud = cost_cloud # JV modified; maybe add here any interesting veh info & saving to a global variable
 
             if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
                 filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
@@ -1211,6 +1213,8 @@ class Vehicle(OMEGABase):
                                                           self.vehicle_id)
                 cc = pd.merge(cost_curve, self.cost_curve_non_numeric_data, left_index=True, right_index=True)
                 cc.to_csv(filename, columns=sorted(cc.columns), index=False)
+                # tag: add append_v_cost_curves here
+                # full_industry_vehicles.append_v_cost_curve(cc,self)
 
         self.cost_curve = cost_curve
 

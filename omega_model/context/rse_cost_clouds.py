@@ -205,8 +205,8 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                'electrified_driveline_cost', 'structure_cost', 'glider_non_structure_cost']
 
-    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'powertrain_type', 'vehicle_name']
-    cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material', 'powertrain_type']
+    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'powertrain_type', 'vehicle_name'] #,'tech_bundle'] #,'base_sales']
+    cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material', 'powertrain_type'] #,'tech_bundle'] #,'base_sales']
 
     tech_flags = set()
 
@@ -628,6 +628,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                             for idx, ct in enumerate(powertrain_cost_terms):
                                 cloud_point[ct] = powertrain_costs[idx]
 
+                            # cloud_point['tech_bundle'] = ccc
                             cloud_points.append(cloud_point)
 
         cost_cloud = pd.DataFrame(cloud_points)

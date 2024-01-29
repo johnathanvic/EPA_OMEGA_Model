@@ -5,7 +5,7 @@ import pandas as pd
 Save cost curves for composite vehicles and aggregate (mfr-composite) vehicles into unified dataset
 Functions called during compliance search, except for 
 industry_cv_cost_curve() does all in one go locally
-industry_v_cost_curve() relies on global var to append in eack mfr's complance search, saves in omega.py file
+automaker_cv_cost_curve() relies on global var to append in eack mfr's complance search, saves in omega.py file
 
 '''
 
@@ -51,7 +51,7 @@ def industry_cv_cost_curve(calendar_year, compliance_id, candidate_mfr_composite
     
                 
 # # v_cost_curve
-def industry_v_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles):
+def automaker_cv_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles):
     # Construct full industry candidate vehicles by extracting cost curve for each manufacturer's composite candidate vehicle
     # Gets called for each manufacturer & appends to running list omega_globals.industry_v_df, which is initilized in omega.py
 
@@ -87,7 +87,7 @@ def industry_v_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_
 
     omega_globals.industry_v_df = omega_globals.industry_v_df.append(mfr_df)
 
-def save_industry_v_cost_curve():
+def save_automaker_cv_cost_curve():
     omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df,index=False) # move to end so not re-saving every automaker
     # omega_globals.industry_v_df.to_csv('JV_info\industry_v_df.csv', columns=omega_globals.industry_v_df.columns[:21],index=False) # move to end so not re-saving every automaker
 
@@ -113,3 +113,60 @@ def save_industry_v_cost_curve():
 #     Notes:
 #     Should be able to get aggregate vehicle set in the second iteration
 #     '''
+    
+
+# def append_cv_cost_curve(cv,calendar_year,compliance_id): # (candidate_mfr_composite_vehicles):
+#     # Construct full industry candidate vehicles by extracting cost curve for each manufacturer's composite candidate vehicle
+#     # Gets called for each manufacturer & appends to running list omega_globals.industry_v_df, which is initilized in omega.py
+        
+#     # Process
+#         # add cv -> dataframe
+#     cv_cost_curve = cv.cost_curve
+#     cv_cost_curve.compliance_id = compliance_id
+#     cv_cost_curve.vehicle_id = cv.vehicle_id
+#     cv_cost_curve.calendar_year = calendar_year
+#     cv_cost_curve.base_year_market_share = cv.base_year_market_share
+#     cv_cost_curve.initial_registered_count = cv.initial_registered_count
+
+#     # append to list
+#     omega_globals.automaker_cv_cost_curve = omega_globals.automaker_cv_cost_curve.append(cost_curve)
+
+#     return 
+
+
+
+def append_v_cost_curve(cc,veh): # (candidate_mfr_composite_vehicles):
+    # Construct full industry candidate vehicles by extracting cost curve for each manufacturer's composite candidate vehicle
+    # Gets called for each manufacturer & appends to running list omega_globals.industry_v_df, which is initilized in omega.py
+
+    # if not omega_globals.consolidate_v_cost_curve.empty: 
+    #     if compliance_id == omega_globals.consolidate_v_cost_curve['compliance_id'].iloc[-1]:
+    #         return # avoid duplicates for same mfr
+        
+    # Process
+    cc.columns = cc.columns.str.replace(f'veh_{veh.vehicle_id}_','')
+    veh_data = vars(veh)
+    veh.cost_curve = veh.cost_curve
+    v_cost_curve = cc
+    relevant_veh_col = ['compliance_id','model_year','name','manufacturer_id','market_class_id','vehicle_id',
+                        'base_year_cert_fuel_id','base_year_market_share','base_year_msrp_dollars','base_year_product',
+                        'base_year_reg_class_id','base_year_vehicle_id','body_style','context_size_class',
+                        'cost_curve_class','fueling_class','fueling_class_reg_class_id','initial_registered_count']
+    for col in relevant_veh_col:
+        v_cost_curve[col] = getattr(veh, col)
+
+    if veh.compliance_id == 'consolidated_OEM':
+        # tag: move to where this func is called, add to list, and then save; also need to remove omega_globals or figure out why inacessable; maybe hide it in omega_globals.options
+        omega_globals.automaker_v_cost_curve.to_csv('JV_info\consolidate_automaker_v_cost_curve.csv', columns=omega_globals.automaker_v_cost_curve,index=False) 
+    else:          
+        # append to list
+        omega_globals.automaker_v_cost_curve = omega_globals.automaker_v_cost_curve.append(v_cost_curve) 
+
+        
+
+def save_automaker_v_cost_curve(is_consolidate):
+    if is_consolidate == False:
+    #     omega_globals.automaker_v_cost_curve.to_csv('JV_info\consolidate_automaker_v_cost_curve.csv', columns=omega_globals.automaker_v_cost_curve,index=False) 
+    # else:
+        omega_globals.automaker_v_cost_curve.to_csv('JV_info\nonconsolidate_automaker_v_cost_curve.csv', columns=omega_globals.automaker_v_cost_curve,index=False) 
+        # move to end so not re-saving every automaker

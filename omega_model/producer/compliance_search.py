@@ -928,6 +928,44 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for new_veh in manufacturer_vehicles:
                 calc_vehicle_frontier(new_veh)
 
+        # JV modified
+        # Create an empty DataFrame to store all cost clouds
+        all_cost_clouds = pd.DataFrame(columns = [])
+        all_cost_curves = pd.DataFrame(columns = [])
+            # Loop through the manufacturer_vehicles again to collect cost clouds
+        for veh in manufacturer_vehicles:
+            # Cost Cloud
+            # # copy & remove unique veh_#_ from cost_cloud columns
+            # veh.cost_cloud.columns = veh.cost_cloud.columns.str.replace(f'veh_{veh.vehicle_id}_','')
+            # # Access the stored cost_cloud attribute from the Vehicle object
+            # cost_cloud = veh.cost_cloud  # Accessing the stored cost_cloud from each Vehicle object
+            # cost_cloud.veh_id = veh.vehicle_id
+            # # Check if the cost_cloud is not None or empty before appending
+            # if cost_cloud is not None and not cost_cloud.empty:
+            #     all_cost_clouds = all_cost_clouds.append(cost_cloud, ignore_index=True)
+                
+            # Cost Curve
+            cost_curve = veh.cost_curve
+            cost_curve.columns = cost_curve.columns.str.replace(f'veh_{veh.vehicle_id}_','')
+            # Get veh data not in cost_curve
+            veh_data = vars(veh)
+            relevant_veh_col = ['compliance_id','model_year','name','manufacturer_id','market_class_id','vehicle_id',
+                                'base_year_cert_fuel_id','base_year_market_share','base_year_msrp_dollars','base_year_product',
+                                'base_year_reg_class_id','base_year_vehicle_id','body_style','context_size_class',
+                                'cost_curve_class','fueling_class','fueling_class_reg_class_id','initial_registered_count']
+            for col in relevant_veh_col:
+                cost_curve[col] = getattr(veh, col)
+            # Check if the cost_curve is not None or empty before appending
+            if cost_curve is not None and not cost_curve.empty:
+                all_cost_curves= all_cost_curves.append(cost_curve, ignore_index=True)
+
+        # Save all_cost_clouds to a single CSV file after the loop
+        # filename = f"JV_info\cost_clouds\{compliance_id}_cost_cloud.csv"
+        # all_cost_clouds.to_csv(filename) # , columns=sorted(all_cost_clouds.columns), index=False)
+        # Save all cost_curves
+        filename = f"JV_info\cost_curves\{compliance_id}_cost_curve.csv"
+        all_cost_curves.to_csv(filename) # , columns=sorted(all_cost_clouds.columns), index=False)
+
         # print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
         alt_vehs = [new_veh for new_veh in manufacturer_vehicles if not new_veh.base_year_product]
@@ -1113,7 +1151,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     if compliance_id == 'consolidated_OEM':
         full_industry_vehicles.industry_cv_cost_curve(calendar_year, compliance_id, composite_vehicles) # replaced candidate_mfr_composite_vehicles with composite_vehs
     else:
-        full_industry_vehicles.industry_v_cost_curve(calendar_year, compliance_id, composite_vehicles)
+        full_industry_vehicles.automaker_cv_cost_curve(calendar_year, compliance_id, composite_vehicles)
 
     return composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales
 
@@ -1152,6 +1190,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                 filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, cv.model_year,
                                                           cv.name.replace(':', '-'), cv.vehicle_id)
                 cv.cost_curve.to_csv(filename, columns=sorted(cv.cost_curve.columns), index=False)
+                # Consider appending to global df w/ additional data (eg: base_year_market_share or initial_registered_count, cost_curve_class, veh_name %s%d_%s_%s, etc)
+                # full_industry_vehicles.append_cv_cost_curve(cv,calendar_year,compliance_id)
 
         for veh in cv.vehicle_list:
             veh_final = VehicleFinal()
@@ -1180,7 +1220,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     if compliance_id == 'consolidated_OEM':
         full_industry_vehicles.industry_cv_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles)
     else:
-        full_industry_vehicles.industry_v_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles)
+        full_industry_vehicles.automaker_cv_cost_curve(calendar_year, compliance_id, candidate_mfr_composite_vehicles)
 
     # propagate pre-production vehicles
     for ppv in pre_production_vehicles:

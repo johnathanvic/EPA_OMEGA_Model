@@ -1,0 +1,74 @@
+OMEGA & ASC Restructuring Notes
+
+STRUCTURE
+
+baseInputs (once)
+- 
+
+preprocess (once & forall)
+- Load .xls
+- Rename vars
+- Filter
+- calibrate ASCs?
+
+defData
+- def data
+- calibrate ASCs?
+
+defDemandModel
+- def pref model (could move out)
+
+initSio
+- initilize sio param
+- init utilities & market
+
+
+THOUGHTS
+issues:
+- Have to recalc asc every time change v_og
+- idea: make pre-process file called once
+ideas
+- make preprocessing a function/ callable in collect results
+- add calibAsc end of defData after Make and pref model
+Pros of calib before
+- SHouldnt count as SIO time
+- Setup once
+Pros of after
+- auto update w/ changes in o.g.
+Updated thoughts
+- Now that demand independent, add defData to preprocessing; can overwrite with runs
+
+Preprocessing structure
+- inputs: context (v_og)
+- load data
+- make structure
+- defData & defDemandModel
+- calib ASCs
+- save make
+
+- declare cases/options
++ vehicle context
++ market context: outside good, stringency, attr
+
+RECORDS
+Did:
+- Added defDemandModel
+- Moved defining starting point to defData, dont define utilities until initSio
+To do:
+- move structure definition to preprocessing
+- add ASCs to utility calcs in calcUtilities
+- update defData to integrate better w/ omega
+- integrate preprocessing and updated baseinputs into code
+- resolve issue project_sales vs base sales
+
+leftoff
+- fmincon ASC
+- finish defining preprocessing
+- integrate preprocessing into main
+
+Notepad:
+issue - why is first utility 4x1 instead of 4x100? (is it because of MNL?)
+-> need to change utilities in make before updating
+
+Leftoff - ASCs seem poorly estimated, investigate and maybe look at jasons code % [make.demandShare;make.salesShare]
+SIO seems to love lux after ASCs

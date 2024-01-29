@@ -206,14 +206,14 @@ try:
             self.kwh_per_mile_scale_years = [2020]
             self.kwh_per_mile_scale = [1.0]
 
-            self.redesign_interval_gain_years = [2020, 2029, 2034]
-            self.redesign_interval_gain = [1.0, 1.0, 0.0]
+            self.redesign_interval_gain_years = [2020, 2021, 2022] # [2020, 2029, 2034]
+            self.redesign_interval_gain = [0.0, 0.0, 0.0] # [1.0, 1.0, 0.0]
 
             self.manufacturer_gigawatthour_data = None
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database', 'producer_compliance_search', 'cross_subsidy_search_',
-                                        'cv_cost_curves', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_',
+                                        'cv_cost_curves', 'v_cost_curves', 'v_cost_clouds', 'v_cloud_plots_',
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
