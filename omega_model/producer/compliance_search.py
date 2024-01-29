@@ -928,6 +928,48 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for new_veh in manufacturer_vehicles:
                 calc_vehicle_frontier(new_veh)
 
+        # JV modified
+        # Create an empty DataFrame to store all cost clouds
+        # all_cost_clouds = pd.DataFrame(columns = [])
+        all_cost_curves = pd.DataFrame(columns = [])
+            # Loop through the manufacturer_vehicles again to collect cost clouds
+        for veh in manufacturer_vehicles:
+            # Cost Cloud
+            # # copy & remove unique veh_#_ from cost_cloud columns
+            # veh.cost_cloud.columns = veh.cost_cloud.columns.str.replace(f'veh_{veh.vehicle_id}_','')
+            # # Access the stored cost_cloud attribute from the Vehicle object
+            # cost_cloud = veh.cost_cloud  # Accessing the stored cost_cloud from each Vehicle object
+            # cost_cloud.veh_id = veh.vehicle_id
+            # # Check if the cost_cloud is not None or empty before appending
+            # if cost_cloud is not None and not cost_cloud.empty:
+            #     all_cost_clouds = all_cost_clouds.append(cost_cloud, ignore_index=True)
+
+            # Cost Curve
+            cost_curve = copy.deepcopy(veh.cost_curve)
+            cost_curve.columns = cost_curve.columns.str.replace(f'veh_{veh.vehicle_id}_','')
+            # Get veh data not in cost_curve
+            veh_data = vars(veh)
+            relevant_veh_col = ['compliance_id','model_year','name','manufacturer_id','market_class_id','vehicle_id',
+                                'base_year_market_share','initial_registered_count','base_year_cert_fuel_id',
+                                'base_year_msrp_dollars','base_year_product','base_year_reg_class_id','base_year_vehicle_id',
+                                'body_style','context_size_class','cost_curve_class','fueling_class','fueling_class_reg_class_id']
+            for col in relevant_veh_col:
+                cost_curve[col] = getattr(veh, col)
+            # Check if the cost_curve is not None or empty before appending
+            if cost_curve is not None and not cost_curve.empty:
+                all_cost_curves= all_cost_curves.append(cost_curve, ignore_index=True)
+
+        # Save all_cost_clouds to a single CSV file after the loop
+        # filename = f"JV_info\cost_clouds\{compliance_id}_cost_cloud.csv"
+        # all_cost_clouds.to_csv(filename) # , columns=sorted(all_cost_clouds.columns), index=False)
+        # Save all cost_curves
+        file_name = f"JV_info_rebuild\cost_curves\{compliance_id}_cost_curves.csv"
+        all_cost_curves.to_csv(file_name) # , columns=sorted(all_cost_clouds.columns), index=False)
+        # Save firsk 1k rows of cost_curves
+        head_file_name = f"JV_info_rebuild\cost_curves\{compliance_id}_cost_curves_first_1000.csv"
+        all_cost_curves.head(1000).to_csv(head_file_name)
+        # Tag: would be nice to add tech row # of cost curve        
+
         # print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
         alt_vehs = [new_veh for new_veh in manufacturer_vehicles if not new_veh.base_year_product]

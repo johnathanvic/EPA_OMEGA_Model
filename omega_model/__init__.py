@@ -92,57 +92,57 @@ try:
             self.force_two_pass = False
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
-            self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.manufacturers_file = path + 'proposal_inputs/manufacturers_20220329.csv'
+            self.vehicles_file = path + 'proposal_inputs/vehicles_ldv_20221017_cleanedredesigne.csv'
             self.vehicles_file_base_year = None
             self.vehicles_df = pd.DataFrame()
-            self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
-            self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
+            self.onroad_vehicle_calculations_file = path + 'proposal_inputs/onroad_vehicle_calculations_20221028a.csv'
+            self.onroad_fuels_file = path + 'proposal_inputs/onroad_fuels_20220325.csv'
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
             self.context_new_vehicle_generalized_costs_file = None
             self.sales_share_calibration_file = None
             self.generate_context_calibration_files = True
-            self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
-            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
-            self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
-            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights_5545.csv'
-            self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
-            self.context_stock_vmt_file = path + 'test_inputs/context_stock_vmt.csv'
+            self.context_fuel_prices_file = path + 'proposal_inputs/context_fuel_prices_20220429.csv'
+            self.fuel_upstream_methods_file = path + 'proposal_inputs/policy_fuel_upstream_methods-upstream_zero_20210602.csv'
+            self.drive_cycles_file = path + 'proposal_inputs/drive_cycles_20220325.csv'
+            self.drive_cycle_weights_file = path + 'proposal_inputs/drive_cycle_weights_5545_20220518.csv'
+            self.drive_cycle_ballast_file = path + 'proposal_inputs/drive_cycle_ballast_20220325.csv'
+            self.context_stock_vmt_file = path + 'proposal_inputs/context_stock_vmt_20221031.csv'
 
-            self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
-            self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
-            self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
+            self.ice_vehicle_simulation_results_file = path + 'proposal_inputs/simulated_vehicles_rse_ice_20221021_debug_noP2.csv'
+            self.bev_vehicle_simulation_results_file = path + 'proposal_inputs/simulated_vehicles_rse_bev_20221101.csv'
+            self.phev_vehicle_simulation_results_file = path + 'proposal_inputs/simulated_vehicles_rse_phev_20220711.csv'
 
-            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
-            self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
-            self.body_styles_file = path + 'test_inputs/body_styles.csv'
-            self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
+            self.powertrain_cost_input_file = path + 'proposal_inputs/powertrain_cost_20230314.csv'
+            self.glider_cost_input_file = path + 'proposal_inputs/glider_cost_20220719.csv'
+            self.body_styles_file = path + 'proposal_inputs/body_styles_20220324.csv'
+            self.mass_scaling_file = path + 'proposal_inputs/mass_scaling_20220719.csv'
 
             self.analysis_initial_year = None
-            self.analysis_final_year = 2021
+            self.analysis_final_year = 2020
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
-            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint_NTR-FRM-CFR-form.csv'
-            self.policy_reg_classes_file = path + 'test_inputs/regulatory_classes.csv'
-            self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
-            self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
-            self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
-            self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
-            self.workfactor_definition_file = path + 'test_inputs/workfactor_definition.csv'
+            self.policy_targets_file = path + 'proposal_inputs/ghg_standards-footprint_yoy_a_to2032_C_b50_74_m0p35_T_b50_83_m1p38_20221116.csv'
+            self.policy_reg_classes_file = path + 'proposal_inputs/regulatory_classes_20210708.csv'
+            self.production_multipliers_file = path + 'proposal_inputs/production_multipliers_20230208.csv'
+            self.policy_fuels_file = path + 'proposal_inputs/policy_fuels_20220722.csv'
+            self.ghg_credit_params_file = path + 'proposal_inputs/ghg_credit_params_20220301.csv'
+            self.ghg_credits_file = path + 'proposal_inputs/ghg_credits_21trends_20221122c.csv'
+            self.workfactor_definition_file = path + 'proposal_inputs/workfactor_definition_20230106.csv'
 
-            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
-            self.market_classes_file = path + 'test_inputs/market_classes-body_style.csv'
-            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'
-            self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'
-            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age-body_style.csv'
-            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_body_style.csv'
-            self.required_sales_share_file = path + 'test_inputs/required_sales_share-body_style.csv'
-            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age-body_style.csv'
-            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications-body_style.csv'
+            self.context_new_vehicle_market_file = path + 'proposal_inputs/context_new_vehicle_market_20221111.csv'
+            self.market_classes_file = path + 'proposal_inputs/market_classes-body_style_20220531.csv'
+            self.producer_generalized_cost_file = path + 'proposal_inputs/producer_generalized_cost-body_style_20220613.csv'
+            self.production_constraints_file = path + 'proposal_inputs/production_constraints-body_style_20221130.csv'
+            self.vehicle_reregistration_file = path + 'proposal_inputs/reregistration_fixed_by_age-body_style_20220531.csv'
+            self.sales_share_file = path + 'proposal_inputs/sales_share_params_ice_bev_pu_b0p4_k1p0_x02031-cuv_b2p0_k1p0_x02029_nu8p0-sdn_b0p4_k1p0_x02020_nu1p0_20230228.csv'
+            self.required_sales_share_file = path + 'proposal_inputs/required_sales_share-body_style_noACC2_20230222.csv'
+            self.onroad_vmt_file = path + 'proposal_inputs/annual_vmt_fixed_by_age-body_style_20221116.csv'
+            self.vehicle_price_modifications_file = path + 'proposal_inputs/vehicle_price_modifications_20230314b.csv'
 
-            self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
+            self.offcycle_credits_file = path + 'proposal_inputs/offcycle_credits_20230206.csv'
 
             self.consumer_pricing_num_options = 4
             self.consumer_pricing_multiplier_min = 1/1.1
@@ -158,7 +158,7 @@ try:
 
             self.allow_ice_of_bev = False
 
-            self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
+            self.ip_deflators_file = path + 'proposal_inputs/implicit_price_deflators_20220104.csv'
 
             self.start_time = 0
             self.end_time = 0
@@ -207,7 +207,7 @@ try:
             self.kwh_per_mile_scale = [1.0]
 
             self.redesign_interval_gain_years = [2020, 2029, 2034]
-            self.redesign_interval_gain = [1.0, 1.0, 0.0]
+            self.redesign_interval_gain = [0.0, 1.0, 0.0]
 
             self.manufacturer_gigawatthour_data = None
 

@@ -1,0 +1,18 @@
+input_template_name:,policy.offcycle_credits,input_template_version:,0.11,description:,20230206 distinguish between BEV and ICE for AC efficiency ,,
+start_year,credit_name,credit_group,credit_destination,fueling_class_reg_class_id:ICE.car,fueling_class_reg_class_id:ICE.truck,fueling_class_reg_class_id:BEV.car,fueling_class_reg_class_id:BEV.truck
+2020,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,2.5,4.4,2.5,4.4
+2020,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,2.7,2.7,2.7,2.7
+2020,ac_leakage,ac,cert_indirect_offcycle_co2e_grams_per_mile,13.8,17.2,13.8,17.2
+2020,ac_efficiency,ac,cert_direct_offcycle_co2e_grams_per_mile,5,7.2,5,7.2
+2027,ac_leakage,ac,cert_indirect_offcycle_co2e_grams_per_mile,0,0,0,0
+2027,ac_efficiency,ac,cert_direct_offcycle_co2e_grams_per_mile,5,7.2,0,0
+2027,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,2.5,3.718309859,0,0
+2028,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,2.067307692,2.664788732,0,0
+2029,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,1.394230769,1.797183099,0,0
+2030,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,0.625,0.805633803,0,0
+2031,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,0,0,0,0
+2027,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,2.7,2.281690141,0,0
+2028,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,2.232692308,1.635211268,0,0
+2029,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,1.505769231,1.102816901,0,0
+2030,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,0.675,0.494366197,0,0
+2031,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,0,0,0,0
