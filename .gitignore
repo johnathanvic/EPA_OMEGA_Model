@@ -3,6 +3,7 @@ venv
 env
 build
 dist
+/JV_info/2023-03-25-11-46-49-ld-central-compliance-run (1)/2023_03_25_11_46_49_ld_central_compliance_run*
 /omega_model/output/*
 /omega_preproc/output_context_aeo
 outputs
