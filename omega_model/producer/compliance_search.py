@@ -955,6 +955,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
                                 'body_style','context_size_class','cost_curve_class','fueling_class','fueling_class_reg_class_id']
             for col in relevant_veh_col:
                 cost_curve[col] = getattr(veh, col)
+            cost_curve['tech_row'] = cost_curve.index.values # validate
+            cost_curve['cost_curve_point'] = range(len(cost_curve))
             # Check if the cost_curve is not None or empty before appending
             if cost_curve is not None and not cost_curve.empty:
                 all_cost_curves= all_cost_curves.append(cost_curve, ignore_index=True)
@@ -962,6 +964,13 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # Save all_cost_clouds to a single CSV file after the loop
         # filename = f"JV_info\cost_clouds\{compliance_id}_cost_cloud.csv"
         # all_cost_clouds.to_csv(filename) # , columns=sorted(all_cost_clouds.columns), index=False)
+                
+        # Reorder cols to put cols overlapping both ICE & BEV first, then powertrain specific cols
+        overlapping_cols = all_cost_curves.columns[all_cost_curves.notna().all()]
+        powertrain_cols = all_cost_curves.columns[all_cost_curves.isna().any()]
+        col_order = list(overlapping_cols) + list(powertrain_cols)
+        all_cost_curves = all_cost_curves[col_order]
+
         # Save all cost_curves
         file_name = f"JV_info_rebuild\cost_curves\{compliance_id}_cost_curves.csv"
         all_cost_curves.to_csv(file_name) # , columns=sorted(all_cost_clouds.columns), index=False)
