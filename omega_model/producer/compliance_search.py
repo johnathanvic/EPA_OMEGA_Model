@@ -1161,10 +1161,10 @@ def create_composite_vehicles(calendar_year, compliance_id):
             all_cost_curves = all_cost_curves[col_order]
 
             # Save all cost_curves
-            file_name = f"JV_info_rebuild\cost_curves\{compliance_id}_cost_curves.csv"
+            file_name = f"JV_info\cost_curves\{compliance_id}_cost_curves.csv"
             all_cost_curves.to_csv(file_name) # , columns=sorted(all_cost_clouds.columns), index=False)
             # Save firsk 1k rows of cost_curves
-            head_file_name = f"JV_info_rebuild\cost_curves\{compliance_id}_cost_curves_first_1000.csv"
+            head_file_name = f"JV_info\cost_curves\{compliance_id}_cost_curves_first_1000.csv"
             all_cost_curves.head(1000).to_csv(head_file_name)
             # Tag: would be nice to add tech row # of cost curve        
 
