@@ -75,6 +75,7 @@ try:
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
+            # inputs_folder = 'proposal_inputs/'
             self.inputfile_metadata = []
             self.session_name = 'OMEGA Quick Test'
             self.session_unique_name = 'OMEGA Quick Test'
@@ -174,8 +175,8 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.footprint_min_scaler = 1/1.05
-            self.footprint_max_scaler = 1.05
+            self.footprint_min_scaler = 1 # 1/1.05
+            self.footprint_max_scaler = 1 # 1.05
             self.rlhp20_min_scaler = 1.0
             self.rlhp20_max_scaler = 1.0
             self.rlhp60_min_scaler = 1.0

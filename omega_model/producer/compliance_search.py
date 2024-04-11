@@ -1119,19 +1119,33 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 #     all_cost_clouds = all_cost_clouds.append(cost_cloud, ignore_index=True)
 
                 # Cost Curve
-                cost_curve = copy.deepcopy(veh.cost_curve)
-                cost_curve.columns = cost_curve.columns.str.replace(f'veh_{veh.vehicle_id}_','')
+                numeric_cost_curve = copy.deepcopy(veh.cost_curve)
+                numeric_cost_curve.columns = numeric_cost_curve.columns.str.replace(f'veh_{veh.vehicle_id}_','')
                 # Get veh data not in cost_curve
                 veh_data = vars(veh)
                 relevant_veh_col = ['compliance_id','model_year','name','manufacturer_id','market_class_id','vehicle_id',
                                     'base_year_market_share','initial_registered_count','base_year_cert_fuel_id',
                                     'base_year_msrp_dollars','base_year_product','base_year_reg_class_id','base_year_vehicle_id',
-                                    'body_style','context_size_class','cost_curve_class','fueling_class','fueling_class_reg_class_id',
-                                    'reg_class_id','market_class_id','projected_sales','model_year_prevalence','target_co2e_grams_per_mile']
+                                    'body_style','context_size_class','fueling_class','fueling_class_reg_class_id',
+                                    'reg_class_id','market_class_id','projected_sales','model_year_prevalence','target_co2e_grams_per_mile'] # 'cost_curve_class', 
+                
                 for col in relevant_veh_col:
-                    cost_curve[col] = getattr(veh, col)
-                cost_curve['tech_row'] = cost_curve.index.values # validate
-                cost_curve['cost_curve_point'] = range(len(cost_curve))
+                    numeric_cost_curve[col] = getattr(veh, col)
+                numeric_cost_curve['tech_row'] = numeric_cost_curve.index.values # validate
+                numeric_cost_curve['cost_curve_point'] = range(len(numeric_cost_curve))
+                cost_curve = pd.concat([numeric_cost_curve, veh.cost_curve_non_numeric_data], axis=1)
+
+
+                # Issue with duplicate non_numeric data in some but not all numeric_cost_curve
+                cost_curve = numeric_cost_curve
+                for column in veh.cost_curve_non_numeric_data.columns:
+                        # Add or replace the column manually instead of concatinating the two dfs
+                        cost_curve[column] = veh.cost_curve_non_numeric_data[column]
+                # if veh.fueling_class == "BEV":
+                #     cost_curve = numeric_cost_curve
+                # else:
+                #     cost_curve = pd.concat([numeric_cost_curve, veh.cost_curve_non_numeric_data], axis=1)
+
                 # Check if the cost_curve is not None or empty before appending
                 if cost_curve is not None and not cost_curve.empty:
                     all_cost_curves= all_cost_curves.append(cost_curve, ignore_index=True)
